@@ -1,0 +1,174 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import BirthDatePicker from '../components/BirthDatePicker.astro';
+import AgeNav from '../components/AgeNav.astro';
+import { getCollection } from 'astro:content';
+import { STAGES, CATEGORY_LABEL } from '../lib/stages';
+import { withBase } from '../lib/url';
+
+const all = await getCollection('developmental', ({ data }) => !data.draft);
+
+// 首页每个阶段展示 order 最小的 4 条（不足则全部）
+const byStage = new Map<string, typeof all>();
+for (const s of STAGES) {
+  byStage.set(
+    s.range,
+    all
+      .filter((e) => e.data.age_range === s.range)
+      .sort((a, b) => a.data.order - b.data.order)
+      .slice(0, 4)
+  );
+}
+
+const acuteAll = (await getCollection('acute')).sort((a, b) => a.data.title.localeCompare(b.data.title));
+const acuteTop = acuteAll.slice(0, 3);
+
+const counts = new Map<string, number>();
+for (const e of all) counts.set(e.data.age_range, (counts.get(e.data.age_range) ?? 0) + 1);
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: '婴幼儿健康养育手册',
+  inLanguage: 'zh-CN',
+  description: '0～3 岁婴幼儿健康养育手册，按月龄组织的可溯源知识地图。',
+};
+---
+
+<BaseLayout title="婴幼儿健康养育手册" nav="home">
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} is:inline />
+
+  <div class="wrap">
+    <section class="hero">
+      <span class="eyebrow">0～3 岁 · 公益整理</span>
+      <h1>按月龄查，每条都能溯源</h1>
+      <p class="lede">
+        喂养、睡眠、发育、安全、日常照护——按孩子现在的月龄组织，急症单独成路，随时可查。
+      </p>
+
+      <BirthDatePicker />
+
+      <p class="link-row">
+        <a href={withBase('/quick')}>症状速查</a>
+        <span aria-hidden="true" class="muted">·</span>
+        <a href={withBase('/milestones')}>发育里程碑</a>
+        <span aria-hidden="true" class="muted">·</span>
+        <a href={withBase('/sources')}>内容依据</a>
+      </p>
+    </section>
+
+    <section class="section" aria-labelledby="stage-heading">
+      <div class="section-head">
+        <h2 id="stage-heading">阶段内容</h2>
+        <a class="more" href={withBase('/quick')}>看不到想找的？搜一下 →</a>
+      </div>
+
+      <div id="stage-empty">
+        <p class="small muted" style="margin-bottom:.8rem;">
+          还没有输入出生日期。先看看 7 个阶段分别关心什么：
+        </p>
+        <div class="stage-list">
+          {
+            STAGES.map((s) => (
+              <a href={withBase(`/age/${s.range}`)}>
+                <span class="n">{s.name}</span>
+                <span class="s">{s.tagline}</span>
+                <span class="s" style="color:var(--brand);">
+                  {counts.get(s.range) ?? 0} 条内容
+                </span>
+              </a>
+            ))
+          }
+        </div>
+      </div>
+
+      <div id="stage-panels" hidden>
+        {
+          STAGES.map((s) => (
+            <div data-stage-panel={s.range} hidden>
+              <div class="section-head" style="margin-bottom:.7rem;">
+                <h2 style="font-size:1rem;">
+                  {s.name}
+                  <span class="muted" style="font-weight:400;font-size:.8rem;">
+                    · {s.tagline}
+                  </span>
+                </h2>
+                <a class="more" href={withBase(`/age/${s.range}`)}>全部 {counts.get(s.range) ?? 0} 条 →</a>
+              </div>
+              <div class="entry-grid">
+                {(byStage.get(s.range) ?? []).map((e) => (
+                  <a
+                    class="entry-card"
+                    href={withBase(`/age/${s.range}`) + '#' + (e.id.split('/').pop() ?? '')}
+                  >
+                    <span class="k">{e.data.title}</span>
+                    <p class="sum">{e.data.summary}</p>
+                    <span class="src">
+                      {CATEGORY_LABEL[e.data.category]} · {e.data.source.tier}
+                    </span>
+                  </a>
+                ))}
+              </div>
+              {(byStage.get(s.range) ?? []).length === 0 && (
+                <p class="small muted">这一阶段的内容正在补充。</p>
+              )}
+            </div>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="nav-heading">
+      <div class="section-head">
+        <h2 id="nav-heading">月龄阶段</h2>
+        <span class="small muted" id="stage-current-label">全部阶段</span>
+      </div>
+      <AgeNav />
+    </section>
+
+    <section class="section" aria-labelledby="quick-heading">
+      <div class="section-head">
+        <h2 id="quick-heading">急症与突发状况</h2>
+        <a class="more" href={withBase('/quick')}>全部 {acuteAll.length} 条 →</a>
+      </div>
+      <p class="small muted" style="margin-top:-.3rem;margin-bottom:.8rem;">
+        不按月龄筛选，任何年龄都可能遇到。
+      </p>
+      <div class="qlist">
+        {
+          acuteTop.map((a) => (
+            <a class="qitem" href={withBase(`/quick/${a.id}`)}>
+              <span class="row">
+                <span class="tag tag-acute">急症</span>
+                <span class="t">{a.data.title}</span>
+              </span>
+              <span class="s">{a.data.summary}</span>
+            </a>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="more-heading">
+      <div class="section-head">
+        <h2 id="more-heading">还想看</h2>
+      </div>
+      <div class="entry-grid">
+        <a class="entry-card" href={withBase('/milestones')}>
+          <span class="k">发育里程碑对照</span>
+          <p class="sum">
+            8 个月龄节点 × 4 个维度，运动里程碑给出 WHO 窗口上下限；附国家卫健委预警征象自查清单。
+          </p>
+        </a>
+        <a class="entry-card" href={withBase('/quick')}>
+          <span class="k">症状快速查询</span>
+          <p class="sum">输入「抽搐」「误吞」「辅食」这类你会说的词，急症条目固定置顶。</p>
+        </a>
+        <a class="entry-card" href={withBase('/sources')}>
+          <span class="k">来源与声明</span>
+          <p class="sum">全部引用指南的名称、发布机构、文号与年份；本站的边界与免责说明。</p>
+        </a>
+      </div>
+    </section>
+  </div>
+</BaseLayout>

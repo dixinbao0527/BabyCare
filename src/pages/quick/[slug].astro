@@ -1,0 +1,118 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SeverityCard from '../../components/SeverityCard.astro';
+import { getCollection, render } from 'astro:content';
+import { SEVERITY_META } from '../../lib/stages';
+import { withBase } from '../../lib/url';
+
+export async function getStaticPaths() {
+  const acute = await getCollection('acute');
+  return acute.map((entry) => ({ params: { slug: entry.id }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+const d = entry.data;
+const { Content } = await render(entry);
+
+// 顺序由 schema refine 保证：observe → urgent → emergency
+const levels = d.severity_levels;
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: '首页', item: `${Astro.site ?? ''}${withBase('/')}` },
+    { '@type': 'ListItem', position: 2, name: '快速查询', item: `${Astro.site ?? ''}${withBase('/quick')}` },
+    { '@type': 'ListItem', position: 3, name: d.title },
+  ],
+};
+---
+
+<BaseLayout
+  title={`${d.title}｜急症`}
+  description={d.summary}
+  nav="none"
+  bare
+>
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} is:inline />
+
+  <div class="alert-bar" role="note" aria-label="最重要的一条警示">
+    <div class="wrap">
+      <span class="inner">
+        <span class="ic" aria-hidden="true">⚠</span>
+        <span>{d.red_flags[0]}</span>
+      </span>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="acute-head">
+      <div class="acute-topline">
+        <a class="back" href={withBase('/quick')}>← 症状速查</a>
+        <a class="back" href={withBase('/')}>婴幼儿健康养育手册</a>
+      </div>
+      <h1>{d.title}</h1>
+      <div class="tags" style="margin-bottom:.7rem;">
+        {d.scenario_tags.map((t) => <span class="tag">{t}</span>)}
+      </div>
+      <p class="lede">{d.summary}</p>
+
+      <p class="mini-disclaimer">
+        本站为公益整理，不替代诊疗。以下分级用于判断<strong>该不该现在去医院</strong>，
+        不含任何药品名称与剂量；实际处置听医生的。
+      </p>
+    </div>
+
+    <section aria-labelledby="sev-heading" style="margin-top:1.6rem;">
+      <h2 id="sev-heading" style="font-size:1.02rem;">现在处于哪一级</h2>
+      <p class="small muted" style="margin-top:-.2rem;">
+        从上到下逐条对照，命中哪一级就按哪一级处理；同时命中多级，取最严重的一级。
+      </p>
+      <div class="sev-grid">
+        {levels.map((lv, i) => (
+          <SeverityCard
+            level={lv.level}
+            label={lv.label}
+            criteria={lv.criteria}
+            action={lv.action}
+            index={i + 1}
+          />
+        ))}
+      </div>
+    </section>
+
+    <Content />
+
+    <section class="home-care" aria-labelledby="care-heading">
+      <h2 id="care-heading">送医前可以做的</h2>
+      <ul>
+        {d.home_care.map((c) => <li>{c}</li>)}
+      </ul>
+    </section>
+
+    <p class="footnote">
+      高发年龄：{d.peak_age_note}
+    </p>
+
+    <details class="source-fold">
+      <summary>来源与复核信息</summary>
+      <div class="fold-body">
+        <p style="margin-bottom:.4rem;">
+          <strong>{d.source.name}</strong>
+          {d.source.section && <><br />章节：{d.source.section}</>}
+          <br />年份：{d.source.year} · 层级：{d.source.tier}
+          {d.source.url && <><br /><a href={d.source.url} rel="noopener noreferrer nofollow">查看原文</a></>}
+        </p>
+        <p style="margin:0;">
+          本站复核：{d.reviewer} · {d.last_reviewed}
+          <br />
+          分级文案为结构化整理，具体表述以指南原文为准。如发现与原文不一致，请以原文为最终依据。
+        </p>
+      </div>
+    </details>
+
+    <p class="small muted" style="margin-top:1.6rem;">
+      其他突发状况：<a href={withBase('/quick')}>查看全部急症条目 →</a>
+    </p>
+  </div>
+</BaseLayout>

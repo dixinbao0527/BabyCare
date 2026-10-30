@@ -1,0 +1,30 @@
+---
+import { SEVERITY_META } from '../lib/stages';
+
+interface Props {
+  level: 'observe' | 'urgent' | 'emergency';
+  label: string;
+  criteria: string;
+  action: string;
+  index: number;
+}
+
+const { level, label, criteria, action, index } = Astro.props;
+const meta = SEVERITY_META[level];
+const aria = `紧急程度：${meta.label}。${criteria}`;
+---
+
+<div
+  class="sev"
+  style={`background:${meta.bg};border-color:${meta.border};color:${meta.color};`}
+  role="group"
+  aria-label={aria}
+>
+  <div class="lv">
+    <span class="icon" aria-hidden="true">{meta.icon}</span>
+    <span>{label}</span>
+  </div>
+  <span class="lbl">第 {index} 级</span>
+  <p class="crit">{criteria}</p>
+  <p class="act"><strong>怎么做：</strong>{action}</p>
+</div>

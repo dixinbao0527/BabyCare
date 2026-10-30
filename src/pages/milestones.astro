@@ -1,0 +1,191 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+import { SCREEN_NODES, screenNodeFor, CATEGORY_LABEL } from '../lib/stages';
+import {
+  warningSignsAt,
+  WARN_DOMAIN_LABEL,
+  WARNING_SOURCE,
+  REFERRAL_TEXT,
+  type WarnDomain,
+} from '../lib/warningSigns';
+import { withBase } from '../lib/url';
+
+const milestones = await getCollection('milestones');
+
+const DOMAINS = [
+  { key: 'motor', label: '大运动', note: 'WHO 窗口' },
+  { key: 'language', label: '语言', note: '' },
+  { key: 'cognitive', label: '认知', note: '' },
+  { key: 'social', label: '社交', note: '' },
+] as const;
+
+const nodes = SCREEN_NODES.map((n) => ({
+  node: n,
+  milestones: DOMAINS.map((d) => ({
+    ...d,
+    items: milestones
+      .filter((m) => m.data.age_month === n && m.data.domain === d.key)
+      .sort((a, b) => a.id.localeCompare(b.id)),
+  })).filter((d) => d.items.length > 0),
+  signs: warningSignsAt(n),
+}));
+---
+
+<BaseLayout
+  title="发育里程碑与预警征象"
+  description="8 个月龄节点的发育里程碑对照，运动里程碑给出 WHO 窗口上下限；附国家卫健委预警征象筛查表原文 32 条。"
+  nav="milestones"
+>
+  <div class="wrap">
+    <div class="page-head">
+      <h1>发育里程碑对照</h1>
+      <p class="tagline">
+        看窗口，不看单点；看整体，不看单项。落在窗口内都属正常，早不表扬，晚不警告。
+      </p>
+    </div>
+
+    <div class="node-picker">
+      <label for="node">对照月龄</label>
+      <select id="node" aria-describedby="node-hint">
+        {nodes.map((n) => <option value={String(n.node)}>{n.node} 月龄</option>)}
+      </select>
+      <span class="small muted" id="node-hint">预警征象的筛查节点固定为 3/6/8/12/18/24/30/36 月龄。</span>
+    </div>
+
+    {
+      nodes.map((n, i) => (
+        <section data-node={String(n.node)} hidden={i !== 0} aria-label={`${n.node} 月龄`}>
+          <h2 style="margin-top:1.8rem;font-size:1.08rem;">{n.node} 月龄的里程碑</h2>
+          <p class="small muted" style="margin-top:-.2rem;">
+            运动维度给出 WHO 六项粗大运动里程碑的 1～99 百分位窗口，不是达标线。
+          </p>
+
+          {n.milestones.map((d) => (
+            <div class="dom-block">
+              <h3>
+                {d.label}
+                <span class="badge">{d.items.length} 条</span>
+              </h3>
+              <ul class="mlist">
+                {d.items.map((m) => (
+                  <li>
+                    <span>
+                      {m.data.description}
+                      <span class="msrc">{m.data.source}</span>
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+
+          <div class="check-block">
+            <h2>{n.node} 月龄预警征象</h2>
+            <p class="rule">
+              {WARNING_SOURCE}
+            </p>
+            <ul class="checklist">
+              {n.signs.map((s) => (
+                <li>
+                  <label>
+                    <input type="checkbox" data-sign={String(s.seq)} data-node={String(n.node)} />
+                    <span>
+                      {s.sign}
+                      <span class="dom">{WARN_DOMAIN_LABEL[s.domain as WarnDomain]}</span>
+                    </span>
+                  </label>
+                </li>
+              ))}
+            </ul>
+            <p class="small muted" style="margin:.9rem 0 0;">
+              该年龄段任何一条阳性，提示有发育偏异的可能。本站不判断严重程度，只提示去做评估。
+            </p>
+          </div>
+        </section>
+      ))
+    }
+
+    <div class="referral-bar" id="referral" role="status" aria-live="polite" hidden>
+      {REFERRAL_TEXT}
+    </div>
+
+    <div class="notice" style="margin-top:2rem;">
+      <h2>怎么用这一页</h2>
+      <p>
+        里程碑是「多数孩子在这个范围内会出现」的描述，不是考试题。孩子提前出现不代表更聪明，
+        晚一点出现也不等于有问题——尤其是运动里程碑，WHO 给出的窗口跨度本身就很大。
+      </p>
+      <p>
+        早产儿一律按矫正月龄对照（首页填写胎龄后，这里会自动跳到对应节点）。
+        如果某一条预警征象符合，请带上这一页的记录去儿科或儿童保健机构做评估，不要自行下结论。
+      </p>
+      <p class="small muted" style="margin-bottom:0;">
+        本页不出现任何评分、百分比或达标率。完整说明见<a href={withBase('/sources')}>来源与声明</a>。
+      </p>
+    </div>
+  </div>
+
+  <script>
+    import { SCREEN_NODES, screenNodeFor } from '../lib/stages';
+    import { calcAge, parseBirthDate } from '../lib/age';
+
+    const select = document.getElementById('node') as HTMLSelectElement | null;
+    const hint = document.getElementById('node-hint');
+    const sections = Array.from(document.querySelectorAll<HTMLElement>('[data-node]'));
+    const referral = document.getElementById('referral');
+
+    function show(node: string) {
+      sections.forEach((s) => {
+        s.hidden = s.dataset.node !== node;
+      });
+    }
+
+    select?.addEventListener('change', () => {
+      show(select.value);
+      document.querySelectorAll<HTMLInputElement>('.checklist input').forEach((cb) => {
+        if (cb.dataset.node !== select.value) cb.checked = false;
+      });
+      updateReferral();
+    });
+
+    function updateReferral() {
+      if (!referral) return;
+      const anyChecked = Array.from(
+        document.querySelectorAll<HTMLInputElement>('.checklist input')
+      ).some((cb) => cb.checked);
+      referral.hidden = !anyChecked;
+    }
+
+    document.querySelectorAll<HTMLInputElement>('.checklist input').forEach((cb) => {
+      cb.addEventListener('change', updateReferral);
+    });
+
+    // 按已保存的出生日期定位到「不晚于当前月龄」的最近筛查节点
+    try {
+      const raw = localStorage.getItem('ich.birth.v1');
+      if (raw) {
+        const parsed = JSON.parse(raw) as { birth?: string; ga?: number };
+        const birth = parseBirthDate(parsed.birth);
+        if (birth) {
+          const info = calcAge(birth, new Date(), parsed.ga && parsed.ga >= 24 ? parsed.ga : 40);
+          const node = screenNodeFor(info.months);
+          if (select) {
+            select.value = String(node);
+            show(String(node));
+          }
+          if (hint) {
+            const isExact = SCREEN_NODES.includes(info.months as (typeof SCREEN_NODES)[number]);
+            hint.textContent = isExact
+              ? `已按宝宝当前月龄（${info.months} 个月）定位，${info.corrected ? '早产按矫正月龄计算。' : ''}`
+              : `宝宝当前 ${info.months} 个月，按最近的 ${node} 月龄节点对照${info.months < node ? '，满 ' + node + ' 月龄后自动切换' : ''}${info.corrected ? '；早产按矫正月龄计算' : ''}。`;
+          }
+        }
+      }
+    } catch {
+      /* 忽略存储异常 */
+    }
+
+    show(select?.value ?? '3');
+  </script>
+</BaseLayout>

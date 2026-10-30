@@ -1,0 +1,108 @@
+---
+import '../styles/global.css';
+import { withBase, SITE_NAME, NAV } from '../lib/url';
+
+interface Props {
+  title: string;
+  description?: string;
+  nav?: 'home' | 'quick' | 'milestones' | 'sources' | 'none';
+  /** 急症页用：不渲染页头，让红色警示条成为页面第一个元素，严格贴顶（A-8） */
+  bare?: boolean;
+}
+
+const {
+  title,
+  description = '0～3 岁婴幼儿健康养育手册：按月龄组织的喂养、睡眠、发育、安全与日常照护知识，每条都可溯源到国家卫健委、WHO 与 AAP 指南。',
+  nav = 'none',
+  bare = false,
+} = Astro.props;
+
+const pageTitle = title === SITE_NAME ? title : `${title}｜${SITE_NAME}`;
+const canonical = new URL(Astro.url.pathname, Astro.site ?? 'https://example.github.io');
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical.href} />
+    <link rel="icon" href={withBase('/favicon.svg')} type="image/svg+xml" />
+    <meta name="theme-color" content="#faf8f4" />
+    <meta name="color-scheme" content="light" />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="zh_CN" />
+    <meta name="robots" content="index,follow" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">跳到主要内容</a>
+
+    {!bare && (
+    <header class="site-header">
+      <div class="wrap-wide inner">
+        <a class="brand" href={withBase('/')}>
+          <span class="mark" aria-hidden="true">育</span>
+          <span>{SITE_NAME}</span>
+        </a>
+        <nav class="nav" aria-label="主导航">
+          {
+            NAV.map((item) => (
+              <a
+                href={withBase(item.href)}
+                aria-current={nav === item.key ? 'page' : undefined}
+              >
+                {item.label}
+              </a>
+            ))
+          }
+        </nav>
+      </div>
+    </header>
+    )}
+
+    <main id="main">
+      <slot />
+    </main>
+
+    <footer class="site-footer">
+      <div class="wrap-wide">
+        <p class="disclaimer">
+          本站为公益整理，内容依据国家卫健委、WHO、AAP 公开发布的指南，<strong
+            >不替代专业医疗诊断，也不构成用药建议</strong
+          >。孩子出现急症表现时请立即就医或拨打 120；内容与指南原文有出入时，以原文为准。
+        </p>
+        <div class="foot-row">
+          <span>最后更新：2026-10-30 · 内容仅供健康教育参考</span>
+          <span>
+            <a href={withBase('/sources')}>来源与免责声明</a>
+            <span aria-hidden="true"> · </span>
+            <button
+              type="button"
+              id="clear-storage"
+              style="font:inherit;background:none;border:0;padding:0;color:inherit;text-decoration:underline;cursor:pointer;min-height:44px;display:inline-flex;align-items:center;"
+            >
+              清除本机记录
+            </button>
+          </span>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      const btn = document.getElementById('clear-storage');
+      btn?.addEventListener('click', () => {
+        try {
+          localStorage.removeItem('ich.birth.v1');
+        } catch {
+          /* 隐私模式下不可用，忽略 */
+        }
+        btn.textContent = '已清除';
+        window.dispatchEvent(new CustomEvent('ich:storage-cleared'));
+      });
+    </script>
+  </body>
+</html>

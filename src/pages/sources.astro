@@ -1,0 +1,226 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+import { withBase } from '../lib/url';
+import { WARNING_SIGNS } from '../lib/warningSigns';
+
+const dev = await getCollection('developmental', ({ data }) => !data.draft);
+const acute = await getCollection('acute');
+
+type Row = {
+  name: string;
+  org: string;
+  version: string;
+  year: number;
+  tier: string;
+  dev: number;
+  acute: number;
+};
+
+// 构建期从所有条目的 source 字段聚合去重：页面上写的来源 = 条目实际引用的来源
+const map = new Map<string, Row>();
+const add = (s: { name: string; section: string; year: number; tier: string }, kind: 'dev' | 'acute') => {
+  const key = `${s.name}__${s.year}`;
+  const org =
+    s.tier === 'WHO'
+      ? '世界卫生组织（WHO）'
+      : s.tier === 'AAP'
+        ? '美国儿科学会（AAP）'
+        : '国家卫生健康委员会';
+  const cur = map.get(key);
+  if (cur) {
+    if (kind === 'dev') cur.dev += 1;
+    else cur.acute += 1;
+    return;
+  }
+  map.set(key, {
+    name: s.name,
+    org,
+    version: s.section || '—',
+    year: s.year,
+    tier: s.tier,
+    dev: kind === 'dev' ? 1 : 0,
+    acute: kind === 'acute' ? 1 : 0,
+  });
+};
+
+for (const e of dev) add(e.data.source, 'dev');
+for (const e of acute) add(e.data.source, 'acute');
+
+const rows = [...map.values()].sort((a, b) =>
+  a.tier === b.tier ? a.year - b.year : a.tier.localeCompare(b.tier)
+);
+
+const tierLabel: Record<string, string> = {
+  NHC: '国家卫健委',
+  WHO: 'WHO',
+  AAP: 'AAP',
+};
+---
+
+<BaseLayout
+  title="来源与声明"
+  description="本站引用的全部指南清单、免责声明、版权与嵌入说明，以及本地数据清除入口。"
+  nav="sources"
+>
+  <div class="wrap">
+    <div class="page-head">
+      <h1>来源与声明</h1>
+      <p class="tagline">每一条知识都要能追到原文，这是本站的唯一底线。</p>
+    </div>
+
+    <section aria-labelledby="list-heading" style="margin-top:1.6rem;">
+      <h2 id="list-heading" style="font-size:1.05rem;">引用指南清单</h2>
+      <p class="small muted" style="margin-top:-.2rem;">
+        本表由构建脚本从全部条目的 <code>source</code> 字段自动聚合，页面上写的来源与条目实际引用永远一致。
+        共 {rows.length} 份文献，覆盖 {dev.length + acute.length} 条内容。
+      </p>
+
+      <table class="src-table">
+        <thead>
+          <tr>
+            <th scope="col">指南全称</th>
+            <th scope="col">发布机构</th>
+            <th scope="col">章节 / 版本</th>
+            <th scope="col">年份</th>
+            <th scope="col">站内条目</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            rows.map((r) => (
+              <tr>
+                <td data-label="指南">{r.name}</td>
+                <td data-label="机构">{r.org}</td>
+                <td data-label="章节">{r.version}</td>
+                <td data-label="年份">
+                  {r.year} <span class="tag tag-tier">{tierLabel[r.tier] ?? r.tier}</span>
+                </td>
+                <td data-label="条目">
+                  发展性 {r.dev} 条{ r.acute > 0 ? ` · 急症 ${r.acute} 条` : '' }
+                </td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </section>
+
+    <section class="notice" aria-labelledby="docs-heading">
+      <h2 id="docs-heading">核心文献与文号</h2>
+      <p class="small muted" style="margin-top:-.2rem;">
+        以下为站内主要依据的完整标识，便于按文号或 ISBN 查到原文。
+      </p>
+      <ul class="doclist">
+        <li>
+          <strong>《3 岁以下婴幼儿健康养育照护指南（试行）》</strong>
+          <span>国家卫生健康委办公厅，国卫办妇幼函〔2022〕409 号，2022 年 11 月</span>
+        </li>
+        <li>
+          <strong>《儿童心理行为发育问题预警征象筛查表》</strong>
+          <span>国家卫生健康委，现行版；2017 年起纳入国家基本公共卫生服务</span>
+        </li>
+        <li>
+          <strong>WHO Multicentre Growth Reference Study：六项粗大运动里程碑窗口</strong>
+          <span>世界卫生组织，Acta Paediatr Suppl. 2006;450:86–95</span>
+        </li>
+        <li>
+          <strong>WHO Guideline for complementary feeding of infants and young children 6–23 months of age</strong>
+          <span>世界卫生组织，2023，ISBN 978-92-4-008186-4</span>
+        </li>
+        <li>
+          <strong>Infant and young child feeding（fact sheet）</strong>
+          <span>世界卫生组织，现行版</span>
+        </li>
+        <li>
+          <strong>《婴幼儿喂养健康教育核心信息》</strong>
+          <span>国家卫生健康委，现行版</span>
+        </li>
+      </ul>
+    </section>
+
+    <section class="notice" aria-labelledby="disclaimer-heading">
+      <h2 id="disclaimer-heading">免责声明</h2>
+      <p>
+        本项目为<strong>公益、非商业、个人维护</strong>的健康教育整理，不是医疗机构，也不提供诊疗服务。
+        站内所有内容<strong>不替代专业医疗诊断、治疗或用药建议</strong>。
+      </p>
+      <p>
+        孩子出现呼吸困难、意识改变、抽搐、面色发青、大量出血等急症表现时，请立即拨打 120 或前往急诊，
+        不要以本站内容作为是否就医的唯一依据。
+      </p>
+      <p>
+        内容依据公开发布的指南整理，但可能存在转述偏差、版本滞后或理解错误。
+        <strong>如站内表述与指南原文不一致，一律以原文为准。</strong>
+        指南更新后本站不另行通知，最后复核日期见各条目。
+      </p>
+      <p>
+        本站对使用本站内容所产生的任何后果不承担责任。继续使用即表示你已理解上述边界。
+      </p>
+    </section>
+
+    <section class="notice" aria-labelledby="copy-heading">
+      <h2 id="copy-heading">版权与引用方式</h2>
+      <p>
+        站内文字为原创整理，依据的指南原文版权归原发布机构所有。本站<strong>不使用指南原文配图</strong>，
+        不复制指南全文，仅做结构化摘要与索引，并标注来源。
+      </p>
+      <p>
+        引用本站内容请注明来源与复核日期；用于商业用途请先联系维护者。
+        若你是权利人并认为本站内容侵犯了你的权益，请联系删除。
+      </p>
+      <p>
+        关于视频：v1 不嵌入任何视频文件，仅在相关条目底部以文字链接指向崔玉涛／育学园官方抖音账号，
+        标注「相关视频可前往官方账号观看」。不下载、不转存、不剪辑、不二次上传。
+      </p>
+    </section>
+
+    <section class="notice" aria-labelledby="method-heading">
+      <h2 id="method-heading">内容方法与已知边界</h2>
+      <p>
+        预警征象共 {WARNING_SIGNS.length} 条，逐字照录自国家卫健委《儿童心理行为发育问题预警征象筛查表》，
+        仅收录 0～3 岁的 8 个月龄节点（3/6/8/12/18/24/30/36 月龄）。「领域」标签为本项目为便于筛选添加的辅助标注，
+        非原表内容。任何一条阳性只提示「建议评估」，本站不做判断、不下结论。
+      </p>
+      <p>
+        运动里程碑采用 WHO 六项粗大运动里程碑的 1～99 百分位窗口，站内一律成对显示上下限，
+        不提供「几个月必须会什么」的单点标准。
+      </p>
+      <p>
+        急症条目的三级分级（观察 / 立即就医 / 立即呼救）为便于家长判断而做的结构化整理，
+        分级文案须由具备儿科背景的复核人对照原文逐条核对后方可用于正式场景。
+      </p>
+    </section>
+
+    <section class="notice" aria-labelledby="privacy-heading">
+      <h2 id="privacy-heading">隐私与本地存储</h2>
+      <p>
+        本站没有后端、没有账号、没有埋点 SDK，也不收集任何个人信息。
+        你在首页填写的出生日期与胎龄，只写入浏览器的 <code>localStorage</code>（键名
+        <code>ich.birth.v1</code>），不会上传到任何服务器。
+      </p>
+      <p style="margin-bottom:.4rem;">
+        想清除这份本地记录，可以点下面的按钮，或在浏览器设置里清除本站数据。
+      </p>
+      <button class="btn btn-ghost" type="button" id="clear-storage-local">清除本机记录</button>
+      <span class="small muted" id="clear-state" aria-live="polite"></span>
+    </section>
+
+    <p class="small muted" style="margin-top:2rem;">
+      最后更新：2026-10-30 · <a href={withBase('/')}>返回首页</a>
+    </p>
+  </div>
+
+  <script>
+    const btn = document.getElementById('clear-storage-local');
+    const state = document.getElementById('clear-state');
+    btn?.addEventListener('click', () => {
+      try {
+        localStorage.removeItem('ich.birth.v1');
+        if (state) state.textContent = '已清除，下次访问需要重新输入。';
+      } catch {
+        if (state) state.textContent = '浏览器拒绝了存储访问，请在浏览器设置里清除本站数据。';
+      }
+    });
+  </script>
+</BaseLayout>

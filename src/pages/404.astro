@@ -1,0 +1,25 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { withBase } from '../lib/url';
+---
+
+<BaseLayout title="页面没找到" nav="none">
+  <div class="wrap">
+    <div class="notfound">
+      <p class="big">404</p>
+      <h1>这个页面不在了</h1>
+      <p class="muted">可能是链接过期，或者地址打错了。</p>
+
+      <div class="entry-grid" style="margin-top:2rem;text-align:left;">
+        <a class="entry-card" href={withBase('/quick')}>
+          <span class="k">孩子突发状况？先去查症状</span>
+          <p class="sum">抽搐、误吞、烫伤、摔到头、急性喉炎——急症条目全部在这里。</p>
+        </a>
+        <a class="entry-card" href={withBase('/')}>
+          <span class="k">回首页看月龄阶段</span>
+          <p class="sum">输入出生日期，定位当前月龄该注意什么。</p>
+        </a>
+      </div>
+    </div>
+  </div>
+</BaseLayout>

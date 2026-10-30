@@ -1,0 +1,349 @@
+# 发育里程碑 · 8 个筛查节点 × 4 个维度
+# 运动维度采用 WHO 六项粗大运动里程碑窗口（1～99 百分位），
+# 表述一律成对给出「下限—上限」，禁止只写单一个月龄数字。
+# 语言/认知/社交维度综合国家卫健委指南与 AAP 通用表述，需医学复核后定稿。
+
+# ---------- 3 月 ----------
+- id: m3-motor
+  age_month: 3
+  domain: motor
+  description: 俯卧时能把头抬离床面并短暂保持
+  source: 国家卫健委《3岁以下婴幼儿健康养育照护指南（试行）》
+- id: m3-language
+  age_month: 3
+  domain: language
+  description: 会发出「咕咕」等喉音，能被逗笑
+  source: 国家卫健委《3岁以下婴幼儿健康养育照护指南（试行）》
+- id: m3-cognitive
+  age_month: 3
+  domain: cognitive
+  description: 眼睛能追随移动的人或玩具转过中线
+  source: 国家卫健委《3岁以下婴幼儿健康养育照护指南（试行）》
+- id: m3-social
+  age_month: 3
+  domain: social
+  description: 看到熟悉的脸会注视，逗引时出现社交性微笑
+  source: 国家卫健委《3岁以下婴幼儿健康养育照护指南（试行）》
+
+# ---------- 6 月 ----------
+- id: m6-motor
+  age_month: 6
+  domain: motor
+  description: 能扶坐；无支撑独坐的达成窗口是 3.8～9.2 个月
+  source: WHO Multicentre Growth Reference Study（2006）
+- id: m6-language
+  age_month: 6
+  domain: language
+  description: 会笑出声，能发出连续音节
+  source: 国家卫健委《3岁以下婴幼儿健康养育照护指南（试行）》
+- id: m6-cognitive
+  age_month: 6
+  domain: cognitive
+  description: 会伸手抓面前的玩具，并把它送向嘴边
+  source: 国家卫健委《3岁以下婴幼儿健康养育照护指南（试行）》
+- id: m6-social
+  age_month: 6
+  domain: social
+  description: 开始区分生人和熟人，对熟悉的人有明显的亲近反应
+  source: 国家卫健委《3岁以下婴幼儿健康养育照护指南（试行）》
+
+# ---------- 8 月 ----------
+- id: m8-motor
+  age_month: 8
+  domain: motor
+  description: 能独坐；手膝爬行的达成窗口是 5.2～13.5 个月
+  source: WHO Multicentre Growth Reference Study（2006）
+- id: m8-language
+  age_month: 8
+  domain: language
+  description: 能发出「ba」「da」等重复音节
+  source: 国家卫健委《3岁以下婴幼儿健康养育照护指南（试行）》
+- id: m8-cognitive
+  age_month: 8
+  domain: cognitive
+  description: 能把玩具从一只手换到另一只手
+  source: 国家卫健委《3岁以下婴幼儿健康养育照护指南（试行）》
+- id: m8-social
+  age_month: 8
+  domain: social
+  description: 对陌生人出现警惕或退缩，认生明显
+  source: 国家卫健委《3岁以下婴幼儿健康养育照护指南（试行）》
+
+# ---------- 12 月 ----------
+- id: m12-motor
+  age_month: 12
+  domain: motor
+  description: 能扶物站立（窗口 4.8～11.4 个月）、扶物行走（窗口 5.9～13.7 个月）
+  source: WHO Multicentre Growth Reference Study（2006）
+- id: m12-language
+  age_month: 12
+  domain: language
+  description: 叫名字有反应，会说一两个有意义的词
+  source: 国家卫健委《3岁以下婴幼儿健康养育照护指南（试行）》
+- id: m12-cognitive
+  age_month: 12
+  domain: cognitive
+  description: 会用拇指和食指对捏小物品
+  source: 国家卫健委《3岁以下婴幼儿健康养育照护指南（试行）》
+- id: m12-social
+  age_month: 12
+  domain: social
+  description: 会模仿「再见」「欢迎」等手势动作
+  source: 国家卫健委《3岁以下婴幼儿健康养育照护指南（试行）》
+
+# ---------- 18 月 ----------
+- id: m18-motor
+  age_month: 18
+  domain: motor
+  description: 能独走（窗口 8.2～17.6 个月），会蹲下捡东西再站起来
+  source: WHO Multicentre Growth Reference Study（2006）
+- id: m18-language
+  age_month: 18
+  domain: language
+  description: 会有意识地叫「爸爸」「妈妈」，能说 5～10 个词
+  source: 国家卫健委《3岁以下婴幼儿健康养育照护指南（试行）》
+- id: m18-cognitive
+  age_month: 18
+  domain: cognitive
+  description: 能按大人的要求指认人或物
+  source: 国家卫健委《3岁以下婴幼儿健康养育照护指南（试行）》
+- id: m18-social
+  age_month: 18
+  domain: social
+  description: 与人目光交流自然，会用手指向感兴趣的东西分享给大人看
+  source: 国家卫健委《3岁以下婴幼儿健康养育照护指南（试行）》
+
+# ---------- 24 月 ----------
+- id: m24-motor
+  age_month: 24
+  domain: motor
+  description: 能跑，能扶着栏杆上楼梯/台阶
+  source: 国家卫健委《3岁以下婴幼儿健康养育照护指南（试行）》
+- id: m24-language
+  age_month: 24
+  domain: language
+  description: 能说出 3 个以上物品的名称，词汇量通常在 50 个以上
+  source: 国家卫健委《3岁以下婴幼儿健康养育照护指南（试行）》
+- id: m24-cognitive
+  age_month: 24
+  domain: cognitive
+  description: 能按吩咐完成简单事情，如「把球给妈妈」
+  source: 国家卫健委《3岁以下婴幼儿健康养育照护指南（试行）》
+- id: m24-social
+  age_month: 24
+  domain: social
+  description: 会自己用勺吃饭，能与其他孩子在同一空间各玩各的
+  source: 国家卫健委《3岁以下婴幼儿健康养育照护指南（试行）》
+
+# ---------- 30 月 ----------
+- id: m30-motor
+  age_month: 30
+  domain: motor
+  description: 跑得稳，能双脚同时离地跳起
+  source: 国家卫健委《3岁以下婴幼儿健康养育照护指南（试行）》
+- id: m30-language
+  age_month: 30
+  domain: language
+  description: 会说 2～3 个字的短语，如「妈妈抱」
+  source: 国家卫健委《3岁以下婴幼儿健康养育照护指南（试行）》
+- id: m30-cognitive
+  age_month: 30
+  domain: cognitive
+  description: 能认识一两种颜色，能找到藏起来的物品
+  source: 国家卫健委《3岁以下婴幼儿健康养育照护指南（试行）》
+- id: m30-social
+  age_month: 30
+  domain: social
+  description: 会用动作或语言示意大小便，兴趣范围明显扩大
+  source: 国家卫健委《3岁以下婴幼儿健康养育照护指南（试行）》
+
+# ---------- 36 月 ----------
+- id: m36-motor
+  age_month: 36
+  domain: motor
+  description: 能双脚跳，能单脚站立片刻
+  source: 国家卫健委《3岁以下婴幼儿健康养育照护指南（试行）》
+- id: m36-language
+  age_month: 36
+  domain: language
+  description: 能说出自己的名字，会说完整短句
+  source: 国家卫健委《3岁以下婴幼儿健康养育照护指南（试行）》
+- id: m36-cognitive
+  age_month: 36
+  domain: cognitive
+  description: 会模仿画圆，会玩「拿棍当马骑」这类假想游戏
+  source: 国家卫健委《3岁以下婴幼儿健康养育照护指南（试行）》
+- id: m36-social
+  age_month: 36
+  domain: social
+  description: 能与其他孩子一起玩，开始理解轮流和等待
+  source: 国家卫健委《3岁以下婴幼儿健康养育照护指南（试行）》
+
+# ---------- 补充条目：每个维度第 2 条 ----------
+- id: m3-motor-2
+  age_month: 3
+  domain: motor
+  description: 俯卧时能用前臂支撑抬起上半身，双手能短暂握在一起
+  source: 国家卫健委《3岁以下婴幼儿健康养育照护指南（试行）》
+- id: m3-language-2
+  age_month: 3
+  domain: language
+  description: 听到声音会安静下来或转头寻找声源
+  source: 国家卫健委《3岁以下婴幼儿健康养育照护指南（试行）》
+- id: m3-cognitive-2
+  age_month: 3
+  domain: cognitive
+  description: 会注视自己的手，并把手放进嘴里
+  source: 国家卫健委《3岁以下婴幼儿健康养育照护指南（试行）》
+- id: m3-social-2
+  age_month: 3
+  domain: social
+  description: 被抱起或听到熟悉的声音时会安静下来
+  source: 国家卫健委《3岁以下婴幼儿健康养育照护指南（试行）》
+
+- id: m6-motor-2
+  age_month: 6
+  domain: motor
+  description: 会用手掌耙取面前的玩具，能把它从一只手递到另一只手
+  source: 国家卫健委《3岁以下婴幼儿健康养育照护指南（试行）》
+- id: m6-language-2
+  age_month: 6
+  domain: language
+  description: 听到有人说话会转头寻找说话的人
+  source: 国家卫健委《3岁以下婴幼儿健康养育照护指南（试行）》
+- id: m6-cognitive-2
+  age_month: 6
+  domain: cognitive
+  description: 玩具掉落后会低头寻找掉落的方向
+  source: 国家卫健委《3岁以下婴幼儿健康养育照护指南（试行）》
+- id: m6-social-2
+  age_month: 6
+  domain: social
+  description: 会对着镜子里的自己微笑或发声
+  source: 国家卫健委《3岁以下婴幼儿健康养育照护指南（试行）》
+
+- id: m8-motor-2
+  age_month: 8
+  domain: motor
+  description: 能扶物站立片刻（扶物站立窗口 4.8～11.4 个月）
+  source: WHO Multicentre Growth Reference Study（2006）
+- id: m8-language-2
+  age_month: 8
+  domain: language
+  description: 会用手势表达需求，如伸手要抱、摇头表示不要
+  source: 国家卫健委《3岁以下婴幼儿健康养育照护指南（试行）》
+- id: m8-cognitive-2
+  age_month: 8
+  domain: cognitive
+  description: 会掀开盖住玩具的布去找玩具，知道东西不见了但还在
+  source: 国家卫健委《3岁以下婴幼儿健康养育照护指南（试行）》
+- id: m8-social-2
+  age_month: 8
+  domain: social
+  description: 听到「不」会短暂停下动作，开始看大人的脸色
+  source: 国家卫健委《3岁以下婴幼儿健康养育照护指南（试行）》
+
+- id: m12-motor-2
+  age_month: 12
+  domain: motor
+  description: 能自己从坐位转为爬行或扶站，动作衔接连贯
+  source: 国家卫健委《3岁以下婴幼儿健康养育照护指南（试行）》
+- id: m12-language-2
+  age_month: 12
+  domain: language
+  description: 能听懂「不行」「给我」这类简单指令
+  source: 国家卫健委《3岁以下婴幼儿健康养育照护指南（试行）》
+- id: m12-cognitive-2
+  age_month: 12
+  domain: cognitive
+  description: 会把小玩具放进容器里，再倒出来
+  source: 国家卫健委《3岁以下婴幼儿健康养育照护指南（试行）》
+- id: m12-social-2
+  age_month: 12
+  domain: social
+  description: 会用挥手表示再见，会主动把东西递给大人
+  source: 国家卫健委《3岁以下婴幼儿健康养育照护指南（试行）》
+
+- id: m18-motor-2
+  age_month: 18
+  domain: motor
+  description: 能踢球（脚能碰到球），能弯腰捡东西再站起来
+  source: 国家卫健委《3岁以下婴幼儿健康养育照护指南（试行）》
+- id: m18-language-2
+  age_month: 18
+  domain: language
+  description: 能说出 1～2 个身体部位的名称
+  source: 国家卫健委《3岁以下婴幼儿健康养育照护指南（试行）》
+- id: m18-cognitive-2
+  age_month: 18
+  domain: cognitive
+  description: 会模仿大人的日常动作，如擦桌子、打电话
+  source: 国家卫健委《3岁以下婴幼儿健康养育照护指南（试行）》
+- id: m18-social-2
+  age_month: 18
+  domain: social
+  description: 会主动把玩具递给大人，寻求一起玩
+  source: 国家卫健委《3岁以下婴幼儿健康养育照护指南（试行）》
+
+- id: m24-motor-2
+  age_month: 24
+  domain: motor
+  description: 能自己扶着栏杆下楼梯，一次一阶
+  source: 国家卫健委《3岁以下婴幼儿健康养育照护指南（试行）》
+- id: m24-language-2
+  age_month: 24
+  domain: language
+  description: 会问「这是什么」，开始用两个词组合表达
+  source: 国家卫健委《3岁以下婴幼儿健康养育照护指南（试行）》
+- id: m24-cognitive-2
+  age_month: 24
+  domain: cognitive
+  description: 能把形状或颜色相同的两块积木配对
+  source: 国家卫健委《3岁以下婴幼儿健康养育照护指南（试行）》
+- id: m24-social-2
+  age_month: 24
+  domain: social
+  description: 会说「不要」，开始明确表达自己的意愿
+  source: 国家卫健委《3岁以下婴幼儿健康养育照护指南（试行）》
+
+- id: m30-motor-2
+  age_month: 30
+  domain: motor
+  description: 能踮脚走几步，能单脚站立 1～2 秒
+  source: 国家卫健委《3岁以下婴幼儿健康养育照护指南（试行）》
+- id: m30-language-2
+  age_month: 30
+  domain: language
+  description: 会用「我」指代自己，能说 20 个以上的词
+  source: 国家卫健委《3岁以下婴幼儿健康养育照护指南（试行）》
+- id: m30-cognitive-2
+  age_month: 30
+  domain: cognitive
+  description: 能按大小顺序套叠 3 个以上的套杯
+  source: 国家卫健委《3岁以下婴幼儿健康养育照护指南（试行）》
+- id: m30-social-2
+  age_month: 30
+  domain: social
+  description: 在提醒下会说「谢谢」「再见」等礼貌用语
+  source: 国家卫健委《3岁以下婴幼儿健康养育照护指南（试行）》
+
+- id: m36-motor-2
+  age_month: 36
+  domain: motor
+  description: 能自己骑三轮车踩动踏板，能接住弹过来的大球
+  source: 国家卫健委《3岁以下婴幼儿健康养育照护指南（试行）》
+- id: m36-language-2
+  age_month: 36
+  domain: language
+  description: 能回答「你叫什么名字」「你几岁」这类问题
+  source: 国家卫健委《3岁以下婴幼儿健康养育照护指南（试行）》
+- id: m36-cognitive-2
+  age_month: 36
+  domain: cognitive
+  description: 能独立完成 3～4 块的拼图
+  source: 国家卫健委《3岁以下婴幼儿健康养育照护指南（试行）》
+- id: m36-social-2
+  age_month: 36
+  domain: social
+  description: 会参与简单的角色扮演，如给娃娃喂饭、看病
+  source: 国家卫健委《3岁以下婴幼儿健康养育照护指南（试行）》

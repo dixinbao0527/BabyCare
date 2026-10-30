@@ -1,0 +1,144 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import KnowledgeCard from '../../components/KnowledgeCard.astro';
+import { getCollection } from 'astro:content';
+import {
+  STAGES,
+  CATEGORY_ORDER,
+  CATEGORY_LABEL,
+  prevStage,
+  nextStage,
+  screenNodeFor,
+} from '../../lib/stages';
+import { warningSignsAt, WARN_DOMAIN_LABEL, WARNING_SOURCE } from '../../lib/warningSigns';
+import { withBase } from '../../lib/url';
+
+export async function getStaticPaths() {
+  const all = await getCollection('developmental', ({ data }) => !data.draft);
+  return STAGES.map((stage) => {
+    const entries = all
+      .filter((e) => e.data.age_range === stage.range)
+      .sort((a, b) => {
+        const ca = CATEGORY_ORDER.indexOf(a.data.category);
+        const cb = CATEGORY_ORDER.indexOf(b.data.category);
+        return ca === cb ? a.data.order - b.data.order : ca - cb;
+      });
+    return { params: { range: stage.range }, props: { stage, entries } };
+  });
+}
+
+const { range } = Astro.params;
+const { stage, entries } = Astro.props;
+
+const groups = CATEGORY_ORDER.map((cat) => ({
+  cat,
+  label: CATEGORY_LABEL[cat],
+  items: entries.filter((e) => e.data.category === cat),
+})).filter((g) => g.items.length > 0);
+
+const prev = prevStage(range);
+const next = nextStage(range);
+
+const node = screenNodeFor(stage.max);
+const signs = warningSignsAt(node);
+
+const acutes = await getCollection('acute');
+const relatedSlugs = [...new Set(entries.flatMap((e) => e.data.related))].filter((s) =>
+  acutes.some((a) => a.id === s)
+);
+const relatedAcutes = relatedSlugs.map((s) => acutes.find((a) => a.id === s)!);
+
+const title = `${stage.name}宝宝的养育要点`;
+---
+
+<BaseLayout title={title} description={`${stage.name}阶段：${stage.tagline}。共 ${entries.length} 条可溯源知识，含该阶段预警征象。`}>
+  <div class="wrap">
+    <div class="page-head">
+      {
+        prev ? (
+          <a class="back" href={withBase(`/age/${prev.range}`)}>
+            ← {prev.name}
+          </a>
+        ) : (
+          <span class="back" aria-disabled="true">← 已是第一个阶段</span>
+        )
+      }
+      <h1>{stage.name}</h1>
+      <p class="tagline">{stage.tagline}</p>
+      <p class="small muted" style="margin-top:.6rem;">
+        {entries.length} 条内容 · 按月龄筛选，急症内容不在本页展开
+      </p>
+    </div>
+
+    {
+      groups.map((g) => (
+        <section aria-labelledby={`g-${g.cat}`}>
+          <h2 class="group-title" id={`g-${g.cat}`}>
+            {g.label}
+            <span class="count">{g.items.length} 条</span>
+          </h2>
+          <div class="knowledge-list">
+            {g.items.map((e) => (
+              <KnowledgeCard entry={e} />
+            ))}
+          </div>
+        </section>
+      ))
+    }
+
+    {
+      entries.length === 0 && (
+        <p class="small muted" style="margin-top:2rem;">
+          这一阶段的内容正在补充。可以先看 <a href={withBase('/quick')}>快速查询</a> 或
+          <a href={withBase('/milestones')}>发育里程碑</a>。
+        </p>
+      )
+    }
+
+    <section class="warn-block" aria-labelledby="warn-heading">
+      <h2 id="warn-heading">{node} 月龄预警征象</h2>
+      <p class="src-note">
+        {WARNING_SOURCE}
+        {node !== stage.max && `本阶段无独立筛查节点，展示最近的 ${node} 月龄节点。`}
+      </p>
+      <ul class="warn-list">
+        {
+          signs.map((s) => (
+            <li>
+              <span class="dot" aria-hidden="true" />
+              <span>{s.sign}</span>
+              <span class="dom">{WARN_DOMAIN_LABEL[s.domain]}</span>
+            </li>
+          ))
+        }
+      </ul>
+      <p class="small muted" style="margin:.8rem 0 0;">
+        有任何一条符合，建议尽快咨询儿科医生或儿童保健机构进行评估。本站不做判断、不给结论。
+        完整清单见<a href={withBase('/milestones')}>发育里程碑</a>。
+      </p>
+    </section>
+
+    {
+      relatedAcutes.length > 0 && (
+        <p class="small" style="margin-top:1.4rem;">
+          相关急症：
+          {relatedAcutes.map((a, i) => (
+            <>
+              {i > 0 && '、'}
+              <a href={withBase(`/quick/${a.id}`)}>{a.data.title}</a>
+            </>
+          ))}
+        </p>
+      )
+    }
+
+    <nav class="stage-pager" aria-label="阶段翻页">
+      <span>
+        {prev ? <a href={withBase(`/age/${prev.range}`)}>← {prev.name}</a> : <span class="muted">—</span>}
+      </span>
+      <span>
+        {next ? <a href={withBase(`/age/${next.range}`)}>{next.name} →</a> : <span class="muted">—</span>}
+      </span>
+    </nav>
+  </div>
+</BaseLayout>

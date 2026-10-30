@@ -1,0 +1,24 @@
+# 依赖
+node_modules/
+.pnpm-store/
+
+# 构建产物
+dist/
+.astro/
+
+# 中间产物（PRD 排版流水线、验收截图）
+output/
+*.tmp.mjs
+
+# 系统与编辑器
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# 日志
+*.log
+npm-debug.log*
+
+# 助手工作记录
+.workbuddy/

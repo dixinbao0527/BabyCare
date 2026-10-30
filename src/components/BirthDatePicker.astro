@@ -1,0 +1,211 @@
+---
+import { withBase } from '../lib/url';
+
+const today = new Date();
+const pad = (n: number) => String(n).padStart(2, '0');
+const todayStr = `${today.getFullYear()}-${pad(today.getMonth() + 1)}-${pad(today.getDate())}`;
+const minStr = `${today.getFullYear() - 6}-${pad(today.getMonth() + 1)}-${pad(today.getDate())}`;
+---
+
+<div class="picker" id="birth-picker">
+  <label class="field-label" for="birth-date">宝宝出生日期</label>
+  <div class="date-row">
+    <input
+      id="birth-date"
+      type="date"
+      inputmode="numeric"
+      max={todayStr}
+      min={minStr}
+      autocomplete="off"
+      aria-describedby="birth-hint"
+    />
+  </div>
+  <p class="form-hint" id="birth-hint">用于定位月龄，只保存在你的设备上，不会上传。</p>
+
+  <details class="ga-toggle">
+    <summary>早产儿？填一下出生时的胎龄（可选）</summary>
+    <div class="ga-body">
+      <label for="ga-select">胎龄</label>
+      <select id="ga-select">
+        <option value="40" selected>40 周（足月）</option>
+        {
+          Array.from({ length: 19 }, (_, i) => 36 - i).map((w) => (
+            <option value={String(w)}>{w} 周{w < 37 ? '（早产）' : ''}</option>
+          ))
+        }
+      </select>
+      <span class="small muted">不满 37 周时，按矫正月龄对照发育里程碑。</span>
+    </div>
+  </details>
+
+  <div class="age-result" id="age-result" aria-live="polite">
+    <span>输入出生日期，看当前阶段该注意什么。</span>
+  </div>
+
+  <a class="acute-entry" href={withBase('/quick#q')} id="acute-entry">
+    <span class="t">
+      <span>孩子突发状况？直接查症状</span>
+      <span aria-hidden="true">→</span>
+    </span>
+    <span class="d">咳嗽像犬吠、抽搐、误吞、烫伤、摔到头</span>
+  </a>
+</div>
+
+<script>
+  import { calcAge, parseBirthDate, formatDate } from '../lib/age';
+  import { stageOf, STAGES } from '../lib/stages';
+  import { withBase } from '../lib/url';
+
+  const KEY = 'ich.birth.v1';
+
+  const input = document.getElementById('birth-date') as HTMLInputElement | null;
+  const gaSelect = document.getElementById('ga-select') as HTMLSelectElement | null;
+  const result = document.getElementById('age-result');
+
+  type Stored = { birth: string; ga: number };
+
+  function readStore(): Stored | null {
+    try {
+      const raw = localStorage.getItem(KEY);
+      if (!raw) return null;
+      const parsed = JSON.parse(raw) as Partial<Stored>;
+      if (typeof parsed?.birth !== 'string') return null;
+      const ga = Number(parsed.ga);
+      return { birth: parsed.birth, ga: Number.isFinite(ga) && ga >= 24 && ga <= 42 ? ga : 40 };
+    } catch {
+      return null;
+    }
+  }
+
+  function writeStore(value: Stored | null) {
+    try {
+      if (value === null) localStorage.removeItem(KEY);
+      else localStorage.setItem(KEY, JSON.stringify({ ...value, ts: Date.now() }));
+    } catch {
+      /* 隐私模式下静默降级 */
+    }
+  }
+
+  function applyStage(range: string | null) {
+    const panels = document.querySelectorAll<HTMLElement>('[data-stage-panel]');
+    panels.forEach((p) => {
+      p.hidden = p.dataset.stagePanel !== range;
+    });
+    const empty = document.getElementById('stage-empty');
+    if (empty) empty.hidden = range !== null;
+    document.querySelectorAll<HTMLAnchorElement>('.stage-strip a').forEach((a) => {
+      if (range && a.dataset.range === range) a.setAttribute('aria-current', 'true');
+      else a.removeAttribute('aria-current');
+    });
+    const label = document.getElementById('stage-current-label');
+    if (label) {
+      const s = STAGES.find((x) => x.range === range);
+      label.textContent = s ? `当前阶段：${s.name}` : '全部阶段';
+    }
+  }
+
+  function renderEmpty() {
+    if (!result) return;
+    result.replaceChildren();
+    const span = document.createElement('span');
+    span.textContent = '输入出生日期，看当前阶段该注意什么。';
+    result.append(span);
+    applyStage(null);
+  }
+
+  function renderAge(birth: Date, ga: number) {
+    if (!result) return;
+    const info = calcAge(birth, new Date(), ga);
+    const { stage, outOfRange } = stageOf(info.months);
+
+    result.replaceChildren();
+
+    const line = document.createElement('span');
+    if (info.days === 0) {
+      line.append('宝宝今天出生，');
+    } else {
+      line.append('宝宝现在 ');
+    }
+    const strong = document.createElement('strong');
+    strong.textContent = `${info.months} 个月`;
+    line.append(strong, `，处于 ${stage.name}阶段。`);
+    result.append(line);
+
+    const link = document.createElement('a');
+    link.href = withBase(`/age/${stage.range}`);
+    link.textContent = '查看该阶段全部内容 →';
+    link.style.fontWeight = '600';
+    result.append(link);
+
+    if (info.corrected) {
+      const note = document.createElement('span');
+      note.className = 'note';
+      const extraDays = Math.round(info.correctedExtraDays);
+      note.textContent = `因 ${ga} 周早产，以上为矫正月龄（${info.months} 个月${extraDays > 0 ? ` ${extraDays} 天` : ''}）；实际月龄 ${info.rawMonths} 个月。矫正至实际 24 个月为止。`;
+      result.append(note);
+    }
+
+    if (outOfRange) {
+      const note = document.createElement('span');
+      note.className = 'note';
+      note.textContent = '本手册覆盖 0～3 岁，当前已超出范围，内容可能不再适用。';
+      result.append(note);
+    }
+
+    applyStage(stage.range);
+  }
+
+  function sync() {
+    const value = input?.value ?? '';
+    const birth = parseBirthDate(value);
+    if (!birth) {
+      if (value) {
+        if (result) {
+          result.replaceChildren();
+          const span = document.createElement('span');
+          span.textContent = '出生日期不能晚于今天，请重新选择。';
+          result.append(span);
+        }
+      } else {
+        renderEmpty();
+      }
+      return;
+    }
+    const ga = Number(gaSelect?.value ?? 40);
+    writeStore({ birth: formatDate(birth), ga });
+    renderAge(birth, ga);
+  }
+
+  // 初始化：从本地恢复
+  const stored = readStore();
+  if (stored) {
+    const d = parseBirthDate(stored.birth);
+    if (d && input) {
+      input.value = stored.birth;
+      if (gaSelect) gaSelect.value = String(stored.ga);
+      renderAge(d, stored.ga);
+    } else {
+      renderEmpty();
+    }
+  } else {
+    renderEmpty();
+  }
+
+  input?.addEventListener('change', sync);
+  input?.addEventListener('blur', sync);
+  gaSelect?.addEventListener('change', sync);
+
+  // 支持「今天出生」快速测试：URL 带 ?today=1
+  if (new URLSearchParams(location.search).get('today') === '1' && input) {
+    const t = new Date();
+    const p = (n: number) => String(n).padStart(2, '0');
+    input.value = `${t.getFullYear()}-${p(t.getMonth() + 1)}-${p(t.getDate())}`;
+    sync();
+  }
+
+  window.addEventListener('ich:storage-cleared', () => {
+    if (input) input.value = '';
+    if (gaSelect) gaSelect.value = '40';
+    renderEmpty();
+  });
+</script>

@@ -1,0 +1,23 @@
+---
+import { STAGES } from '../lib/stages';
+import { withBase } from '../lib/url';
+
+interface Props {
+  current?: string;
+}
+const { current } = Astro.props;
+---
+
+<nav class="stage-strip" aria-label="月龄阶段导航">
+  {
+    STAGES.map((s) => (
+      <a
+        href={withBase(`/age/${s.range}`)}
+        data-range={s.range}
+        aria-current={current === s.range ? 'true' : undefined}
+      >
+        {s.short}
+      </a>
+    ))
+  }
+</nav>

@@ -1,0 +1,351 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+import { CATEGORY_ORDER, CATEGORY_LABEL } from '../../lib/stages';
+import { withBase } from '../../lib/url';
+
+const acute = (await getCollection('acute')).sort((a, b) =>
+  a.data.title.localeCompare(b.data.title, 'zh-CN')
+);
+const dev = await getCollection('developmental', ({ data }) => !data.draft);
+
+const groups = CATEGORY_ORDER.map((cat) => ({
+  cat,
+  label: CATEGORY_LABEL[cat],
+  items: dev
+    .filter((e) => e.data.category === cat)
+    .sort((a, b) => a.data.age_range.localeCompare(b.data.age_range) || a.data.order - b.data.order),
+})).filter((g) => g.items.length > 0);
+
+const acuteTop = acute.slice(0, 3);
+---
+
+<BaseLayout
+  title="症状快速查询"
+  description="输入症状或关键词快速定位：急症条目固定置顶，不参与月龄筛选；发展性知识可按分类浏览。"
+  nav="quick"
+>
+  <div class="wrap">
+    <div class="page-head">
+      <h1>症状快速查询</h1>
+      <p class="tagline">用你会说的词就行：抽搐、误吞、辅食、夜醒。</p>
+    </div>
+
+    <div class="search-box">
+      <span class="glass" aria-hidden="true">⌕</span>
+      <label class="sr-only" for="q" style="position:absolute;left:-9999px;">搜索症状或关键词</label>
+      <input
+        id="q"
+        type="search"
+        enterkeyhint="search"
+        placeholder="输入症状，如：抽搐、误吞、辅食"
+        autocomplete="off"
+        aria-controls="search-results"
+      />
+    </div>
+
+    <div id="search-results" hidden aria-live="polite"></div>
+
+    <div id="default-view">
+      <section class="quick-section" aria-labelledby="acute-heading">
+        <h2 id="acute-heading">
+          急症 / 突发状况
+          <span class="tag tag-acute">急症</span>
+        </h2>
+        <p class="small muted" style="margin:0;">
+          {acute.length} 条 · 不参与月龄筛选，任何年龄都可能遇到
+        </p>
+        <div class="qlist">
+          {
+            acute.map((a) => (
+              <a class="qitem" href={withBase(`/quick/${a.id}`)} data-search-item>
+                <span class="row">
+                  <span class="tag tag-acute">急症</span>
+                  <span class="t">{a.data.title}</span>
+                </span>
+                <span class="s">{a.data.summary}</span>
+                <span class="meta">
+                  {a.data.scenario_tags.slice(0, 4).map((t) => (
+                    <span class="tag">{t}</span>
+                  ))}
+                  <span class="tag tag-tier">{a.data.source.tier}</span>
+                </span>
+              </a>
+            ))
+          }
+        </div>
+      </section>
+
+      <section class="quick-section" aria-labelledby="dev-heading">
+        <h2 id="dev-heading">按月龄的知识</h2>
+        <p class="small muted" style="margin:0;">
+          {dev.length} 条 · 默认按分类浏览，选中分类后展开
+        </p>
+
+        <div class="cat-toggle" role="group" aria-label="按分类筛选">
+          {
+            groups.map((g) => (
+              <button type="button" data-cat={g.cat} aria-pressed="false">
+                {g.label}（{g.items.length}）
+              </button>
+            ))
+          }
+        </div>
+
+        <p class="small muted" id="cat-hint" style="margin-top:.9rem;">
+          选择一个分类，或直接用上面的搜索框。
+        </p>
+
+        {
+          groups.map((g) => (
+            <div data-cat-group={g.cat} hidden>
+              <h3 class="group-title">
+                {g.label}
+                <span class="count">{g.items.length} 条</span>
+              </h3>
+              <div class="qlist">
+                {g.items.map((d) => (
+                  <a
+                    class="qitem"
+                    href={withBase(`/age/${d.data.age_range}`) + '#' + (d.id.split('/').pop() ?? '')}
+                  >
+                    <span class="row">
+                      <span class="t">{d.data.title}</span>
+                      <span class="tag">{d.data.age_range.replace('-', '～')}</span>
+                    </span>
+                    <span class="s">{d.data.summary}</span>
+                    <span class="meta">
+                      {d.data.scenario_tags.slice(0, 3).map((t) => (
+                        <span class="tag">{t}</span>
+                      ))}
+                      <span class="tag tag-tier">{d.data.source.tier}</span>
+                    </span>
+                  </a>
+                ))}
+              </div>
+            </div>
+          ))
+        }
+      </section>
+
+      <noscript>
+        <p class="small muted" style="margin-top:1.5rem;">
+          当前未启用脚本，搜索不可用；上方已按分类列出全部条目，可直接点开。
+        </p>
+      </noscript>
+    </div>
+  </div>
+
+  <script>
+    import { withBase } from '../../lib/url';
+
+    const input = document.getElementById('q') as HTMLInputElement | null;
+    const results = document.getElementById('search-results');
+    const defaultView = document.getElementById('default-view');
+
+    type Item = {
+      slug: string;
+      path?: string;
+      title: string;
+      tags: string[];
+      summary: string;
+      type: 'acute' | 'developmental';
+      category: string;
+      age_range: string;
+    };
+
+    let items: Item[] | null = null;
+    let fuse: { search: (q: string) => { item: Item; score?: number }[] } | null = null;
+    let loading: Promise<void> | null = null;
+
+    const CAT_LABEL: Record<string, string> = {
+      feeding: '喂养',
+      sleep: '睡眠',
+      development: '发育',
+      safety: '安全',
+      daily_care: '日常照护',
+    };
+
+    const esc = (s: string) =>
+      s.replace(/[&<>"']/g, (c) =>
+        ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c] as string
+      );
+
+    function mark(text: string, q: string): string {
+      const safe = esc(text);
+      if (!q) return safe;
+      const needle = esc(q);
+      if (!needle) return safe;
+      const idx = safe.toLowerCase().indexOf(needle.toLowerCase());
+      if (idx < 0) return safe;
+      return (
+        safe.slice(0, idx) +
+        '<mark>' +
+        safe.slice(idx, idx + needle.length) +
+        '</mark>' +
+        safe.slice(idx + needle.length)
+      );
+    }
+
+    function hrefOf(it: Item): string {
+      return it.type === 'acute'
+        ? withBase(`/quick/${it.slug}`)
+        : withBase(`/age/${it.age_range}`) + '#' + it.slug;
+    }
+
+    function renderResults(list: Item[], q: string) {
+      if (!results) return;
+      if (list.length === 0) {
+        results.innerHTML = `
+          <div class="empty-result">
+            <p style="margin-bottom:.6rem;"><strong>没找到「${esc(q)}」</strong></p>
+            <p class="small muted" style="margin-bottom:.6rem;">试试更短的词，或从最常见的急症入口进：</p>
+            <div class="qlist">
+              ${['acute-laryngitis', 'febrile-seizure', 'choking']
+                .map((slug) => {
+                  const it = (items ?? []).find((x) => x.slug === slug);
+                  return it
+                    ? `<a class="qitem" href="${hrefOf(it)}"><span class="row"><span class="tag tag-acute">急症</span><span class="t">${esc(it.title)}</span></span><span class="s">${esc(it.summary)}</span></a>`
+                    : '';
+                })
+                .join('')}
+            </div>
+            <p class="small" style="margin:.9rem 0 0;"><a href="${withBase('/sources')}">查看内容依据 →</a></p>
+          </div>`;
+        return;
+      }
+
+      results.innerHTML =
+        `<p class="small muted" style="margin:.9rem 0 .2rem;">${list.length} 条结果</p>` +
+        `<div class="qlist">` +
+        list
+          .map(
+            (it) => `
+        <a class="qitem" href="${hrefOf(it)}">
+          <span class="row">
+            ${it.type === 'acute' ? '<span class="tag tag-acute">急症</span>' : ''}
+            <span class="t">${mark(it.title, q)}</span>
+            ${it.type === 'developmental' ? `<span class="tag">${esc(it.age_range.replace('-', '～'))}</span>` : ''}
+          </span>
+          <span class="s">${mark(it.summary, q)}</span>
+          <span class="meta">
+            ${it.type === 'developmental' ? `<span class="tag">${CAT_LABEL[it.category] ?? ''}</span>` : ''}
+            ${it.tags.slice(0, 3).map((t) => `<span class="tag">${mark(t, q)}</span>`).join('')}
+          </span>
+        </a>`
+          )
+          .join('') +
+        `</div>`;
+    }
+
+    async function ensureIndex() {
+      if (items) return;
+      if (loading) return loading;
+      loading = (async () => {
+        try {
+          const res = await fetch(withBase('/search-index.json'), { credentials: 'omit' });
+          items = (await res.json()) as Item[];
+          items.sort((a, b) => (a.type === b.type ? 0 : a.type === 'acute' ? -1 : 1));
+        } catch {
+          items = [];
+        }
+        try {
+          const mod = await import('fuse.js');
+          const Fuse = (mod as any).default ?? mod;
+          fuse = new Fuse(items, {
+            threshold: 0.35,
+            ignoreLocation: true,
+            keys: [
+              { name: 'title', weight: 3 },
+              { name: 'tags', weight: 2 },
+              { name: 'summary', weight: 1 },
+            ],
+          });
+        } catch {
+          fuse = null; // 降级为纯 includes
+        }
+      })();
+      return loading;
+    }
+
+    function fallbackSearch(q: string): Item[] {
+      const needle = q.toLowerCase();
+      const pool = items ?? [];
+      const scored: { it: Item; s: number }[] = [];
+      for (const it of pool) {
+        let s = 0;
+        if (it.title.toLowerCase().includes(needle)) s += 3;
+        if (it.tags.some((t) => t.toLowerCase().includes(needle))) s += 2;
+        if (it.summary.toLowerCase().includes(needle)) s += 1;
+        if (s > 0) scored.push({ it, s });
+      }
+      scored.sort((a, b) => b.s - a.s);
+      return scored.map((x) => x.it);
+    }
+
+    async function run(query: string) {
+      const q = query.trim();
+      if (!q) {
+        if (results) {
+          results.hidden = true;
+          results.innerHTML = '';
+        }
+        if (defaultView) defaultView.hidden = false;
+        return;
+      }
+
+      await ensureIndex();
+      if (defaultView) defaultView.hidden = true;
+      if (!results) return;
+      results.hidden = false;
+
+      let list: Item[] = [];
+      if (fuse) {
+        list = fuse.search(q).map((r) => r.item);
+        // 中文按字符匹配效果一般，补一层子串兜底并去重
+        for (const it of fallbackSearch(q)) {
+          if (!list.includes(it)) list.push(it);
+        }
+      } else {
+        list = fallbackSearch(q);
+      }
+      list = list.slice(0, 30);
+      list.sort((a, b) => (a.type === b.type ? 0 : a.type === 'acute' ? -1 : 1));
+
+      renderResults(list, q);
+    }
+
+    let timer: number | undefined;
+    input?.addEventListener('input', () => {
+      window.clearTimeout(timer);
+      const v = input.value;
+      timer = window.setTimeout(() => void run(v), 160);
+    });
+    input?.addEventListener('focus', () => void ensureIndex(), { once: true });
+
+    // 分类筛选
+    const chips = document.querySelectorAll<HTMLButtonElement>('[data-cat]');
+    const groups = document.querySelectorAll<HTMLElement>('[data-cat-group]');
+    const hint = document.getElementById('cat-hint');
+    chips.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const cat = btn.dataset.cat;
+        const active = btn.getAttribute('aria-pressed') === 'true';
+        chips.forEach((b) => b.setAttribute('aria-pressed', 'false'));
+        if (active) {
+          groups.forEach((g) => (g.hidden = true));
+          if (hint) hint.hidden = false;
+          return;
+        }
+        btn.setAttribute('aria-pressed', 'true');
+        groups.forEach((g) => (g.hidden = g.dataset.catGroup !== cat));
+        if (hint) hint.hidden = true;
+      });
+    });
+
+    // 从首页急症入口带 #q 过来时聚焦搜索框
+    if (location.hash === '#q' && input) {
+      input.focus({ preventScroll: false });
+    }
+  </script>
+</BaseLayout>
