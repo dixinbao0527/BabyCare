@@ -14,6 +14,8 @@ const ROOT = process.cwd();
 const DIST = path.join(ROOT, 'dist');
 const SHOTS = process.argv.includes('--shots');
 const SHOT_DIR = path.join(ROOT, 'output/screens');
+// 与 astro.config.mjs 保持一致：BASE_PATH=/BabyCare 时产物引用带前缀
+const BASE = (process.env.BASE_PATH || '').replace(/\/$/, '');
 
 const CHROME_CANDIDATES = [
   'C:/Program Files/Google/Chrome/Application/chrome.exe',
@@ -53,6 +55,9 @@ const MIME = {
 
 const server = http.createServer((req, res) => {
   let p = decodeURIComponent((req.url || '/').split('?')[0]);
+  // 产物可能是带 base（如 /BabyCare）构建的：剥掉前缀再映射到 dist，
+  // 否则页面里的 /BabyCare/_astro/*.css 会 404，样式失效会让 A-8 等断言假失败。
+  if (BASE && (p === BASE || p.startsWith(BASE + '/'))) p = p.slice(BASE.length) || '/';
   if (p.endsWith('/')) p += 'index.html';
   let file = path.join(DIST, p);
   if (fs.existsSync(file) && fs.statSync(file).isDirectory()) {
@@ -89,7 +94,7 @@ if (SHOTS && !fs.existsSync(SHOT_DIR)) fs.mkdirSync(SHOT_DIR, { recursive: true 
 for (const route of ROUTES) {
   const page = await browser.newPage();
   await page.setViewport({ width: 375, height: 667, deviceScaleFactor: 2, isMobile: true, hasTouch: true });
-  await page.goto(origin + route, { waitUntil: 'networkidle0', timeout: 30000 });
+  await page.goto(origin + BASE + route, { waitUntil: 'networkidle0', timeout: 30000 });
   await new Promise((r) => setTimeout(r, 250));
 
   const report = await page.evaluate(() => {

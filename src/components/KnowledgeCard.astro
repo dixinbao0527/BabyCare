@@ -2,6 +2,7 @@
 import { render, getCollection } from 'astro:content';
 import type { CollectionEntry } from 'astro:content';
 import { withBase } from '../lib/url';
+import { CATEGORY_META } from '../lib/stages';
 
 interface Props {
   entry: CollectionEntry<'developmental'>;
@@ -9,6 +10,7 @@ interface Props {
 const { entry } = Astro.props;
 const { Content } = await render(entry);
 const slug = entry.id.split('/').pop() ?? entry.id;
+const cat = CATEGORY_META[entry.data.category];
 
 // related 存的是 acute 的 slug，标题从合集里取，避免在本文件硬编码映射
 const acutes = await getCollection('acute');
@@ -16,9 +18,12 @@ const titleOf = (s: string) => acutes.find((a) => a.id === s || a.id.split('/').
 const related = entry.data.related.filter((s) => acutes.some((a) => a.id === s || a.id.split('/').pop() === s));
 ---
 
-<details class="kcard" id={slug}>
+<details class={`kcard ${cat?.tone ?? ''}`} id={slug}>
   <summary>
-    <span class="k">{entry.data.title}</span>
+    <span class="k">
+      <span class="cat-badge" aria-hidden="true">{cat?.badge ?? '育'}</span>
+      {entry.data.title}
+    </span>
     <span class="sum">{entry.data.summary}</span>
     <span class="src">{entry.data.source.name}</span>
   </summary>

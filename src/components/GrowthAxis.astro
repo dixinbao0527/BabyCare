@@ -1,0 +1,72 @@
+---
+import AgeNav from './AgeNav.astro';
+import { STAGES } from '../lib/stages';
+
+interface Props {
+  counts?: Record<string, number>;
+  defaultRange?: string;
+}
+const { counts = {}, defaultRange = STAGES[0].range } = Astro.props;
+
+// 连续月龄边界：0、2、4、7、10、13、25、36
+const BOUNDS = [0, 2, 4, 7, 10, 13, 25, 36];
+const TOTAL = 36;
+const bands = STAGES.map((s, i) => {
+  const start = BOUNDS[i];
+  const end = BOUNDS[i + 1];
+  return {
+    ...s,
+    left: (start / TOTAL) * 100,
+    width: ((end - start) / TOTAL) * 100,
+  };
+});
+const ticks = [0, 6, 12, 18, 24, 30, 36];
+const base = STAGES.find((s) => s.range === defaultRange) ?? STAGES[0];
+const baseCount = counts[base.range] ?? 0;
+---
+
+<aside class="axis-card" aria-labelledby="axis-heading">
+  <div class="axis-head">
+    <h2 id="axis-heading">成长轴</h2>
+    <span>0～36 个月 · 点下面的阶段切换</span>
+  </div>
+
+  <div class="axis" aria-hidden="true">
+    <div class="axis-track">
+      {
+        bands.map((b) => (
+          <span
+            class="axis-band"
+            data-band={b.range}
+            style={`left:${b.left}%;width:${b.width}%`}
+          />
+        ))
+      }
+    </div>
+    <div class="axis-marker" id="axis-marker" hidden>
+      <span class="axis-bubble" id="axis-bubble"></span>
+    </div>
+    <div class="axis-ticks">
+      {ticks.map((t) => <span style={`left:${(t / TOTAL) * 100}%`}>{t === 0 ? '0' : `${t} 月`}</span>)}
+    </div>
+  </div>
+
+  <p class="axis-current" id="axis-current">
+    <strong>先看 {base.name}</strong> · {base.tagline}
+  </p>
+
+  <div class="axis-stats">
+    <div class="axis-stat">
+      <b id="stat-next">—</b>
+      <span id="stat-next-label">下个筛查节点 · 填生日后显示</span>
+    </div>
+    <div class="axis-stat">
+      <b id="stat-count">{baseCount}<small>条</small></b>
+      <span>本阶段内容 · 共 41 条</span>
+    </div>
+  </div>
+
+  <div class="axis-nav">
+    <AgeNav current={defaultRange} />
+  </div>
+</aside>

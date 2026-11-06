@@ -59,6 +59,18 @@ export const CATEGORY_LABEL: Record<string, string> = {
   daily_care: '日常照护',
 };
 
+/** 分类的视觉标识：单字徽章 + CSS tone（见 global.css 的 .cat-*） */
+export const CATEGORY_META: Record<
+  string,
+  { label: string; badge: string; tone: string; hint: string }
+> = {
+  feeding: { label: '喂养', badge: '喂', tone: 'cat-feeding', hint: '奶量与辅食' },
+  sleep: { label: '睡眠', badge: '睡', tone: 'cat-sleep', hint: '作息与夜醒' },
+  development: { label: '发育', badge: '育', tone: 'cat-development', hint: '动作与互动' },
+  safety: { label: '安全', badge: '安', tone: 'cat-safety', hint: '居家与出行' },
+  daily_care: { label: '日常照护', badge: '护', tone: 'cat-daily', hint: '洗澡与护理' },
+};
+
 /** 分组顺序固定：喂养 → 睡眠 → 发育 → 安全 → 日常照护 */
 export const CATEGORY_ORDER = ['feeding', 'sleep', 'development', 'safety', 'daily_care'] as const;
 

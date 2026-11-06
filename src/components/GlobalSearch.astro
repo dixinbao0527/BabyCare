@@ -1,0 +1,320 @@
+---
+import { withBase } from '../lib/url';
+---
+
+<div class="header-tools">
+  <button
+    type="button"
+    class="search-trigger"
+    id="search-open"
+    aria-haspopup="dialog"
+    aria-controls="global-search"
+    aria-expanded="false"
+    aria-keyshortcuts="Control+K Meta+K"
+  >
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+      <circle cx="11" cy="11" r="7"></circle>
+      <path d="m16.5 16.5 4 4"></path>
+    </svg>
+    <span class="search-text">搜索</span>
+    <kbd id="gs-kbd">⌘K</kbd>
+  </button>
+</div>
+
+<dialog class="search-dialog" id="global-search" aria-labelledby="gs-title">
+  <div class="gs-head">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+      <circle cx="11" cy="11" r="7"></circle>
+      <path d="m16.5 16.5 4 4"></path>
+    </svg>
+    <label class="sr-only" id="gs-title" for="gs-input">搜索症状或知识</label>
+    <input
+      id="gs-input"
+      class="gs-input"
+      type="search"
+      placeholder="搜症状、月龄、喂养…例如「抽搐」「误吞」「夜醒」"
+      autocomplete="off"
+      enterkeyhint="search"
+    />
+    <button type="button" class="gs-close" id="gs-close" aria-label="关闭搜索">Esc</button>
+  </div>
+
+  <div class="gs-results" id="gs-results" aria-live="polite">
+    <p class="gs-empty">输入关键词，急症条目会固定排在前面。</p>
+  </div>
+
+  <div class="gs-foot">
+    <span id="gs-count">共 41 条内容 · 搜索在本机完成</span>
+    <a href={withBase('/quick')}>在速查页搜索 →</a>
+  </div>
+</dialog>
+
+<script>
+  import { withBase } from '../lib/url';
+
+  type Item = {
+    slug: string;
+    path?: string;
+    title: string;
+    tags: string[];
+    summary: string;
+    type: 'acute' | 'developmental';
+    category: string;
+    age_range: string;
+  };
+
+  const CAT_LABEL: Record<string, string> = {
+    feeding: '喂养',
+    sleep: '睡眠',
+    development: '发育',
+    safety: '安全',
+    daily_care: '日常照护',
+  };
+
+  const dialog = document.getElementById('global-search') as HTMLDialogElement | null;
+  const trigger = document.getElementById('search-open');
+  const closeBtn = document.getElementById('gs-close');
+  const input = document.getElementById('gs-input') as HTMLInputElement | null;
+  const results = document.getElementById('gs-results');
+  const countEl = document.getElementById('gs-count');
+  const kbd = document.getElementById('gs-kbd');
+
+  if (kbd && !/Mac|iPhone|iPad/i.test(navigator.userAgent)) {
+    kbd.textContent = 'Ctrl K';
+  }
+
+  let items: Item[] | null = null;
+  let fuse: { search: (q: string) => { item: Item }[] } | null = null;
+  let loading: Promise<void> | null = null;
+  let active = 0;
+  let timer: number | undefined;
+
+  function hrefOf(it: Item): string {
+    return it.type === 'acute'
+      ? withBase(`/quick/${it.slug}`)
+      : withBase(`/age/${it.age_range}`) + '#' + it.slug;
+  }
+
+  function tag(text: string, cls = ''): HTMLSpanElement {
+    const el = document.createElement('span');
+    el.className = `tag ${cls}`.trim();
+    el.textContent = text;
+    return el;
+  }
+
+  function empty(message: string, showQuick = false) {
+    if (!results) return;
+    results.replaceChildren();
+    const p = document.createElement('p');
+    p.className = 'gs-empty';
+    p.textContent = message;
+    results.append(p);
+
+    if (showQuick) {
+      const links = document.createElement('p');
+      links.className = 'gs-empty';
+      links.style.paddingTop = '0';
+      links.append('试试：');
+      let found = false;
+      ['choking', 'febrile-seizure', 'burns'].forEach((slug, i) => {
+        const it = items?.find((x) => x.slug === slug);
+        if (!it) return;
+        if (found) links.append(' · ');
+        found = true;
+        const a = document.createElement('a');
+        a.href = hrefOf(it);
+        a.textContent = it.title;
+        links.append(a);
+      });
+      if (!found) {
+        const a = document.createElement('a');
+        a.href = withBase('/quick');
+        a.textContent = '去症状速查页';
+        links.append(a);
+      }
+      results.append(links);
+    }
+  }
+
+  function render(list: Item[]) {
+    if (!results) return;
+    results.replaceChildren();
+    active = 0;
+
+    if (list.length === 0) {
+      empty('没找到。换个更短的词试试，比如「烫」「吐」「夜醒」。', true);
+      return;
+    }
+
+    list.forEach((it, i) => {
+      const a = document.createElement('a');
+      a.className = 'gs-item' + (i === 0 ? ' is-active' : '');
+      a.href = hrefOf(it);
+
+      const row = document.createElement('span');
+      row.className = 'row';
+      if (it.type === 'acute') row.append(tag('急症', 'tag-acute'));
+      const t = document.createElement('span');
+      t.className = 't';
+      t.textContent = it.title;
+      row.append(t);
+      if (it.type === 'developmental') row.append(tag(it.age_range.replace('-', '～')));
+
+      const s = document.createElement('span');
+      s.className = 's';
+      s.textContent = it.summary;
+
+      const meta = document.createElement('span');
+      meta.className = 'meta';
+      if (it.type === 'developmental') meta.append(tag(CAT_LABEL[it.category] ?? '内容'));
+      it.tags.slice(0, 3).forEach((x) => meta.append(tag(x)));
+
+      a.append(row, s, meta);
+      results.append(a);
+    });
+
+    const all = Array.from(results.querySelectorAll<HTMLAnchorElement>('.gs-item'));
+    all.forEach((el) => {
+      el.addEventListener('mouseenter', () => {
+        active = all.indexOf(el);
+        all.forEach((x) => x.classList.toggle('is-active', x === el));
+      });
+    });
+  }
+
+  function fallbackSearch(q: string): Item[] {
+    const needle = q.toLowerCase();
+    const pool = items ?? [];
+    const scored: { it: Item; s: number }[] = [];
+    for (const it of pool) {
+      let s = 0;
+      if (it.title.toLowerCase().includes(needle)) s += 3;
+      if (it.tags.some((x) => x.toLowerCase().includes(needle))) s += 2;
+      if (it.summary.toLowerCase().includes(needle)) s += 1;
+      if (s > 0) scored.push({ it, s });
+    }
+    scored.sort((a, b) => b.s - a.s);
+    return scored.map((x) => x.it);
+  }
+
+  async function ensureIndex() {
+    if (items) return;
+    if (loading) return loading;
+    loading = (async () => {
+      try {
+        const res = await fetch(withBase('/search-index.json'), { credentials: 'omit' });
+        if (!res.ok) throw new Error('index missing');
+        items = (await res.json()) as Item[];
+        items.sort((a, b) => (a.type === b.type ? 0 : a.type === 'acute' ? -1 : 1));
+        if (countEl) countEl.textContent = `共 ${items.length} 条内容 · 搜索在本机完成`;
+      } catch {
+        items = [];
+      }
+      try {
+        const mod: any = await import('fuse.js');
+        const Fuse = mod.default ?? mod;
+        fuse = new Fuse(items, {
+          threshold: 0.35,
+          ignoreLocation: true,
+          keys: [
+            { name: 'title', weight: 3 },
+            { name: 'tags', weight: 2 },
+            { name: 'summary', weight: 1 },
+          ],
+        });
+      } catch {
+        fuse = null;
+      }
+    })();
+    return loading;
+  }
+
+  async function run(q: string) {
+    const query = q.trim();
+    if (!query) {
+      if (countEl) countEl.textContent = '共 41 条内容 · 搜索在本机完成';
+      empty('输入关键词，急症条目会固定排在前面。');
+      return;
+    }
+    await ensureIndex();
+    if (!items || items.length === 0) {
+      empty('搜索索引暂时没取到。可以直接去症状速查页浏览。', true);
+      return;
+    }
+    let list: Item[] = [];
+    if (fuse) {
+      list = fuse.search(query).map((r) => r.item);
+      for (const it of fallbackSearch(query)) if (!list.includes(it)) list.push(it);
+    } else {
+      list = fallbackSearch(query);
+    }
+    list = list.slice(0, 12);
+    list.sort((a, b) => (a.type === b.type ? 0 : a.type === 'acute' ? -1 : 1));
+    render(list);
+  }
+
+  function open() {
+    if (!dialog) return;
+    if (typeof dialog.showModal === 'function') {
+      if (!dialog.open) dialog.showModal();
+    } else {
+      dialog.setAttribute('open', '');
+    }
+    trigger?.setAttribute('aria-expanded', 'true');
+    window.setTimeout(() => input?.focus(), 30);
+    void ensureIndex();
+  }
+
+  function close() {
+    if (!dialog) return;
+    if (typeof dialog.close === 'function') dialog.close();
+    else dialog.removeAttribute('open');
+    trigger?.setAttribute('aria-expanded', 'false');
+  }
+
+  trigger?.addEventListener('click', open);
+  closeBtn?.addEventListener('click', close);
+
+  dialog?.addEventListener('click', (e) => {
+    if (e.target === dialog) close();
+  });
+  dialog?.addEventListener('close', () => {
+    trigger?.setAttribute('aria-expanded', 'false');
+    if (input) input.value = '';
+    empty('输入关键词，急症条目会固定排在前面。');
+  });
+
+  input?.addEventListener('input', () => {
+    window.clearTimeout(timer);
+    const v = input.value;
+    timer = window.setTimeout(() => void run(v), 140);
+  });
+
+  input?.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      close();
+      return;
+    }
+    if (!results) return;
+    const all = Array.from(results.querySelectorAll<HTMLAnchorElement>('.gs-item'));
+    if (all.length === 0) return;
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      active = (active + (e.key === 'ArrowDown' ? 1 : -1) + all.length) % all.length;
+      all.forEach((x, i) => x.classList.toggle('is-active', i === active));
+      all[active]?.scrollIntoView({ block: 'nearest' });
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      all[active]?.click();
+    }
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+      e.preventDefault();
+      if (dialog?.open) close();
+      else open();
+    }
+  });
+</script>

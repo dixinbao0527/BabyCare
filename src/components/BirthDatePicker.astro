@@ -38,9 +38,9 @@ const minStr = `${today.getFullYear() - 6}-${pad(today.getMonth() + 1)}-${pad(to
     </div>
   </details>
 
-  <div class="age-result" id="age-result" aria-live="polite">
-    <span>输入出生日期，看当前阶段该注意什么。</span>
-  </div>
+  <p class="hero-example">还没记住生日？直接点成长轴上的阶段，或看<a href={withBase('/milestones')}>发育里程碑</a>。</p>
+
+  <div class="age-result" id="age-result" aria-live="polite" hidden></div>
 
   <a class="acute-entry" href={withBase('/quick#q')} id="acute-entry">
     <span class="t">
@@ -53,14 +53,25 @@ const minStr = `${today.getFullYear() - 6}-${pad(today.getMonth() + 1)}-${pad(to
 
 <script>
   import { calcAge, parseBirthDate, formatDate } from '../lib/age';
-  import { stageOf, STAGES } from '../lib/stages';
+  import { stageOf, STAGES, SCREEN_NODES } from '../lib/stages';
   import { withBase } from '../lib/url';
 
   const KEY = 'ich.birth.v1';
+  const DEFAULT_RANGE = STAGES[0].range;
 
   const input = document.getElementById('birth-date') as HTMLInputElement | null;
   const gaSelect = document.getElementById('ga-select') as HTMLSelectElement | null;
   const result = document.getElementById('age-result');
+  const titleEl = document.getElementById('hero-title');
+  const stageNameEl = document.getElementById('stage-name');
+  const stageTaglineEl = document.getElementById('stage-tagline');
+  const stageMoreEl = document.getElementById('stage-more');
+  const axisMarker = document.getElementById('axis-marker');
+  const axisBubble = document.getElementById('axis-bubble');
+  const axisCurrent = document.getElementById('axis-current');
+  const statNext = document.getElementById('stat-next');
+  const statNextLabel = document.getElementById('stat-next-label');
+  const statCount = document.getElementById('stat-count');
 
   type Stored = { birth: string; ga: number };
 
@@ -86,72 +97,168 @@ const minStr = `${today.getFullYear() - 6}-${pad(today.getMonth() + 1)}-${pad(to
     }
   }
 
-  function applyStage(range: string | null) {
-    const panels = document.querySelectorAll<HTMLElement>('[data-stage-panel]');
-    panels.forEach((p) => {
+  function countFor(range: string): number {
+    const panel = document.querySelector<HTMLElement>(`[data-stage-panel="${range}"]`);
+    if (!panel) return 0;
+    const total = Number(panel.dataset.count);
+    if (Number.isFinite(total) && total > 0) return total;
+    return panel.querySelectorAll('.entry-card').length;
+  }
+
+  function setCount(n: number) {
+    if (!statCount) return;
+    statCount.replaceChildren(document.createTextNode(String(n)));
+    const small = document.createElement('small');
+    small.textContent = '条';
+    statCount.append(small);
+  }
+
+  function setDefaultAxis() {
+    const base = STAGES[0];
+    if (axisMarker) axisMarker.hidden = true;
+    if (axisBubble) axisBubble.textContent = '';
+    if (axisCurrent) {
+      axisCurrent.replaceChildren();
+      const strong = document.createElement('strong');
+      strong.textContent = `先看 ${base.name}`;
+      axisCurrent.append(strong, ` · ${base.tagline}`);
+    }
+    if (statNext) statNext.textContent = '—';
+    if (statNextLabel) statNextLabel.textContent = '下个筛查节点 · 填生日后显示';
+    setCount(countFor(DEFAULT_RANGE));
+  }
+
+  function applyStage(range: string) {
+    document.querySelectorAll<HTMLElement>('[data-stage-panel]').forEach((p) => {
       p.hidden = p.dataset.stagePanel !== range;
     });
-    const empty = document.getElementById('stage-empty');
-    if (empty) empty.hidden = range !== null;
+
     document.querySelectorAll<HTMLAnchorElement>('.stage-strip a').forEach((a) => {
-      if (range && a.dataset.range === range) a.setAttribute('aria-current', 'true');
+      if (a.dataset.range === range) a.setAttribute('aria-current', 'true');
       else a.removeAttribute('aria-current');
     });
-    const label = document.getElementById('stage-current-label');
-    if (label) {
-      const s = STAGES.find((x) => x.range === range);
-      label.textContent = s ? `当前阶段：${s.name}` : '全部阶段';
+
+    document.querySelectorAll<HTMLElement>('.axis-band').forEach((b) => {
+      b.classList.toggle('is-current', b.dataset.band === range);
+    });
+
+    const stage = STAGES.find((s) => s.range === range);
+    const count = countFor(range);
+    if (stage) {
+      if (stageNameEl) stageNameEl.textContent = stage.name;
+      if (stageTaglineEl) stageTaglineEl.textContent = stage.tagline;
+      if (stageMoreEl) {
+        stageMoreEl.setAttribute('href', withBase(`/age/${range}`));
+        stageMoreEl.textContent = `本阶段全部 ${count} 条 →`;
+      }
+    }
+    setCount(count);
+    window.dispatchEvent(new CustomEvent('ich:stage-changed', { detail: { range } }));
+  }
+
+  function setTitle(info: ReturnType<typeof calcAge>) {
+    if (!titleEl) return;
+    titleEl.replaceChildren(
+      document.createTextNode(info.days === 0 ? '宝宝今天出生，' : `宝宝 ${info.months} 个月，`),
+      document.createElement('br'),
+      document.createTextNode('现在该注意什么？')
+    );
+  }
+
+  function setAxis(info: ReturnType<typeof calcAge>, stage: { name: string; tagline: string }) {
+    if (axisMarker && axisBubble) {
+      const pct = Math.min(98, Math.max(2, (info.months / 36) * 100));
+      axisMarker.hidden = false;
+      axisMarker.style.left = `${pct}%`;
+      axisBubble.textContent = `${info.months} 个月${info.corrected ? '（矫正）' : ''}`;
+    }
+
+    if (axisCurrent) {
+      axisCurrent.replaceChildren();
+      const strong = document.createElement('strong');
+      strong.textContent = stage.name;
+      axisCurrent.append(strong, ` · ${stage.tagline}`);
+      if (info.corrected) {
+        const note = document.createElement('span');
+        note.className = 'muted';
+        note.textContent = '（按矫正月龄）';
+        axisCurrent.append(note);
+      }
+    }
+
+    const next = SCREEN_NODES.find((n) => n > info.months) ?? null;
+    if (statNext) statNext.textContent = next === null ? '—' : `${next}`;
+    if (statNextLabel) {
+      statNextLabel.textContent =
+        next === null
+          ? info.months >= 36
+            ? '已到 36 月龄最后一个节点'
+            : '已超出手册覆盖的 0～36 个月'
+          : `下个筛查节点 · ${next} 月龄`;
     }
   }
 
   function renderEmpty() {
+    if (result) {
+      result.hidden = true;
+      result.replaceChildren();
+    }
+    if (titleEl) titleEl.textContent = '按月龄查，每条都能溯源';
+    setDefaultAxis();
+    applyStage(DEFAULT_RANGE);
+  }
+
+  function renderError(message: string) {
     if (!result) return;
+    result.hidden = false;
     result.replaceChildren();
     const span = document.createElement('span');
-    span.textContent = '输入出生日期，看当前阶段该注意什么。';
+    span.textContent = message;
     result.append(span);
-    applyStage(null);
+    if (titleEl) titleEl.textContent = '按月龄查，每条都能溯源';
+    setDefaultAxis();
+    applyStage(DEFAULT_RANGE);
   }
 
   function renderAge(birth: Date, ga: number) {
-    if (!result) return;
     const info = calcAge(birth, new Date(), ga);
     const { stage, outOfRange } = stageOf(info.months);
 
-    result.replaceChildren();
+    if (result) {
+      result.hidden = false;
+      result.replaceChildren();
 
-    const line = document.createElement('span');
-    if (info.days === 0) {
-      line.append('宝宝今天出生，');
-    } else {
-      line.append('宝宝现在 ');
+      const line = document.createElement('span');
+      line.append(info.days === 0 ? '宝宝今天出生，' : '宝宝现在 ');
+      const strong = document.createElement('strong');
+      strong.textContent = `${info.months} 个月`;
+      line.append(strong, `，处于 ${stage.name}阶段。`);
+      result.append(line);
+
+      const link = document.createElement('a');
+      link.href = withBase(`/age/${stage.range}`);
+      link.textContent = `查看 ${stage.name} 全部内容 →`;
+      link.style.fontWeight = '600';
+      result.append(link);
+
+      if (info.corrected) {
+        const note = document.createElement('span');
+        note.className = 'note';
+        const extraDays = Math.round(info.correctedExtraDays);
+        note.textContent = `因 ${ga} 周早产，以上为矫正月龄（${info.months} 个月${extraDays > 0 ? ` ${extraDays} 天` : ''}）；实际月龄 ${info.rawMonths} 个月。矫正至实际 24 个月为止。`;
+        result.append(note);
+      }
+
+      if (outOfRange) {
+        const note = document.createElement('span');
+        note.className = 'note';
+        note.textContent = '本手册覆盖 0～3 岁，当前已超出范围，内容可能不再适用。';
+        result.append(note);
+      }
     }
-    const strong = document.createElement('strong');
-    strong.textContent = `${info.months} 个月`;
-    line.append(strong, `，处于 ${stage.name}阶段。`);
-    result.append(line);
 
-    const link = document.createElement('a');
-    link.href = withBase(`/age/${stage.range}`);
-    link.textContent = '查看该阶段全部内容 →';
-    link.style.fontWeight = '600';
-    result.append(link);
-
-    if (info.corrected) {
-      const note = document.createElement('span');
-      note.className = 'note';
-      const extraDays = Math.round(info.correctedExtraDays);
-      note.textContent = `因 ${ga} 周早产，以上为矫正月龄（${info.months} 个月${extraDays > 0 ? ` ${extraDays} 天` : ''}）；实际月龄 ${info.rawMonths} 个月。矫正至实际 24 个月为止。`;
-      result.append(note);
-    }
-
-    if (outOfRange) {
-      const note = document.createElement('span');
-      note.className = 'note';
-      note.textContent = '本手册覆盖 0～3 岁，当前已超出范围，内容可能不再适用。';
-      result.append(note);
-    }
-
+    setTitle(info);
+    setAxis(info, stage);
     applyStage(stage.range);
   }
 
@@ -159,16 +266,8 @@ const minStr = `${today.getFullYear() - 6}-${pad(today.getMonth() + 1)}-${pad(to
     const value = input?.value ?? '';
     const birth = parseBirthDate(value);
     if (!birth) {
-      if (value) {
-        if (result) {
-          result.replaceChildren();
-          const span = document.createElement('span');
-          span.textContent = '出生日期不能晚于今天，请重新选择。';
-          result.append(span);
-        }
-      } else {
-        renderEmpty();
-      }
+      if (value) renderError('出生日期不能晚于今天，请重新选择。');
+      else renderEmpty();
       return;
     }
     const ga = Number(gaSelect?.value ?? 40);
@@ -176,7 +275,6 @@ const minStr = `${today.getFullYear() - 6}-${pad(today.getMonth() + 1)}-${pad(to
     renderAge(birth, ga);
   }
 
-  // 初始化：从本地恢复
   const stored = readStore();
   if (stored) {
     const d = parseBirthDate(stored.birth);

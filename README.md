@@ -11,12 +11,14 @@
 
 | 路由 | 作用 |
 |---|---|
-| `/` | 输入出生日期 → 定位月龄 → 显示当前阶段重点；急症入口不依赖输入，始终可见 |
+| `/` | 输入出生日期 → 成长轴定位月龄 → 显示当前阶段重点；急症入口不依赖输入，始终可见 |
 | `/age/[range]` | 7 个月龄阶段页，按喂养 / 睡眠 / 发育 / 安全 / 日常照护分组，页底附当月龄预警征象 |
 | `/quick` | 症状速查。急症条目固定置顶、不参与月龄筛选；支持搜索与分类浏览 |
 | `/quick/[slug]` | 急症详情。红色警示条贴顶 → 一句话识别 → 三级分诊卡 → 送医前处理 → 高发年龄 → 来源 |
-| `/milestones` | 8 个筛查节点 × 4 个维度里程碑 + 32 条预警征象自查清单 |
+| `/milestones` | WHO 六项大运动窗口图（当前月龄竖线）+ 8 个筛查节点 × 4 个维度里程碑 + 32 条预警征象自查清单 |
 | `/sources` | 指南清单（构建期自动聚合）、免责声明、版权与隐私说明 |
+
+页头提供全局搜索（`⌘K` / `Ctrl+K`），复用构建期生成的 `search-index.json`；急症条目在结果中固定置顶。
 
 核心约束（也是验收项）：
 
@@ -55,9 +57,12 @@ npm run verify     # 375px 无横向滚动、触控 ≥44px、急症页结构、
 src/content/
   developmental/<age_range>/<slug>.md   # 发展性条目，10 个字段的 frontmatter
   acute/<slug>.md                       # 急症条目，含三级分诊结构化字段
-  data/milestones.yaml                  # 里程碑数据集（file loader，需 id 字段）
+  data/milestones.yaml                  # 里程碑数据集（file loader）；运动窗口写在 windows 字段
 src/lib/warningSigns.ts                 # 32 条预警征象常量（逐字照录，禁止改写）
+src/lib/monthlyTasks.ts                 # 首页「本月 3 件事」，slug 需对应阶段页条目
 ```
+
+运动维度的 WHO 窗口用 `windows` 数组维护，每条含 `label / start / end / order`（`end` 必须大于 `start`，`order` 决定图上的行序）。当前六项：独坐 3.8–9.2、手膝爬行 5.2–13.5、扶物站立 4.8–11.4、扶物行走 5.9–13.7、独站 6.9–16.9、独走 8.2–17.6 个月。
 
 新增一条发展性条目：在对应月龄目录下建 `.md`，frontmatter 必填 `title / age_range / category / scenario_tags / summary / source / order / last_reviewed / reviewer`。`order` 在同月龄同分类内必须唯一，`source.section` 与 `source.url` 至少一项非空。
 

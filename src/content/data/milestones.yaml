@@ -31,6 +31,11 @@
   domain: motor
   description: 能扶坐；无支撑独坐的达成窗口是 3.8～9.2 个月
   source: WHO Multicentre Growth Reference Study（2006）
+  windows:
+    - label: 独坐（无支撑）
+      start: 3.8
+      end: 9.2
+      order: 1
 - id: m6-language
   age_month: 6
   domain: language
@@ -53,6 +58,11 @@
   domain: motor
   description: 能独坐；手膝爬行的达成窗口是 5.2～13.5 个月
   source: WHO Multicentre Growth Reference Study（2006）
+  windows:
+    - label: 手膝爬行
+      start: 5.2
+      end: 13.5
+      order: 2
 - id: m8-language
   age_month: 8
   domain: language
@@ -75,6 +85,25 @@
   domain: motor
   description: 能扶物站立（窗口 4.8～11.4 个月）、扶物行走（窗口 5.9～13.7 个月）
   source: WHO Multicentre Growth Reference Study（2006）
+  windows:
+    - label: 扶物站立
+      start: 4.8
+      end: 11.4
+      order: 3
+    - label: 扶物行走
+      start: 5.9
+      end: 13.7
+      order: 4
+- id: m12-motor-3
+  age_month: 12
+  domain: motor
+  description: 能独自站立片刻（WHO 窗口 6.9～16.9 个月）
+  source: WHO Multicentre Growth Reference Study（2006）
+  windows:
+    - label: 独站
+      start: 6.9
+      end: 16.9
+      order: 5
 - id: m12-language
   age_month: 12
   domain: language
@@ -97,6 +126,11 @@
   domain: motor
   description: 能独走（窗口 8.2～17.6 个月），会蹲下捡东西再站起来
   source: WHO Multicentre Growth Reference Study（2006）
+  windows:
+    - label: 独走
+      start: 8.2
+      end: 17.6
+      order: 6
 - id: m18-language
   age_month: 18
   domain: language

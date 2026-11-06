@@ -27,4 +27,7 @@ const aria = `紧急程度：${meta.label}。${criteria}`;
   <span class="lbl">第 {index} 级</span>
   <p class="crit">{criteria}</p>
   <p class="act"><strong>怎么做：</strong>{action}</p>
+  {level === 'emergency' && (
+    <a class="call" href="tel:120" aria-label="拨打 120 急救电话">一键拨打 120</a>
+  )}
 </div>

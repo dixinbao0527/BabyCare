@@ -6,6 +6,7 @@ import {
   STAGES,
   CATEGORY_ORDER,
   CATEGORY_LABEL,
+  CATEGORY_META,
   prevStage,
   nextStage,
   screenNodeFor,
@@ -74,6 +75,9 @@ const title = `${stage.name}宝宝的养育要点`;
       groups.map((g) => (
         <section aria-labelledby={`g-${g.cat}`}>
           <h2 class="group-title" id={`g-${g.cat}`}>
+            <span class={`cat-badge ${CATEGORY_META[g.cat]?.tone ?? ''}`} aria-hidden="true">
+              {CATEGORY_META[g.cat]?.badge ?? '育'}
+            </span>
             {g.label}
             <span class="count">{g.items.length} 条</span>
           </h2>

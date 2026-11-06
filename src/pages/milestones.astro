@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import MotorWindows from '../components/MotorWindows.astro';
 import { getCollection } from 'astro:content';
 import { SCREEN_NODES, screenNodeFor, CATEGORY_LABEL } from '../lib/stages';
 import {
@@ -12,6 +13,9 @@ import {
 import { withBase } from '../lib/url';
 
 const milestones = await getCollection('milestones');
+const windows = milestones
+  .flatMap((m) => m.data.windows.map((w) => ({ ...w, source: m.data.source })))
+  .sort((a, b) => a.order - b.order || a.start - b.start);
 
 const DOMAINS = [
   { key: 'motor', label: '大运动', note: 'WHO 窗口' },
@@ -45,6 +49,10 @@ const nodes = SCREEN_NODES.map((n) => ({
       </p>
     </div>
 
+    <MotorWindows windows={windows} />
+
+    <h2 class="node-list-heading">按筛查节点逐条对照</h2>
+
     <div class="node-picker">
       <label for="node">对照月龄</label>
       <select id="node" aria-describedby="node-hint">
@@ -58,7 +66,7 @@ const nodes = SCREEN_NODES.map((n) => ({
         <section data-node={String(n.node)} hidden={i !== 0} aria-label={`${n.node} 月龄`}>
           <h2 style="margin-top:1.8rem;font-size:1.08rem;">{n.node} 月龄的里程碑</h2>
           <p class="small muted" style="margin-top:-.2rem;">
-            运动维度给出 WHO 六项粗大运动里程碑的 1～99 百分位窗口，不是达标线。
+            运动维度可对照上方窗口图；这一节按节点列出文字表述，不是达标线。
           </p>
 
           {n.milestones.map((d) => (
@@ -113,6 +121,10 @@ const nodes = SCREEN_NODES.map((n) => ({
     <div class="notice" style="margin-top:2rem;">
       <h2>怎么用这一页</h2>
       <p>
+        先看上方窗口图：条目落在条内就是正常范围，落在条外也不等于异常，下一步是做评估。
+        再按筛查节点看文字清单和预警征象。
+      </p>
+      <p>
         里程碑是「多数孩子在这个范围内会出现」的描述，不是考试题。孩子提前出现不代表更聪明，
         晚一点出现也不等于有问题——尤其是运动里程碑，WHO 给出的窗口跨度本身就很大。
       </p>
@@ -134,6 +146,29 @@ const nodes = SCREEN_NODES.map((n) => ({
     const hint = document.getElementById('node-hint');
     const sections = Array.from(document.querySelectorAll<HTMLElement>('[data-node]'));
     const referral = document.getElementById('referral');
+    const mwNow = document.getElementById('mw-now');
+    const mwNowText = document.getElementById('mw-now-text');
+    const mwNowHint = document.getElementById('mw-now-hint');
+
+    function setNow(months: number | null, options: { corrected?: boolean; days?: number } = {}) {
+      if (!mwNow || !mwNowText) return;
+      if (months === null) {
+        mwNow.hidden = true;
+        mwNowText.hidden = true;
+        if (mwNowHint) mwNowHint.hidden = false;
+        return;
+      }
+      const chartMax = Number((mwNow.parentElement as HTMLElement | null)?.dataset.max) || 18;
+      const capped = Math.min(months, chartMax);
+      mwNow.hidden = false;
+      mwNow.style.left = `${Math.min(99, Math.max(0, (capped / chartMax) * 100))}%`;
+      mwNowText.hidden = false;
+      if (mwNowHint) mwNowHint.hidden = true;
+      const ageText = options.days === 0 ? '宝宝今天出生' : `宝宝现在 ${months} 个月`;
+      mwNowText.textContent = `${ageText}${options.corrected ? '（矫正）' : ''}${
+        months > chartMax ? ' · 超出图范围' : ''
+      }`;
+    }
 
     function show(node: string) {
       sections.forEach((s) => {
@@ -169,6 +204,7 @@ const nodes = SCREEN_NODES.map((n) => ({
         const birth = parseBirthDate(parsed.birth);
         if (birth) {
           const info = calcAge(birth, new Date(), parsed.ga && parsed.ga >= 24 ? parsed.ga : 40);
+          setNow(info.months, { corrected: info.corrected, days: info.days });
           const node = screenNodeFor(info.months);
           if (select) {
             select.value = String(node);
@@ -177,7 +213,7 @@ const nodes = SCREEN_NODES.map((n) => ({
           if (hint) {
             const isExact = SCREEN_NODES.includes(info.months as (typeof SCREEN_NODES)[number]);
             hint.textContent = isExact
-              ? `已按宝宝当前月龄（${info.months} 个月）定位，${info.corrected ? '早产按矫正月龄计算。' : ''}`
+              ? `已按宝宝当前月龄（${info.months} 个月）定位${info.corrected ? '，早产按矫正月龄计算。' : '。'}`
               : `宝宝当前 ${info.months} 个月，按最近的 ${node} 月龄节点对照${info.months < node ? '，满 ' + node + ' 月龄后自动切换' : ''}${info.corrected ? '；早产按矫正月龄计算' : ''}。`;
           }
         }
@@ -185,6 +221,8 @@ const nodes = SCREEN_NODES.map((n) => ({
     } catch {
       /* 忽略存储异常 */
     }
+
+    window.addEventListener('ich:storage-cleared', () => setNow(null));
 
     show(select?.value ?? '3');
   </script>

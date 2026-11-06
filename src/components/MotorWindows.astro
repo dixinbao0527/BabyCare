@@ -1,0 +1,82 @@
+---
+interface Window {
+  label: string;
+  start: number;
+  end: number;
+  order?: number;
+}
+
+interface Props {
+  windows: Window[];
+  source?: string;
+}
+
+const { windows, source = 'WHO Multicentre Growth Reference Study（2006）' } = Astro.props;
+const maxEnd = windows.length ? Math.max(...windows.map((w) => w.end)) : 18;
+const MAX = Math.max(18, Math.ceil(maxEnd / 3) * 3);
+const TICKS = Array.from({ length: MAX / 3 + 1 }, (_, i) => i * 3);
+const rows = [...windows].sort((a, b) => (a.order ?? 0) - (b.order ?? 0) || a.start - b.start);
+const pct = (n: number) => Math.max(0, Math.min(100, (n / MAX) * 100));
+---
+
+<figure class="mw-figure" aria-labelledby="mw-caption">
+  <div class="mw-head">
+    <div>
+      <h2 id="mw-caption">大运动：达成窗口</h2>
+      <p class="mw-sub">WHO 1～99 百分位窗口。条的位置和长度都重要，不是达标线。</p>
+    </div>
+    <div class="mw-legend">
+      <span><i class="mw-swatch" aria-hidden="true"></i>1～99 百分位</span>
+      <span id="mw-now-hint" class="mw-now-hint">填生日后显示当前位置</span>
+      <span id="mw-now-text" class="mw-now-text" aria-live="polite" hidden></span>
+    </div>
+  </div>
+
+  {rows.length > 0 ? (
+    <div class="mw-grid">
+      <div class="mw-labels">
+        {rows.map((w) => (
+          <div class="mw-name">
+            <b>{w.label}</b>
+            <span>{w.start}–{w.end} 月</span>
+          </div>
+        ))}
+      </div>
+
+      <div class="mw-plots" data-max={MAX}>
+        <div class="mw-gridlines" aria-hidden="true">
+          {TICKS.map((t) => <span style={`left:${pct(t)}%`} />)}
+        </div>
+
+        {rows.map((w) => (
+          <div class="mw-track">
+            <span
+              class="mw-bar"
+              style={`left:${pct(w.start)}%;width:${pct(w.end) - pct(w.start)}%`}
+              title={`${w.label}：${w.start}～${w.end} 个月（1～99 百分位）`}
+              aria-hidden="true"
+            />
+          </div>
+        ))}
+
+        <div class="mw-now" id="mw-now" hidden aria-hidden="true"></div>
+      </div>
+
+      <div class="mw-axis" aria-hidden="true">
+        <div class="mw-axis-spacer"></div>
+        <div class="mw-ticks">
+          {TICKS.map((t) => (
+            <span style={`left:${pct(t)}%`}>{t === 0 ? '0' : `${t} 月`}</span>
+          ))}
+        </div>
+      </div>
+    </div>
+  ) : (
+    <p class="small muted">窗口数据正在补充。</p>
+  )}
+
+  <figcaption class="mw-foot">
+    <span>共 {rows.length} 项 · {source}</span>
+    <span>条内属正常范围；条外不等于异常，下一步是做发育评估。</span>
+  </figcaption>
+</figure>

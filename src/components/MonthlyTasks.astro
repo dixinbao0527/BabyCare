@@ -1,0 +1,138 @@
+---
+import { STAGES } from '../lib/stages';
+import { MONTHLY_TASKS } from '../lib/monthlyTasks';
+import { withBase } from '../lib/url';
+
+interface Props {
+  defaultRange?: string;
+}
+const { defaultRange = STAGES[0].range } = Astro.props;
+const base = STAGES.find((s) => s.range === defaultRange) ?? STAGES[0];
+---
+
+<section class="todo-card" aria-labelledby="todo-heading">
+  <div class="todo-head">
+    <h2 id="todo-heading">本月 3 件事</h2>
+    <span id="todo-stage-label">{base.name}</span>
+  </div>
+  <p class="todo-hint">按当前阶段 · 勾选只保存在你的设备上</p>
+
+  {
+    STAGES.map((s) => {
+      const tasks = MONTHLY_TASKS[s.range] ?? [];
+      return (
+        <div data-todo-panel={s.range} data-todo-total={tasks.length} hidden={s.range !== base.range}>
+          <ul class="todo-list">
+            {tasks.map((t, i) => {
+              const id = `todo-${s.range}-${i}`;
+              return (
+                <li class="todo-row">
+                  <label class="todo-check" for={id}>
+                    <input type="checkbox" id={id} data-task={`${s.range}:${i}`} />
+                    <span>{t.text}</span>
+                  </label>
+                  <a
+                    class="todo-link"
+                    href={withBase(`/age/${s.range}`) + '#' + t.slug}
+                    aria-label={`查看「${t.text}」的详细说明`}
+                  >
+                    →
+                  </a>
+                </li>
+              );
+            })}
+          </ul>
+          <div class="todo-foot">
+            <span data-todo-count>已勾选 0 / {tasks.length}</span>
+            <span>只存本机</span>
+          </div>
+        </div>
+      );
+    })
+  }
+</section>
+
+<script>
+  import { STAGES } from '../lib/stages';
+
+  const KEY = 'ich.tasks.v1';
+  const panels = Array.from(document.querySelectorAll<HTMLElement>('[data-todo-panel]'));
+  const checks = Array.from(document.querySelectorAll<HTMLInputElement>('.todo-row input[type="checkbox"]'));
+  const stageLabel = document.getElementById('todo-stage-label');
+
+  function read(): Record<string, boolean> {
+    try {
+      const raw = localStorage.getItem(KEY);
+      if (!raw) return {};
+      const parsed = JSON.parse(raw) as Record<string, unknown>;
+      const out: Record<string, boolean> = {};
+      for (const [k, v] of Object.entries(parsed)) if (v === true) out[k] = true;
+      return out;
+    } catch {
+      return {};
+    }
+  }
+
+  function write(value: Record<string, boolean>) {
+    try {
+      if (Object.keys(value).length === 0) localStorage.removeItem(KEY);
+      else localStorage.setItem(KEY, JSON.stringify(value));
+    } catch {
+      /* 隐私模式下静默降级 */
+    }
+  }
+
+  function updateCount(panel: HTMLElement | null) {
+    if (!panel) return;
+    const total = panel.querySelectorAll<HTMLInputElement>('input[type="checkbox"]').length;
+    const checked = panel.querySelectorAll<HTMLInputElement>('input[type="checkbox"]:checked').length;
+    const el = panel.querySelector<HTMLElement>('[data-todo-count]');
+    if (el) el.textContent = `已勾选 ${checked} / ${total}`;
+  }
+
+  function currentRange(): string {
+    const visible = panels.find((p) => !p.hidden);
+    return visible?.dataset.todoPanel ?? panels[0]?.dataset.todoPanel ?? STAGES[0].range;
+  }
+
+  function showRange(range: string) {
+    const target = STAGES.find((s) => s.range === range) ?? STAGES[0];
+    panels.forEach((p) => {
+      p.hidden = p.dataset.todoPanel !== target.range;
+      if (!p.hidden) updateCount(p);
+    });
+    if (stageLabel) stageLabel.textContent = target.name;
+  }
+
+  // 恢复勾选
+  const stored = read();
+  checks.forEach((cb) => {
+    if (cb.dataset.task && stored[cb.dataset.task]) cb.checked = true;
+  });
+  panels.forEach(updateCount);
+  showRange(currentRange());
+
+  checks.forEach((cb) => {
+    cb.addEventListener('change', () => {
+      const task = cb.dataset.task;
+      if (!task) return;
+      const next = read();
+      if (cb.checked) next[task] = true;
+      else delete next[task];
+      write(next);
+      updateCount(cb.closest<HTMLElement>('[data-todo-panel]'));
+    });
+  });
+
+  window.addEventListener('ich:stage-changed', (event) => {
+    const range = (event as CustomEvent<{ range?: string }>).detail?.range;
+    if (range) showRange(range);
+  });
+
+  window.addEventListener('ich:storage-cleared', () => {
+    checks.forEach((cb) => (cb.checked = false));
+    write({});
+    panels.forEach(updateCount);
+    showRange(currentRange());
+  });
+</script>

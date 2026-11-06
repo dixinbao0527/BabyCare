@@ -90,6 +90,19 @@ const milestones = defineCollection({
     domain: z.enum(['motor', 'language', 'cognitive', 'social']),
     description: z.string().min(4),
     source: z.string().min(4),
+    /** WHO 粗大运动达成窗口（1～99 百分位）；只有运动维度需要 */
+    windows: z
+      .array(
+        z
+          .object({
+            label: z.string().min(2).max(14),
+            start: z.number().min(0).max(36),
+            end: z.number().min(0).max(36),
+            order: z.number().int().min(0).max(99).default(0),
+          })
+          .refine((w) => w.end > w.start, { message: 'window.end 必须大于 window.start' })
+      )
+      .default([]),
   }),
 });
 

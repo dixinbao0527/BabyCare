@@ -1,9 +1,10 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import BirthDatePicker from '../components/BirthDatePicker.astro';
-import AgeNav from '../components/AgeNav.astro';
+import GrowthAxis from '../components/GrowthAxis.astro';
+import MonthlyTasks from '../components/MonthlyTasks.astro';
 import { getCollection } from 'astro:content';
-import { STAGES, CATEGORY_LABEL } from '../lib/stages';
+import { STAGES, CATEGORY_META } from '../lib/stages';
 import { withBase } from '../lib/url';
 
 const all = await getCollection('developmental', ({ data }) => !data.draft);
@@ -26,6 +27,11 @@ const acuteTop = acuteAll.slice(0, 3);
 const counts = new Map<string, number>();
 for (const e of all) counts.set(e.data.age_range, (counts.get(e.data.age_range) ?? 0) + 1);
 
+const defaultStage = STAGES[0];
+const defaultEntries = byStage.get(defaultStage.range) ?? [];
+const defaultCount = counts.get(defaultStage.range) ?? 0;
+const totalCount = all.length + acuteAll.length;
+
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'WebSite',
@@ -38,92 +44,75 @@ const jsonLd = {
 <BaseLayout title="婴幼儿健康养育手册" nav="home">
   <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} is:inline />
 
-  <div class="wrap">
-    <section class="hero">
-      <span class="eyebrow">0～3 岁 · 公益整理</span>
-      <h1>按月龄查，每条都能溯源</h1>
-      <p class="lede">
-        喂养、睡眠、发育、安全、日常照护——按孩子现在的月龄组织，急症单独成路，随时可查。
-      </p>
+  <div class="wrap wrap-home">
+    <section class="home-hero" aria-labelledby="hero-title">
+      <div class="hero">
+        <span class="eyebrow">0～3 岁 · 公益整理 · {totalCount} 条可溯源内容</span>
+        <h1 id="hero-title">按月龄查，每条都能溯源</h1>
+        <p class="lede">
+          填一次生日，首页会记住宝宝现在的位置；不填也能按月龄浏览。喂养、睡眠、发育、安全、日常照护，
+          急症单独成路，随时可查。
+        </p>
 
-      <BirthDatePicker />
+        <BirthDatePicker />
 
-      <p class="link-row">
-        <a href={withBase('/quick')}>症状速查</a>
-        <span aria-hidden="true" class="muted">·</span>
-        <a href={withBase('/milestones')}>发育里程碑</a>
-        <span aria-hidden="true" class="muted">·</span>
-        <a href={withBase('/sources')}>内容依据</a>
-      </p>
+        <p class="link-row">
+          <a href={withBase('/quick')}>症状速查</a>
+          <span aria-hidden="true" class="muted">·</span>
+          <a href={withBase('/milestones')}>发育里程碑</a>
+          <span aria-hidden="true" class="muted">·</span>
+          <a href={withBase('/sources')}>内容依据</a>
+        </p>
+      </div>
+
+      <div class="home-side">
+        <GrowthAxis counts={Object.fromEntries(counts)} defaultRange={defaultStage.range} />
+        <MonthlyTasks defaultRange={defaultStage.range} />
+      </div>
     </section>
 
-    <section class="section" aria-labelledby="stage-heading">
+    <section class="section stage-section" aria-labelledby="stage-heading">
       <div class="section-head">
-        <h2 id="stage-heading">阶段内容</h2>
-        <a class="more" href={withBase('/quick')}>看不到想找的？搜一下 →</a>
+        <h2 id="stage-heading">
+          <span id="stage-name">{defaultStage.name}</span>
+          <span class="sub" id="stage-tagline">{defaultStage.tagline}</span>
+        </h2>
+        <a class="more" id="stage-more" href={withBase(`/age/${defaultStage.range}`)}>
+          本阶段全部 {defaultCount} 条 →
+        </a>
       </div>
 
-      <div id="stage-empty">
-        <p class="small muted" style="margin-bottom:.8rem;">
-          还没有输入出生日期。先看看 7 个阶段分别关心什么：
-        </p>
-        <div class="stage-list">
-          {
-            STAGES.map((s) => (
-              <a href={withBase(`/age/${s.range}`)}>
-                <span class="n">{s.name}</span>
-                <span class="s">{s.tagline}</span>
-                <span class="s" style="color:var(--brand);">
-                  {counts.get(s.range) ?? 0} 条内容
-                </span>
-              </a>
-            ))
-          }
-        </div>
-      </div>
-
-      <div id="stage-panels" hidden>
+      <div id="stage-panels">
         {
-          STAGES.map((s) => (
-            <div data-stage-panel={s.range} hidden>
-              <div class="section-head" style="margin-bottom:.7rem;">
-                <h2 style="font-size:1rem;">
-                  {s.name}
-                  <span class="muted" style="font-weight:400;font-size:.8rem;">
-                    · {s.tagline}
-                  </span>
-                </h2>
-                <a class="more" href={withBase(`/age/${s.range}`)}>全部 {counts.get(s.range) ?? 0} 条 →</a>
+          STAGES.map((s) => {
+            const entries = byStage.get(s.range) ?? [];
+            return (
+              <div data-stage-panel={s.range} data-count={counts.get(s.range) ?? 0} hidden={s.range !== defaultStage.range}>
+                <div class="entry-grid">
+                  {entries.map((e) => {
+                    const cat = CATEGORY_META[e.data.category];
+                    return (
+                      <a
+                        class={`entry-card ${cat?.tone ?? ''}`}
+                        href={withBase(`/age/${s.range}`) + '#' + (e.id.split('/').pop() ?? '')}
+                      >
+                        <span class="card-top">
+                          <span class="cat-badge" aria-hidden="true">{cat?.badge ?? '育'}</span>
+                          <span class="cat-label">{cat?.label ?? '内容'}</span>
+                        </span>
+                        <span class="k">{e.data.title}</span>
+                        <p class="sum">{e.data.summary}</p>
+                        <span class="src">{e.data.source.tier} · {e.data.source.year}</span>
+                      </a>
+                    );
+                  })}
+                </div>
+                {entries.length === 0 && <p class="small muted">这一阶段的内容正在补充。</p>}
               </div>
-              <div class="entry-grid">
-                {(byStage.get(s.range) ?? []).map((e) => (
-                  <a
-                    class="entry-card"
-                    href={withBase(`/age/${s.range}`) + '#' + (e.id.split('/').pop() ?? '')}
-                  >
-                    <span class="k">{e.data.title}</span>
-                    <p class="sum">{e.data.summary}</p>
-                    <span class="src">
-                      {CATEGORY_LABEL[e.data.category]} · {e.data.source.tier}
-                    </span>
-                  </a>
-                ))}
-              </div>
-              {(byStage.get(s.range) ?? []).length === 0 && (
-                <p class="small muted">这一阶段的内容正在补充。</p>
-              )}
-            </div>
-          ))
+            );
+          })
         }
       </div>
-    </section>
-
-    <section class="section" aria-labelledby="nav-heading">
-      <div class="section-head">
-        <h2 id="nav-heading">月龄阶段</h2>
-        <span class="small muted" id="stage-current-label">全部阶段</span>
-      </div>
-      <AgeNav />
     </section>
 
     <section class="section" aria-labelledby="quick-heading">

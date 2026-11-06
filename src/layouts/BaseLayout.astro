@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import GlobalSearch from '../components/GlobalSearch.astro';
 import { withBase, SITE_NAME, NAV } from '../lib/url';
 
 interface Props {
@@ -19,6 +20,7 @@ const {
 
 const pageTitle = title === SITE_NAME ? title : `${title}｜${SITE_NAME}`;
 const canonical = new URL(Astro.url.pathname, Astro.site ?? 'https://example.github.io');
+const ogImage = new URL(withBase('/og.png'), Astro.site ?? 'https://example.github.io').href;
 ---
 
 <!doctype html>
@@ -36,6 +38,12 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? 'https://example.git
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="zh_CN" />
+    <meta property="og:site_name" content={SITE_NAME} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="婴幼儿健康养育手册：0～3 岁按月龄组织的可溯源知识" />
+    <meta name="twitter:card" content="summary_large_image" />
     <meta name="robots" content="index,follow" />
   </head>
   <body>
@@ -60,6 +68,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? 'https://example.git
             ))
           }
         </nav>
+        <GlobalSearch />
       </div>
     </header>
     )}
@@ -97,6 +106,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? 'https://example.git
       btn?.addEventListener('click', () => {
         try {
           localStorage.removeItem('ich.birth.v1');
+          localStorage.removeItem('ich.tasks.v1');
         } catch {
           /* 隐私模式下不可用，忽略 */
         }
