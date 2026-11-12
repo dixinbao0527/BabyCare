@@ -1,6 +1,6 @@
 # 婴幼儿健康养育手册
 
-0～3 岁按月龄组织的可溯源知识站点。静态生成、零后端、无追踪，内容依据国家卫健委、WHO、AAP 公开发布的指南整理。
+0～3 岁按月龄组织的可溯源知识站点，外加一份北京亲子户外清单。静态生成、零后端、无追踪。医学内容依据国家卫健委发布的指南整理，并参考 WHO 与 AAP 公开资料；户外信息来自公园与主管部门的公开页面。
 
 **线上地址**：<https://dixinbao0527.github.io/BabyCare/>
 **源码仓库**：<https://github.com/dixinbao0527/BabyCare>
@@ -16,7 +16,11 @@
 | `/quick` | 症状速查。急症条目固定置顶、不参与月龄筛选；支持搜索与分类浏览 |
 | `/quick/[slug]` | 急症详情。红色警示条贴顶 → 一句话识别 → 三级分诊卡 → 送医前处理 → 高发年龄 → 来源 |
 | `/milestones` | WHO 六项大运动窗口图（当前月龄竖线）+ 8 个筛查节点 × 4 个维度里程碑 + 32 条预警征象自查清单 |
-| `/sources` | 指南清单（构建期自动聚合）、免责声明、版权与隐私说明 |
+| `/outdoor` | 北京亲子户外清单。按区 / 类型 / 票务 / 推车 / 是否临水筛选，每条标注核验日期与官方入口 |
+| `/outdoor/[slug]` | 场所详情。带娃适配表 → 实用信息 → 出门前 3 分钟安全清单 → 关联条目 → 来源与纠错 |
+| `/scene/[slug]` | 场景入口（夜醒、吐奶、带娃出门、体检、发烧）。由 `taxonomy.json` 生成，不手写内容 |
+| `/about` | 关于本站：内容方法、复核状态、隐私、版权、更新日志、纠错入口与支持作者 |
+| `/sources` | 指南清单（构建期自动聚合）、复核状态、两类内容的分舱说明、免责声明、版权与隐私说明 |
 
 页头提供全局搜索（`⌘K` / `Ctrl+K`），复用构建期生成的 `search-index.json`；急症条目在结果中固定置顶。
 
@@ -27,6 +31,9 @@
 - 三级分诊必须齐全且顺序固定（observe → urgent → emergency），缺一级**构建失败**。
 - 预警征象**逐字照录**官方原文，任何改写都会让筛查工具失真。
 - 运动里程碑一律成对显示 WHO 窗口上下限，不提供单点月龄标准。
+- 医学内容与户外信息**分舱**：户外条目不得出现药品、剂量或「促进发育」这类医学化断言，构建期扫描拦截。
+- 户外条目必须有 `verified_on`；超过 180 天页面标「待复核」，超过 365 天**构建失败**。
+- 户外条目未核实的设施字段必须显式写 `unknown`，不许猜。
 
 ---
 
@@ -57,9 +64,13 @@ npm run verify     # 375px 无横向滚动、触控 ≥44px、急症页结构、
 src/content/
   developmental/<age_range>/<slug>.md   # 发展性条目，10 个字段的 frontmatter
   acute/<slug>.md                       # 急症条目，含三级分诊结构化字段
+  outdoor/<slug>.md                     # 户外场所，含核验日期、设施四态与安全标签
   data/milestones.yaml                  # 里程碑数据集（file loader）；运动窗口写在 windows 字段
+  data/taxonomy.json                    # 主题 / 场景 / 同义词词表（派生层输入，不手写页面）
 src/lib/warningSigns.ts                 # 32 条预警征象常量（逐字照录，禁止改写）
 src/lib/monthlyTasks.ts                 # 首页「本月 3 件事」，slug 需对应阶段页条目
+src/lib/relations.ts                    # 构建期关系图：显式边 + 反向补全
+src/lib/taxonomy.ts                     # 主题/场景读取
 ```
 
 运动维度的 WHO 窗口用 `windows` 数组维护，每条含 `label / start / end / order`（`end` 必须大于 `start`，`order` 决定图上的行序）。当前六项：独坐 3.8–9.2、手膝爬行 5.2–13.5、扶物站立 4.8–11.4、扶物行走 5.9–13.7、独站 6.9–16.9、独走 8.2–17.6 个月。
@@ -67,6 +78,12 @@ src/lib/monthlyTasks.ts                 # 首页「本月 3 件事」，slug 需
 新增一条发展性条目：在对应月龄目录下建 `.md`，frontmatter 必填 `title / age_range / category / scenario_tags / summary / source / order / last_reviewed / reviewer`。`order` 在同月龄同分类内必须唯一，`source.section` 与 `source.url` 至少一项非空。
 
 新增一条急症条目：`severity_levels` 必须恰好三条且按 observe → urgent → emergency 排列，`red_flags[0]` 写「最不该做的那件事」，`home_care` 至少三条，**不得出现药品名与剂量**。
+
+新增一条户外场所：在 `src/content/outdoor/` 下建 `.md`，必填 `title / district / venue_type / summary / tags / age_fit / stroller / shade / nursing_room / toilet / playground / water_hazard / free / address / official_name / official_url / safety_tags / verified_on / last_reviewed / reviewer`。
+设施字段只接受 `yes / partial / no / unknown` 四态，没查到就写 `unknown`；`free` 只接受 `free / paid / unknown`。
+`water_hazard: true` 时必须通过 `relations` 关联至少一条急症条目。票价与开放时间不要写估计值，页面会统一附加「以官方公告为准」。
+
+新增一条户外条目后跑 `npm run validate`；核验超过 180 天会提示，超过 365 天会阻断构建。
 
 改完跑 `npm run validate`，任一规则不过会直接告诉你文件与原因。
 
@@ -131,12 +148,12 @@ BASE_PATH=/BabyCare SITE_URL=https://dixinbao0527.github.io npm run build
 
 ## 技术栈
 
-Astro 5 静态生成 · Astro Content Collections（zod schema + 构建期业务校验）· 原生 CSS · 少量岛屿脚本 · fuse.js（按需动态加载）。
+Astro 5 静态生成 · Astro Content Collections（zod schema + 构建期业务校验）· 原生 CSS · 少量岛屿脚本 · fuse.js（按需动态加载）· 构建期派生层（`dist/derived/*.json`：关系图 / 复核状态 / 词表 / 站点导览）。
 
-不引入：后端数据库、用户系统、SSR、AI 问答、评论、埋点 SDK。出生日期只写入浏览器 `localStorage`，不上传。
+不引入：后端数据库、用户系统、SSR、AI 问答、评论、埋点 SDK、地图 SDK。出生日期只写入浏览器 `localStorage`，不上传。
 
 ## 免责声明
 
 本项目为公益整理，**不替代专业医疗诊断，也不构成用药建议**。孩子出现呼吸困难、意识改变、抽搐、面色发青等急症表现时请立即拨打 120 或前往急诊。站内表述与指南原文不一致时，以原文为准。
 
-急症条目的分级文案为结构化整理，**上线前须由具备儿科背景的复核人对照原文逐条核对**。
+急症条目的分级文案为结构化整理，**目前尚未完成儿科背景复核人的逐条核对**，页面与 `/sources` 已如实标注该状态。户外场所的票价、开放时间与设施信息以官方公告为准，本站不做实时同步。

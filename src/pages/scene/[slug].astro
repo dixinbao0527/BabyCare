@@ -1,0 +1,152 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+import { withBase } from '../../lib/url';
+import { SCENES } from '../../lib/taxonomy';
+import { slugOf } from '../../lib/relations';
+
+export async function getStaticPaths() {
+  return SCENES.map((scene) => ({ params: { slug: scene.id }, props: { scene } }));
+}
+
+const { scene } = Astro.props;
+const dev = await getCollection('developmental', ({ data }) => !data.draft);
+const acute = await getCollection('acute');
+const outdoor = await getCollection('outdoor', ({ data }) => !data.draft);
+
+type Row = {
+  href: string;
+  title: string;
+  summary: string;
+  kind: 'acute' | 'dev' | 'outdoor';
+  meta: string;
+};
+
+const rows: Row[] = [];
+for (const slug of scene.slugs) {
+  const a = acute.find((e) => e.id === slug);
+  if (a) {
+    rows.push({
+      href: withBase(`/quick/${a.id}`),
+      title: a.data.title,
+      summary: a.data.summary,
+      kind: 'acute',
+      meta: '急症',
+    });
+    continue;
+  }
+  const d = dev.find((e) => slugOf(e) === slug);
+  if (d) {
+    rows.push({
+      href: withBase(`/age/${d.data.age_range}`) + '#' + slug,
+      title: d.data.title,
+      summary: d.data.summary,
+      kind: 'dev',
+      meta: d.data.age_range.replace('-', '～'),
+    });
+    continue;
+  }
+  const o = outdoor.find((e) => e.id === slug);
+  if (o) {
+    rows.push({
+      href: withBase(`/outdoor/${o.id}`),
+      title: o.data.title,
+      summary: o.data.summary,
+      kind: 'outdoor',
+      meta: o.data.district,
+    });
+  }
+}
+
+const known = new Set([...acute, ...dev, ...outdoor].map((e) => slugOf(e)));
+const missing = scene.slugs.filter((slug) => !known.has(slug));
+---
+
+<BaseLayout title={scene.label} description={`${scene.question} 相关条目按急症与月龄知识分组，急症固定在前。`} nav="none">
+  <div class="wrap">
+    <p class="back"><a href={withBase('/quick')}>← 症状快速查询</a></p>
+
+    <div class="page-head">
+      <p class="eyebrow">按场景找</p>
+      <h1>{scene.label}</h1>
+      <p class="tagline">{scene.question}</p>
+    </div>
+
+    <ul class="scene-list">
+      {
+        rows.map((r) => (
+          <li>
+            <a class="scene-item" href={r.href}>
+              <span class="row">
+                <span class={`tag ${r.kind === 'acute' ? 'tag-acute' : ''}`}>{r.meta}</span>
+                <span class="t">{r.title}</span>
+              </span>
+              <span class="s">{r.summary}</span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+
+    {
+      rows.length === 0 && (
+        <p class="notice small">
+          这个场景还没有整理好的条目。可以先去
+          <a href={withBase('/quick')}>症状快速查询</a> 按分类浏览。
+        </p>
+      )
+    }
+
+    {
+      missing.length > 0 && rows.length > 0 && (
+        <p class="small muted">
+          这个场景还有条目在整理中。现有内容依据见 <a href={withBase('/sources')}>来源与声明</a>。
+        </p>
+      )
+    }
+
+    <p class="small muted scene-tail">
+      场景只是入口，不做判断。孩子的具体情况，请咨询儿科医生或就近就医。
+    </p>
+  </div>
+
+  <style>
+    .scene-list {
+      list-style: none;
+      padding: 0;
+      margin: 1rem 0 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+    .scene-item {
+      display: block;
+      padding: 0.8rem 0.9rem;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+      text-decoration: none;
+      color: inherit;
+      min-height: 44px;
+    }
+    .scene-item .row {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      flex-wrap: wrap;
+    }
+    .scene-item .t {
+      font-weight: 500;
+    }
+    .scene-item .s {
+      display: block;
+      margin-top: 0.25rem;
+      font-size: 0.86rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+    .scene-tail {
+      margin-top: 1.6rem;
+    }
+  </style>
+</BaseLayout>

@@ -3,9 +3,22 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
 import { withBase } from '../lib/url';
 import { WARNING_SIGNS } from '../lib/warningSigns';
+import { reviewInfo } from '../lib/review';
 
 const dev = await getCollection('developmental', ({ data }) => !data.draft);
 const acute = await getCollection('acute');
+
+const allItems = [...dev, ...acute];
+const latestReview = allItems
+  .map((e) => e.data.last_reviewed)
+  .filter(Boolean)
+  .sort()
+  .at(-1) ?? '—';
+const reviewers = [...new Set(allItems.map((e) => e.data.reviewer))];
+const freshCount = allItems.filter(
+  (e) => reviewInfo(e.data.last_reviewed, e.data.reviewer).state === 'fresh'
+).length;
+const pendingCount = allItems.length - freshCount;
 
 type Row = {
   name: string;
@@ -104,6 +117,44 @@ const tierLabel: Record<string, string> = {
           }
         </tbody>
       </table>
+    </section>
+
+    <section class="notice" aria-labelledby="review-heading">
+      <h2 id="review-heading">复核状态（构建期统计）</h2>
+      <p>
+        站内共 {allItems.length} 条医学内容，最近一次批量复核为
+        <strong>{latestReview.replace(/-/g, '.')}</strong>，其中 {freshCount} 条仍在一年有效期内
+        {pendingCount > 0 ? `，${pendingCount} 条已超过复核周期` : ''}。
+        记录中的整理者为 {reviewers.join('、')}。
+      </p>
+      <p>
+        <strong>需要明确的一点：</strong>急症条目的三级分级为结构化整理，
+        <strong>尚未完成儿科背景复核人的逐条核对</strong>。在完成之前，请把它当作判断紧急程度的参考，
+        而不是诊断依据；任何让你不安的表现，都值得直接就医。
+      </p>
+      <p class="small muted">
+        状态字段由各条目的 <code>last_reviewed</code> / <code>reviewer</code> 计算，超过 365 天会在页面上标注「待重新复核」。
+      </p>
+    </section>
+
+    <section class="notice" aria-labelledby="split-heading">
+      <h2 id="split-heading">两类内容，两套标准</h2>
+      <p>
+        本站现在包含两类信息，请不要混用它们的可信度预期：
+      </p>
+      <ul class="doclist">
+        <li>
+          <strong>医学知识（月龄条目 / 急症条目 / 里程碑）</strong>
+          <span>依据公开发布的指南整理，逐条标注来源与复核日期，不做诊断与用药建议。</span>
+        </li>
+        <li>
+          <strong>本地生活信息（北京亲子户外）</strong>
+          <span>依据公园与主管部门的公开信息整理，逐条标注核验日期；票价、开放时间与预约规则会变，出行前请以官方公告为准。它不属于医学指南。</span>
+        </li>
+      </ul>
+      <p class="small muted">
+        两类内容的分工与边界，见 <a href={withBase('/about')}>关于本站</a>。
+      </p>
     </section>
 
     <section class="notice" aria-labelledby="docs-heading">

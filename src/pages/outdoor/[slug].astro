@@ -1,0 +1,299 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+import { withBase } from '../../lib/url';
+import {
+  VENUE_LABEL,
+  FACILITY_LABEL,
+  TICKET_LABEL,
+  SEASON_LABEL,
+  SAFETY_ITEMS,
+} from '../../lib/outdoor';
+import { reviewInfo } from '../../lib/review';
+import { buildRelations, relationsOf, slugOf } from '../../lib/relations';
+
+export async function getStaticPaths() {
+  const items = await getCollection('outdoor', ({ data }) => !data.draft);
+  return items.map((entry) => ({ params: { slug: entry.id }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+const d = entry.data;
+
+const dev = await getCollection('developmental', ({ data }) => !data.draft);
+const acute = await getCollection('acute');
+const outdoorAll = await getCollection('outdoor', ({ data }) => !data.draft);
+const relMap = buildRelations({ dev, acute, outdoor: outdoorAll });
+const rels = relationsOf(relMap, 'outdoor', entry.id);
+
+const review = reviewInfo(d.verified_on, d.reviewer);
+const facilities = [
+  { label: '推车通行', value: d.stroller },
+  { label: '遮阴', value: d.shade },
+  { label: '母婴室', value: d.nursing_room },
+  { label: '公共卫生间', value: d.toilet },
+  { label: '儿童游乐区', value: d.playground },
+];
+
+const safety = d.safety_tags.map((t) => ({ key: t, ...(SAFETY_ITEMS[t] ?? { label: t, tip: '' }) }));
+
+function relHref(r: { targetKind: string; targetSlug: string }): string {
+  if (r.targetKind === 'acute') return withBase(`/quick/${r.targetSlug}`);
+  if (r.targetKind === 'outdoor') return withBase(`/outdoor/${r.targetSlug}`);
+  const found = dev.find((e) => slugOf(e) === r.targetSlug);
+  return found ? withBase(`/age/${found.data.age_range}`) + '#' + r.targetSlug : withBase('/quick');
+}
+
+function relTitle(r: { targetKind: string; targetSlug: string }): string {
+  if (r.targetKind === 'acute') return acute.find((e) => e.id === r.targetSlug)?.data.title ?? r.targetSlug;
+  if (r.targetKind === 'outdoor') return outdoorAll.find((e) => e.id === r.targetSlug)?.data.title ?? r.targetSlug;
+  return dev.find((e) => slugOf(e) === r.targetSlug)?.data.title ?? r.targetSlug;
+}
+---
+
+<BaseLayout
+  title={d.title}
+  description={`${d.title}：${d.summary} 含推车、遮阴、水域与母婴设施说明，附官方来源与核验日期。`}
+  nav="outdoor"
+>
+  <div class="wrap">
+    <p class="back">
+      <a href={withBase('/outdoor')}>← 北京亲子户外</a>
+    </p>
+
+    <div class="page-head">
+      <p class="eyebrow">{d.district} · {VENUE_LABEL[d.venue_type] ?? d.venue_type}</p>
+      <h1>{d.title}</h1>
+      <p class="tagline">{d.summary}</p>
+    </div>
+
+    <div class="od-status">
+      <span><strong>{d.verified_on.replace(/-/g, '.')}</strong> 核验</span>
+      <span>信息整理：{d.reviewer}</span>
+      <span class={`od-badge od-badge-${review.state}`}>{review.label}</span>
+    </div>
+
+    <p class="small muted od-disclaimer">
+      本页为本地生活信息整理，不是医疗建议。票价、开放时间与预约规则以官方公告为准；出行前请再核对一次。
+    </p>
+
+    <section aria-labelledby="fit-heading">
+      <h2 id="fit-heading">带娃适配</h2>
+      <dl class="od-table">
+        {facilities.map((f) => (
+          <div class="od-row">
+            <dt>{f.label}</dt>
+            <dd class={f.value === 'unknown' ? 'is-unknown' : ''}>{FACILITY_LABEL[f.value] ?? f.value}</dd>
+          </div>
+        ))}
+        <div class="od-row">
+          <dt>开放水域</dt>
+          <dd class={d.water_hazard ? 'is-warn' : ''}>{d.water_hazard ? '有，需全程牵护' : '无'}</dd>
+        </div>
+        <div class="od-row">
+          <dt>票务</dt>
+          <dd>{TICKET_LABEL[d.free]}</dd>
+        </div>
+        <div class="od-row">
+          <dt>适龄</dt>
+          <dd>{d.age_fit.includes('all') ? '0～3 岁均可' : d.age_fit.join(' / ')}</dd>
+        </div>
+        {d.seasons.length > 0 && (
+          <div class="od-row">
+            <dt>适宜季节</dt>
+            <dd>{d.seasons.map((s) => SEASON_LABEL[s] ?? s).join('、')}</dd>
+          </div>
+        )}
+      </dl>
+      <p class="small muted">「未核实」表示整理时没有找到可靠依据，不是「没有」。</p>
+    </section>
+
+    <section aria-labelledby="info-heading">
+      <h2 id="info-heading">实用信息</h2>
+      <dl class="od-table">
+        <div class="od-row">
+          <dt>地址</dt>
+          <dd>{d.address}</dd>
+        </div>
+        {d.open_hours && (
+          <div class="od-row">
+            <dt>开放时间</dt>
+            <dd>{d.open_hours}</dd>
+          </div>
+        )}
+        {d.ticket_note && (
+          <div class="od-row">
+            <dt>票务说明</dt>
+            <dd>{d.ticket_note}</dd>
+          </div>
+        )}
+        {d.reservation && (
+          <div class="od-row">
+            <dt>预约</dt>
+            <dd>{d.reservation}</dd>
+          </div>
+        )}
+        {d.transit && (
+          <div class="od-row">
+            <dt>公共交通</dt>
+            <dd>{d.transit}</dd>
+          </div>
+        )}
+        {d.parking && (
+          <div class="od-row">
+            <dt>停车</dt>
+            <dd>{d.parking}</dd>
+          </div>
+        )}
+      </dl>
+      <p class="small">
+        <a href={d.official_url} rel="noopener noreferrer" target="_blank">
+          查看官方信息（{d.official_name}）↗
+        </a>
+      </p>
+    </section>
+
+    <section class="od-safety" aria-labelledby="safety-heading">
+      <h2 id="safety-heading">出门前 3 分钟</h2>
+      <p class="small muted">按这个场所的风险标签生成，只写「注意什么」和「站内哪里看」，不替代现场判断。</p>
+      <ul>
+        {
+          safety.map((s) => (
+            <li>
+              <strong>{s.label}</strong>
+              <span>{s.tip}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    {
+      rels.length > 0 && (
+        <section aria-labelledby="rel-heading">
+          <h2 id="rel-heading">接着看</h2>
+          <ul class="od-rel">
+            {rels.map((r) => (
+              <li>
+                <a href={relHref(r)}>{relTitle(r)}</a>
+                <span class="tag">{r.targetKind === 'acute' ? '急症' : r.targetKind === 'dev' ? '知识' : '户外'}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
+
+    <section class="notice" aria-labelledby="src-heading">
+      <h2 id="src-heading">来源与核验</h2>
+      <p class="small">
+        官方信息源：<a href={d.official_url} rel="noopener noreferrer" target="_blank">{d.official_name}</a>；
+        核验日期 {d.verified_on}。设施与体验描述为编辑整理，未逐项实地核验。
+      </p>
+      <p class="small muted">
+        发现信息有误？到
+        <a href="https://github.com/dixinbao0527/BabyCare/issues" rel="noopener noreferrer" target="_blank">GitHub Issues</a>
+        指出具体字段，会比「信息过时了」更容易修。
+      </p>
+    </section>
+  </div>
+
+  <style>
+    .od-status {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem 1rem;
+      align-items: center;
+      margin: 1rem 0 0.4rem;
+      font-size: 0.86rem;
+      color: var(--ink-soft);
+    }
+    .od-badge {
+      padding: 0.1rem 0.5rem;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      font-size: 0.78rem;
+    }
+    .od-badge-stale,
+    .od-badge-expired {
+      color: var(--warn);
+      border-color: var(--warn);
+    }
+    .od-badge-fresh {
+      color: var(--brand);
+      border-color: var(--brand);
+    }
+    .od-disclaimer {
+      margin: 0 0 1.4rem;
+    }
+    .od-table {
+      margin: 0.6rem 0 0.8rem;
+      border-top: 1px solid var(--line);
+    }
+    .od-row {
+      display: grid;
+      grid-template-columns: 7.5rem 1fr;
+      gap: 0.6rem;
+      padding: 0.55rem 0;
+      border-bottom: 1px solid var(--line-soft);
+    }
+    .od-row dt {
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+    .od-row dd {
+      margin: 0;
+      font-size: 0.95rem;
+    }
+    .is-unknown {
+      color: var(--muted);
+    }
+    .is-warn {
+      color: var(--danger);
+    }
+    .od-safety ul {
+      list-style: none;
+      padding: 0;
+      margin: 0.6rem 0 0;
+    }
+    .od-safety li {
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+      padding: 0.65rem 0.8rem;
+      margin-bottom: 0.5rem;
+      background: var(--warn-wash);
+      border: 1px solid #efd3b8;
+      border-radius: var(--radius);
+      font-size: 0.9rem;
+    }
+    .od-safety li strong {
+      color: var(--warn);
+      font-size: 0.86rem;
+    }
+    .od-rel {
+      list-style: none;
+      padding: 0;
+      margin: 0.6rem 0 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+    .od-rel li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.55rem 0.7rem;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+      font-size: 0.92rem;
+    }
+    @media (max-width: 420px) {
+      .od-row {
+        grid-template-columns: 6rem 1fr;
+      }
+    }
+  </style>
+</BaseLayout>

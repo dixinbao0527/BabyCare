@@ -1,0 +1,278 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+import { withBase } from '../../lib/url';
+import { VENUE_LABEL, FACILITY_LABEL, TICKET_LABEL, CRITERIA } from '../../lib/outdoor';
+import { reviewInfo } from '../../lib/review';
+
+const items = (await getCollection('outdoor', ({ data }) => !data.draft)).sort(
+  (a, b) =>
+    a.data.district.localeCompare(b.data.district, 'zh-CN') ||
+    a.data.title.localeCompare(b.data.title, 'zh-CN')
+);
+
+const districts = [...new Set(items.map((i) => i.data.district))];
+const types = [...new Set(items.map((i) => i.data.venue_type))];
+const latestVerified = items.map((i) => i.data.verified_on).sort().at(-1) ?? '';
+const staleCount = items.filter((i) => reviewInfo(i.data.verified_on, i.data.reviewer).state !== 'fresh').length;
+---
+
+<BaseLayout
+  title="北京亲子户外"
+  description="北京带 0～3 岁孩子可去的户外场所清单：按区、类型、推车与水域筛选，每条标注官方来源与核验日期，并回链站内安全知识。"
+  nav="outdoor"
+>
+  <div class="wrap">
+    <div class="page-head">
+      <p class="eyebrow">本地生活信息 · 非医疗建议</p>
+      <h1>北京亲子户外</h1>
+      <p class="tagline">
+        先看能不能推车、有没有水、要不要预约，再决定去不去。每条都留了官方入口，信息会过期，出门前请再核对一次。
+      </p>
+    </div>
+
+    <div class="od-notice">
+      <strong>共 {items.length} 个场所</strong>
+      <span>最近核验：{latestVerified.replace(/-/g, '.')}</span>
+      {staleCount > 0 && <span class="od-stale">{staleCount} 条待复核</span>}
+    </div>
+
+    <p class="small muted od-intro">
+      收录标准：{CRITERIA.join('；')}。票价、开放时间与预约规则以官方公告为准，本站不做实时同步。
+    </p>
+
+    <section class="od-filter-box" aria-labelledby="filter-heading">
+      <h2 id="filter-heading" class="sr-only">筛选场所</h2>
+      <div class="od-filters">
+        <label>
+          <span>所在区</span>
+          <select id="f-district">
+            <option value="">全部</option>
+            {districts.map((d) => <option value={d}>{d}</option>)}
+          </select>
+        </label>
+        <label>
+          <span>类型</span>
+          <select id="f-type">
+            <option value="">全部</option>
+            {types.map((t) => <option value={t}>{VENUE_LABEL[t] ?? t}</option>)}
+          </select>
+        </label>
+        <label>
+          <span>票务</span>
+          <select id="f-ticket">
+            <option value="">全部</option>
+            <option value="free">免费</option>
+            <option value="paid">需购票</option>
+          </select>
+        </label>
+        <label class="od-check">
+          <input type="checkbox" id="f-stroller" />
+          <span>只看推车友好</span>
+        </label>
+        <label class="od-check">
+          <input type="checkbox" id="f-dry" />
+          <span>避开开放水域</span>
+        </label>
+        <button type="button" class="btn btn-ghost od-reset" id="f-reset">重置</button>
+      </div>
+      <p class="small muted od-count" id="od-count" aria-live="polite">显示 {items.length} 个场所</p>
+    </section>
+
+    <div class="entry-grid od-grid" id="od-list">
+      {
+        items.map((item) => {
+          const d = item.data;
+          const review = reviewInfo(d.verified_on, d.reviewer);
+          return (
+            <a
+              class="entry-card od-card"
+              href={withBase(`/outdoor/${item.id}`)}
+              data-district={d.district}
+              data-type={d.venue_type}
+              data-ticket={d.free}
+              data-stroller={d.stroller}
+              data-water={d.water_hazard ? 'yes' : 'no'}
+            >
+              <span class="od-top">
+                <span class="tag">{d.district}</span>
+                <span class="tag">{VENUE_LABEL[d.venue_type] ?? d.venue_type}</span>
+                {review.state !== 'fresh' && <span class="tag od-tag-stale">{review.label}</span>}
+              </span>
+              <span class="k">{d.title}</span>
+              <p class="sum">{d.summary}</p>
+              <span class="od-meta">
+                推车 {FACILITY_LABEL[d.stroller]} · 遮阴 {FACILITY_LABEL[d.shade]} · 水域{' '}
+                {d.water_hazard ? '有' : '无'}
+              </span>
+              <span class="od-foot">
+                <span>{TICKET_LABEL[d.free]}</span>
+                <span>{d.verified_on.replace(/-/g, '.')} 核验</span>
+              </span>
+            </a>
+          );
+        })
+      }
+    </div>
+
+    <p class="od-empty small muted" id="od-empty" hidden>
+      这个组合暂时没有收录。可以到 <a href="https://github.com/dixinbao0527/BabyCare/issues" rel="noopener noreferrer" target="_blank">GitHub Issues</a> 推荐一个场所。
+    </p>
+
+    <p class="small muted od-tail">
+      场所信息为编辑整理，设施与票务以官方公告为准。带娃出门前的安全要点，请看
+      <a href={withBase('/scene/going-out')}>「带娃出门」场景</a>。
+    </p>
+  </div>
+
+  <script>
+    const list = document.getElementById('od-list');
+    const cards = list ? Array.from(list.querySelectorAll<HTMLAnchorElement>('.od-card')) : [];
+    const district = document.getElementById('f-district') as HTMLSelectElement | null;
+    const type = document.getElementById('f-type') as HTMLSelectElement | null;
+    const ticket = document.getElementById('f-ticket') as HTMLSelectElement | null;
+    const stroller = document.getElementById('f-stroller') as HTMLInputElement | null;
+    const dry = document.getElementById('f-dry') as HTMLInputElement | null;
+    const count = document.getElementById('od-count');
+    const empty = document.getElementById('od-empty');
+    const reset = document.getElementById('f-reset');
+
+    function apply() {
+      const d = district?.value ?? '';
+      const t = type?.value ?? '';
+      const k = ticket?.value ?? '';
+      const onlyStroller = stroller?.checked ?? false;
+      const avoidWater = dry?.checked ?? false;
+      let visible = 0;
+
+      for (const card of cards) {
+        const ok =
+          (!d || card.dataset.district === d) &&
+          (!t || card.dataset.type === t) &&
+          (!k || card.dataset.ticket === k) &&
+          (!onlyStroller || card.dataset.stroller === 'yes') &&
+          (!avoidWater || card.dataset.water !== 'yes');
+        card.hidden = !ok;
+        if (ok) visible += 1;
+      }
+
+      if (count) count.textContent = `显示 ${visible} 个场所`;
+      if (empty) empty.hidden = visible !== 0;
+    }
+
+    district?.addEventListener('change', apply);
+    type?.addEventListener('change', apply);
+    ticket?.addEventListener('change', apply);
+    stroller?.addEventListener('change', apply);
+    dry?.addEventListener('change', apply);
+    reset?.addEventListener('click', () => {
+      if (district) district.value = '';
+      if (type) type.value = '';
+      if (ticket) ticket.value = '';
+      if (stroller) stroller.checked = false;
+      if (dry) dry.checked = false;
+      apply();
+    });
+  </script>
+
+  <style>
+    .od-notice {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem 1rem;
+      align-items: baseline;
+      margin: 1rem 0 0.4rem;
+      padding: 0.8rem 1rem;
+      background: var(--surface-warm);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      font-size: 0.9rem;
+    }
+    .od-stale {
+      color: var(--warn);
+    }
+    .od-intro {
+      margin: 0.2rem 0 1rem;
+      line-height: 1.7;
+    }
+    .od-filter-box {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      background: var(--surface);
+      padding: 0.9rem 1rem 0.6rem;
+      margin-bottom: 1.2rem;
+    }
+    .od-filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.7rem 1rem;
+      align-items: flex-end;
+    }
+    .od-filters label {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      font-size: 0.82rem;
+      color: var(--ink-soft);
+    }
+    .od-filters select {
+      min-height: 44px;
+      padding: 0.35rem 0.6rem;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface);
+      color: var(--ink);
+      font: inherit;
+    }
+    .od-check {
+      flex-direction: row !important;
+      align-items: center !important;
+      gap: 0.4rem !important;
+      min-height: 44px;
+    }
+    .od-check input {
+      width: 18px;
+      height: 18px;
+    }
+    .od-reset {
+      min-height: 44px;
+    }
+    .od-count {
+      margin: 0.6rem 0 0.1rem;
+    }
+    .od-grid {
+      align-items: stretch;
+    }
+    .od-card {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+    .od-top {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.3rem;
+    }
+    .od-tag-stale {
+      border-color: var(--warn);
+      color: var(--warn);
+    }
+    .od-meta {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+    .od-foot {
+      display: flex;
+      justify-content: space-between;
+      gap: 0.5rem;
+      margin-top: auto;
+      padding-top: 0.35rem;
+      border-top: 1px dashed var(--line-soft);
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+    .od-tail {
+      margin-top: 1.6rem;
+    }
+  </style>
+</BaseLayout>

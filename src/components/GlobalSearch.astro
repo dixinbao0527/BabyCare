@@ -44,7 +44,7 @@ import { withBase } from '../lib/url';
   </div>
 
   <div class="gs-foot">
-    <span id="gs-count">共 41 条内容 · 搜索在本机完成</span>
+    <span id="gs-count">共 0 条内容 · 搜索在本机完成</span>
     <a href={withBase('/quick')}>在速查页搜索 →</a>
   </div>
 </dialog>
@@ -58,7 +58,7 @@ import { withBase } from '../lib/url';
     title: string;
     tags: string[];
     summary: string;
-    type: 'acute' | 'developmental';
+    type: 'acute' | 'developmental' | 'outdoor';
     category: string;
     age_range: string;
   };
@@ -90,9 +90,9 @@ import { withBase } from '../lib/url';
   let timer: number | undefined;
 
   function hrefOf(it: Item): string {
-    return it.type === 'acute'
-      ? withBase(`/quick/${it.slug}`)
-      : withBase(`/age/${it.age_range}`) + '#' + it.slug;
+    if (it.type === 'acute') return withBase(`/quick/${it.slug}`);
+    if (it.type === 'outdoor') return withBase(`/outdoor/${it.slug}`);
+    return withBase(`/age/${it.age_range}`) + '#' + it.slug;
   }
 
   function tag(text: string, cls = ''): HTMLSpanElement {
@@ -154,6 +154,7 @@ import { withBase } from '../lib/url';
       const row = document.createElement('span');
       row.className = 'row';
       if (it.type === 'acute') row.append(tag('急症', 'tag-acute'));
+      if (it.type === 'outdoor') row.append(tag('户外'));
       const t = document.createElement('span');
       t.className = 't';
       t.textContent = it.title;
@@ -167,6 +168,7 @@ import { withBase } from '../lib/url';
       const meta = document.createElement('span');
       meta.className = 'meta';
       if (it.type === 'developmental') meta.append(tag(CAT_LABEL[it.category] ?? '内容'));
+      if (it.type === 'outdoor' && it.category) meta.append(tag(it.category));
       it.tags.slice(0, 3).forEach((x) => meta.append(tag(x)));
 
       a.append(row, s, meta);
@@ -232,7 +234,7 @@ import { withBase } from '../lib/url';
   async function run(q: string) {
     const query = q.trim();
     if (!query) {
-      if (countEl) countEl.textContent = '共 41 条内容 · 搜索在本机完成';
+      if (countEl) countEl.textContent = `共 ${items?.length ?? 0} 条内容 · 搜索在本机完成`;
       empty('输入关键词，急症条目会固定排在前面。');
       return;
     }

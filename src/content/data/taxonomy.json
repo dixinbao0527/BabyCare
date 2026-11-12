@@ -1,0 +1,160 @@
+{
+  "topics": [
+    {
+      "id": "sleep",
+      "label": "睡眠",
+      "desc": "从新生儿睡多久，到并觉、换床、夜惊，按时间线串起来看。",
+      "slugs": [
+        "newborn-sleep",
+        "safe-sleep",
+        "day-night",
+        "sleep-regression",
+        "separation-anxiety",
+        "nap-transition",
+        "toddler-bed",
+        "bedtime-night-terror"
+      ]
+    },
+    {
+      "id": "feeding",
+      "label": "喂养",
+      "desc": "按需哺乳、判断吃够、辅食添加、挑食与零食边界。",
+      "slugs": [
+        "newborn-feeding",
+        "enough-milk",
+        "complementary-feeding",
+        "texture-finger-food",
+        "no-salt-sugar",
+        "picky-eating",
+        "snacks"
+      ]
+    },
+    {
+      "id": "safety",
+      "label": "安全",
+      "desc": "居家、出行、游乐场与急症处理，按场景而不是按病名组织。",
+      "slugs": [
+        "fall-prevention",
+        "home-safety",
+        "burn-electric-safety",
+        "playground-safety",
+        "road-safety",
+        "no-baby-walker",
+        "choking",
+        "burns",
+        "head-injury",
+        "dehydration",
+        "anaphylaxis",
+        "febrile-seizure",
+        "acute-laryngitis"
+      ]
+    },
+    {
+      "id": "skin",
+      "label": "皮肤与护理",
+      "desc": "湿疹、洗澡、保湿与常见皮肤问题的日常照护。",
+      "slugs": ["eczema-care", "bath-skincare", "teething"]
+    },
+    {
+      "id": "oral",
+      "label": "口腔",
+      "desc": "出牙期缓解、第一颗牙开始的口腔清洁。",
+      "slugs": ["teething", "first-tooth"]
+    },
+    {
+      "id": "emotion",
+      "label": "情绪与互动",
+      "desc": "社交性微笑、分离焦虑、假想游戏与情绪命名。",
+      "slugs": ["social-smile", "separation-anxiety", "pretend-play", "shaken-baby"]
+    },
+    {
+      "id": "development",
+      "label": "发育",
+      "desc": "翻身、靠坐、爬行、行走与语言爆发，一律看窗口不看单点。",
+      "slugs": ["rolling-sitting", "crawling", "language-burst", "pretend-play", "no-baby-walker"]
+    }
+  ],
+  "scenes": [
+    {
+      "id": "night-waking",
+      "label": "夜里总醒",
+      "question": "一放下就醒、夜醒变多，先看哪几条？",
+      "slugs": [
+        "newborn-sleep",
+        "sleep-regression",
+        "separation-anxiety",
+        "bedtime-night-terror",
+        "nap-transition"
+      ],
+      "aliases": ["夜醒", "睡不踏实", "落地醒", "一放下就醒", "接觉", "夜奶", "睡不好"]
+    },
+    {
+      "id": "crying",
+      "label": "一直哭哄不住",
+      "question": "哭得停不下来，是饿了、困了，还是需要就医？",
+      "slugs": ["shaken-baby", "separation-anxiety", "newborn-sleep", "colic"],
+      "aliases": ["哭闹", "哄不住", "肠绞痛", "黄昏闹", "一直哭", "安抚"]
+    },
+    {
+      "id": "spit-up",
+      "label": "吐奶与吃奶",
+      "question": "吐奶、溢奶、厌奶，哪些正常、哪些要看医生？",
+      "slugs": ["newborn-feeding", "enough-milk", "dehydration"],
+      "aliases": ["吐奶", "溢奶", "喷奶", "厌奶", "不吃奶", "奶量"]
+    },
+    {
+      "id": "going-out",
+      "label": "带娃出门",
+      "question": "去公园、去水边、过马路，出门前该盯什么？",
+      "slugs": [
+        "sun-mosquito",
+        "playground-safety",
+        "road-safety",
+        "choking",
+        "burns",
+        "head-injury"
+      ],
+      "aliases": ["出门", "户外", "防晒", "驱蚊", "公园", "遛娃", "水边"]
+    },
+    {
+      "id": "checkup",
+      "label": "体检与发育自查",
+      "question": "儿保前想先对对看，哪些表现值得问医生？",
+      "slugs": ["social-smile", "rolling-sitting", "crawling", "language-burst"],
+      "aliases": ["体检", "儿保", "发育", "不会坐", "不会爬", "说话晚", "筛查"]
+    },
+    {
+      "id": "fever",
+      "label": "发烧与急症",
+      "question": "发热、抽搐、喘不上气，什么程度必须去医院？",
+      "slugs": ["febrile-seizure", "dehydration", "acute-laryngitis", "anaphylaxis"],
+      "aliases": ["发烧", "发热", "抽搐", "惊厥", "高烧", "喘", "喉炎", "过敏"]
+    }
+  ],
+  "synonyms": [
+    {
+      "to": "sleep",
+      "terms": ["夜醒", "睡不踏实", "落地醒", "接觉", "哄睡", "并觉", "午睡", "夜惊", "昼夜颠倒"]
+    },
+    {
+      "to": "feeding",
+      "terms": ["吐奶", "溢奶", "奶量", "厌奶", "辅食", "挑食", "追喂", "零食", "不加盐", "吃奶"]
+    },
+    {
+      "to": "safety",
+      "terms": ["误吞", "噎住", "烫伤", "摔倒", "坠床", "走失", "插座", "热水", "安全座椅", "溺水"]
+    },
+    {
+      "to": "skin",
+      "terms": ["湿疹", "红屁股", "尿布疹", "保湿", "洗澡", "皮肤干", "痱子"]
+    },
+    {
+      "to": "oral",
+      "terms": ["出牙", "长牙", "刷牙", "乳牙", "口腔", "流口水"]
+    },
+    {
+      "to": "development",
+      "terms": ["翻身", "独坐", "爬行", "走路", "说话晚", "词汇", "大运动"]
+    }
+  ]
+}

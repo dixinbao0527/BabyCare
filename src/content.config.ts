@@ -106,4 +106,107 @@ const milestones = defineCollection({
   }),
 });
 
-export const collections = { developmental, acute, milestones };
+/* ------------------------------------------------------------------
+ * 户外活动（v3.0）
+ * 与医学内容分舱：字段围绕「场所事实 + 设施 + 时效」，不承载任何医疗结论。
+ * ---------------------------------------------------------------- */
+
+/** 北京 16 区。不允许「近郊」「城北」等模糊值，否则筛选会失真 */
+export const DISTRICTS = [
+  '东城区',
+  '西城区',
+  '朝阳区',
+  '海淀区',
+  '丰台区',
+  '石景山区',
+  '门头沟区',
+  '房山区',
+  '通州区',
+  '顺义区',
+  '昌平区',
+  '大兴区',
+  '怀柔区',
+  '平谷区',
+  '密云区',
+  '延庆区',
+] as const;
+
+export const VENUE_TYPES = [
+  'city_park',
+  'forest_park',
+  'wetland',
+  'riverside',
+  'botanical',
+  'zoo',
+  'playground',
+  'scenic',
+  'heritage',
+] as const;
+
+/** 四态：宁可写 unknown，也不许猜 */
+export const FACILITY_STATES = ['yes', 'partial', 'no', 'unknown'] as const;
+
+/** 票务三态。boolean 无法表达「未核实」，会逼着作者猜 */
+export const TICKET_STATES = ['free', 'paid', 'unknown'] as const;
+
+export const SAFETY_TAGS = [
+  'water',
+  'sun',
+  'mosquito',
+  'traffic',
+  'fall',
+  'choking',
+  'crowd',
+] as const;
+
+export const OUTDOOR_SEASONS = ['spring', 'summer', 'autumn', 'winter'] as const;
+
+/**
+ * 统一关系边。作者只写在源条目，反向边由构建期补全。
+ * 取代「related 只指向 acute」的单向写法，见 src/lib/relations.ts
+ */
+const relation = z.object({
+  type: z.enum(['related_acute', 'related_dev', 'same_topic', 'outdoor', 'checklist']),
+  slug: z.string().min(2),
+});
+
+const outdoor = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/outdoor' }),
+  schema: z
+    .object({
+      title: z.string().min(2).max(24),
+      district: z.enum(DISTRICTS),
+      venue_type: z.enum(VENUE_TYPES),
+      summary: z.string().min(20).max(90),
+      tags: z.array(z.string().min(1)).min(1).max(6),
+      age_fit: z.array(z.enum([...AGE_RANGES, 'all'])).min(1),
+      stroller: z.enum(FACILITY_STATES),
+      shade: z.enum(FACILITY_STATES),
+      nursing_room: z.enum(FACILITY_STATES),
+      toilet: z.enum(FACILITY_STATES),
+      playground: z.enum(FACILITY_STATES),
+      water_hazard: z.boolean().default(false),
+      free: z.enum(TICKET_STATES),
+      ticket_note: z.string().default(''),
+      open_hours: z.string().default(''),
+      reservation: z.string().default(''),
+      address: z.string().min(6),
+      transit: z.string().default(''),
+      parking: z.string().default(''),
+      official_name: z.string().min(4),
+      official_url: z.string().url(),
+      seasons: z.array(z.enum(OUTDOOR_SEASONS)).default([]),
+      safety_tags: z.array(z.enum(SAFETY_TAGS)).min(1),
+      relations: z.array(relation).default([]),
+      verified_on: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+      last_reviewed: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+      reviewer: z.string().min(2),
+      draft: z.boolean().default(false),
+    })
+    // 有开放水域却没有配任何急症回链，等于把最危险的一项漏掉
+    .refine((d) => !d.water_hazard || d.relations.some((r) => r.type === 'related_acute'), {
+      message: 'water_hazard=true 时必须至少关联一条急症条目（relations.type=related_acute）',
+    }),
+});
+
+export const collections = { developmental, acute, milestones, outdoor };

@@ -12,5 +12,6 @@ export const NAV = [
   { href: '/', label: '首页', key: 'home' },
   { href: '/quick', label: '快速查询', key: 'quick' },
   { href: '/milestones', label: '发育里程碑', key: 'milestones' },
-  { href: '/sources', label: '来源与声明', key: 'sources' },
+  { href: '/outdoor', label: '户外活动', key: 'outdoor' },
+  { href: '/about', label: '关于', key: 'about' },
 ] as const;

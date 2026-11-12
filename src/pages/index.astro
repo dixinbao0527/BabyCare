@@ -5,9 +5,11 @@ import GrowthAxis from '../components/GrowthAxis.astro';
 import MonthlyTasks from '../components/MonthlyTasks.astro';
 import { getCollection } from 'astro:content';
 import { STAGES, CATEGORY_META } from '../lib/stages';
+import { SCENES } from '../lib/taxonomy';
 import { withBase } from '../lib/url';
 
 const all = await getCollection('developmental', ({ data }) => !data.draft);
+const outdoorAll = await getCollection('outdoor', ({ data }) => !data.draft);
 
 // 首页每个阶段展示 order 最小的 4 条（不足则全部）
 const byStage = new Map<string, typeof all>();
@@ -60,6 +62,8 @@ const jsonLd = {
           <a href={withBase('/quick')}>症状速查</a>
           <span aria-hidden="true" class="muted">·</span>
           <a href={withBase('/milestones')}>发育里程碑</a>
+          <span aria-hidden="true" class="muted">·</span>
+          <a href={withBase('/outdoor')}>周末去哪儿</a>
           <span aria-hidden="true" class="muted">·</span>
           <a href={withBase('/sources')}>内容依据</a>
         </p>
@@ -138,11 +142,36 @@ const jsonLd = {
       </div>
     </section>
 
+    <section class="section" aria-labelledby="scene-heading">
+      <div class="section-head">
+        <h2 id="scene-heading">按场景找</h2>
+        <a class="more" href={withBase('/quick')}>全部症状 →</a>
+      </div>
+      <p class="small muted" style="margin-top:-.3rem;margin-bottom:.8rem;">
+        不知道搜什么词，就从此刻的情况进去。
+      </p>
+      <div class="scene-chips">
+        {
+          SCENES.map((s) => (
+            <a class="scene-chip" href={withBase(`/scene/${s.id}`)}>
+              {s.label}
+            </a>
+          ))
+        }
+      </div>
+    </section>
+
     <section class="section" aria-labelledby="more-heading">
       <div class="section-head">
         <h2 id="more-heading">还想看</h2>
       </div>
       <div class="entry-grid">
+        <a class="entry-card" href={withBase('/outdoor')}>
+          <span class="k">北京亲子户外</span>
+          <p class="sum">
+            {outdoorAll.length} 个带娃可去的公园与场所，标注推车、遮阴、水域与核验日期，出门前先看一眼。
+          </p>
+        </a>
         <a class="entry-card" href={withBase('/milestones')}>
           <span class="k">发育里程碑对照</span>
           <p class="sum">

@@ -39,6 +39,10 @@ const ROUTES = [
   '/quick/acute-laryngitis',
   '/quick/choking',
   '/milestones',
+  '/outdoor',
+  '/outdoor/olympic-forest-park',
+  '/about',
+  '/scene/going-out',
   '/sources',
   '/404.html',
 ];

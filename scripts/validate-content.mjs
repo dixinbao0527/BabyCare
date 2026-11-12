@@ -17,6 +17,17 @@ const AGE_RANGES = ['0-1m', '1-3m', '4-6m', '7-9m', '10-12m', '13-24m', '25-36m'
 const SEVERITY_ORDER = ['observe', 'urgent', 'emergency'];
 const NODES = [3, 6, 8, 12, 18, 24, 30, 36];
 
+const DISTRICTS = [
+  '东城区', '西城区', '朝阳区', '海淀区', '丰台区', '石景山区',
+  '门头沟区', '房山区', '通州区', '顺义区', '昌平区', '大兴区',
+  '怀柔区', '平谷区', '密云区', '延庆区',
+];
+const FACILITY_STATES = ['yes', 'partial', 'no', 'unknown'];
+const TICKET_STATES = ['free', 'paid', 'unknown'];
+const SAFETY_TAGS = ['water', 'sun', 'mosquito', 'traffic', 'fall', 'choking', 'crowd'];
+const OUTDOOR_DIR = path.join(ROOT, 'src/content/outdoor');
+const MONTHLY_TASKS = path.join(ROOT, 'src/lib/monthlyTasks.ts');
+
 const errors = [];
 const warnings = [];
 const fail = (m) => errors.push(m);
@@ -168,9 +179,89 @@ for (const { data } of [...dev, ...acute]) {
   for (const t of data.scenario_tags ?? []) tagCount.set(t, (tagCount.get(t) ?? 0) + 1);
 }
 
+/* ---------- 户外活动（v3.0，O 组规则） ---------- */
+const outdoor = [];
+if (fs.existsSync(OUTDOOR_DIR)) {
+  for (const file of walk(OUTDOOR_DIR)) {
+    const relPath = path.relative(ROOT, file);
+    const { data, body } = parse(file);
+    if (!data) {
+      fail(`缺少 frontmatter：${relPath}`);
+      continue;
+    }
+    outdoor.push({ file: relPath, data, body });
+  }
+}
+
+const devSlugs = new Set(dev.map((x) => path.basename(x.file, '.md')));
+const acuteSlugSet = new Set(acute.map((x) => path.basename(x.file, '.md')));
+const outdoorSlugs = new Set(outdoor.map((x) => path.basename(x.file, '.md')));
+const knownSlugs = new Set([...devSlugs, ...acuteSlugSet, ...outdoorSlugs]);
+
+const DRUG_PATTERN = /(布洛芬|对乙酰氨基酚|扑热息痛|阿莫西林|头孢|mg\/kg|毫克\/公斤|ml\/kg)/;
+const MEDICAL_CLAIM = /(促进发育|有助于长高|最适合\s*\d+\s*月龄|治疗效果|包治|治愈率)/;
+
+const outdoorSeen = new Set();
+for (const { file, data, body } of outdoor) {
+  const slug = path.basename(file, '.md');
+
+  if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(slug)) {
+    fail(`[O-01] ${file}: slug 必须是小写连字符 → ${slug}`);
+  }
+  if (outdoorSeen.has(slug)) fail(`[O-01] ${file}: slug 重复 → ${slug}`);
+  outdoorSeen.add(slug);
+
+  if (!DISTRICTS.includes(data.district)) {
+    fail(`[O-02] ${file}: district 非法 → ${data.district}`);
+  }
+  if (!/^https:\/\//.test(data.official_url ?? '')) {
+    fail(`[O-03] ${file}: official_url 必须是 https 链接`);
+  }
+
+  const days = daysAgo(data.verified_on);
+  if (days === null) fail(`[O-04] ${file}: verified_on 格式非法 → ${data.verified_on}`);
+  else if (days < 0) fail(`[O-04] ${file}: verified_on 在未来 → ${data.verified_on}`);
+  else if (days > 365) fail(`[O-04] ${file}: 已 ${days} 天未核验（>365），必须重新核验或下线`);
+  else if (days > 180) warn(`[O-04] ${file}: 已 ${days} 天未核验（>180），页面会显示「待复核」`);
+
+  for (const key of ['stroller', 'shade', 'nursing_room', 'toilet', 'playground']) {
+    if (!FACILITY_STATES.includes(data[key])) {
+      fail(`[O-11] ${file}: ${key} 必须是 yes/partial/no/unknown，未核实请显式写 unknown`);
+    }
+  }
+  if (!TICKET_STATES.includes(data.free)) {
+    fail(`[O-11] ${file}: free 必须是 free/paid/unknown → ${data.free}`);
+  }
+  for (const t of data.safety_tags ?? []) {
+    if (!SAFETY_TAGS.includes(t)) fail(`[O-11] ${file}: safety_tags 非法 → ${t}`);
+  }
+
+  if (data.water_hazard && !(data.relations ?? []).some((r) => r.type === 'related_acute')) {
+    fail(`[O-06] ${file}: water_hazard=true 但没有关联任何急症条目`);
+  }
+
+  const text = JSON.stringify(data) + body;
+  if (DRUG_PATTERN.test(text)) fail(`[O-07] ${file}: 出现药品名或剂量`);
+  if (MEDICAL_CLAIM.test(text)) fail(`[O-08] ${file}: 出现医学化断言，户外条目只写设施适配`);
+
+  for (const r of data.relations ?? []) {
+    if (!knownSlugs.has(r.slug)) fail(`[O-09] ${file}: relations 引用了不存在的条目 → ${r.slug}`);
+  }
+}
+
+// O-12：户外条目不得混进首页「本月 3 件事」
+if (fs.existsSync(MONTHLY_TASKS)) {
+  const src = fs.readFileSync(MONTHLY_TASKS, 'utf8');
+  for (const slug of outdoorSlugs) {
+    if (src.includes(`'${slug}'`)) fail(`[O-12] monthlyTasks.ts: 户外条目不得进入月龄待办 → ${slug}`);
+  }
+}
+
 /* ---------- 输出 ---------- */
 const rel = (p) => path.relative(ROOT, p);
-console.log(`\n内容校验：developmental ${dev.length} 条 · acute ${acute.length} 条 · 标签 ${tagCount.size} 个\n`);
+console.log(
+  `\n内容校验：developmental ${dev.length} 条 · acute ${acute.length} 条 · outdoor ${outdoor.length} 条 · 标签 ${tagCount.size} 个\n`
+);
 
 if (warnings.length) {
   console.log(`⚠ 警告 ${warnings.length} 条`);
