@@ -20,10 +20,13 @@
   --danger: #99231c;
   --danger-wash: #fdf0ee;
   --danger-line: #e8b6b1;
-  --radius: 10px;
-  --radius-lg: 16px;
+  --radius: var(--r-md);
+  --radius-lg: var(--r-lg);
   --shadow-sm: 0 1px 2px rgba(28, 43, 48, 0.05);
   --shadow: 0 2px 10px rgba(28, 43, 48, 0.06);
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 16px;
   --max: 760px;
   --max-home: 1040px;
   --max-wide: 1080px;
@@ -148,7 +151,7 @@ h1 {
   text-wrap: balance;
 }
 h2 {
-  font-size: clamp(1.2rem, 3.2vw, 1.45rem);
+  font-size: clamp(1.125rem, 2.4vw, 1.375rem);
 }
 h3 {
   font-size: var(--fs-base);
@@ -262,7 +265,7 @@ main {
   justify-content: center;
   width: 30px;
   height: 30px;
-  border-radius: 9px;
+  border-radius: var(--r-sm);
   background: var(--brand);
   color: #fff;
   font-size: var(--fs-sm);
@@ -284,7 +287,7 @@ main {
   padding: 0 var(--sp-5);
   color: var(--ink-soft);
   font-size: var(--fs-sm);
-  border-radius: 8px;
+  border-radius: var(--r-sm);
 }
 
 .nav a:hover {
@@ -445,7 +448,7 @@ main {
   gap: var(--sp-3);
   min-height: 44px;
   padding: 0 var(--sp-8);
-  border-radius: 10px;
+  border-radius: var(--r-md);
   border: 1px solid var(--brand);
   background: var(--brand);
   color: #fff;
@@ -519,7 +522,7 @@ select {
   color: var(--ink);
   background: var(--surface);
   border: 1px solid #cfc8bb;
-  border-radius: 10px;
+  border-radius: var(--r-md);
   padding: 0 var(--sp-6);
   min-height: 48px;
   width: 100%;
@@ -572,7 +575,7 @@ input[type="search"] {
 .age-result {
   margin-top: var(--sp-6);
   padding: var(--sp-6) var(--sp-6);
-  border-radius: 12px;
+  border-radius: var(--r-md);
   background: var(--brand-wash);
   color: var(--brand-deep);
   font-size: var(--fs-md);
@@ -598,7 +601,7 @@ input[type="search"] {
   margin-top: var(--sp-6);
   padding: var(--sp-6) var(--sp-8);
   border: 1px solid var(--danger-line);
-  border-radius: 12px;
+  border-radius: var(--r-md);
   background: var(--danger-wash);
   color: var(--danger);
 }
@@ -689,7 +692,6 @@ input[type="search"] {
 
 .section-head h2 {
   margin-bottom: 0;
-  font-size: var(--fs-lg);
 }
 
 .section-head .more {
@@ -748,7 +750,7 @@ input[type="search"] {
   gap: var(--sp-1);
   padding: var(--sp-8) var(--sp-8);
   border: 1px solid var(--line);
-  border-radius: 12px;
+  border-radius: var(--r-md);
   background: var(--surface);
   color: var(--ink);
 }
@@ -792,7 +794,7 @@ input[type="search"] {
   gap: var(--sp-3);
   padding: var(--sp-8) var(--sp-8);
   border: 1px solid var(--line);
-  border-radius: 14px;
+  border-radius: var(--r-lg);
   background: var(--surface);
   color: var(--ink);
   box-shadow: var(--shadow-sm);
@@ -836,7 +838,7 @@ input[type="search"] {
 
 .kcard {
   border: 1px solid var(--line);
-  border-radius: 14px;
+  border-radius: var(--r-lg);
   background: var(--surface);
   box-shadow: var(--shadow-sm);
   overflow: hidden;
@@ -928,7 +930,7 @@ input[type="search"] {
   display: flex;
   align-items: center;
   gap: var(--sp-4);
-  font-size: var(--fs-md);
+  font-size: var(--fs-lg);
   font-weight: 700;
   color: var(--ink);
   margin: var(--sp-16) 0 var(--sp-6);
@@ -987,13 +989,13 @@ input[type="search"] {
 .warn-block {
   margin-top: var(--sp-16);
   border: 1px solid var(--line);
-  border-radius: 14px;
+  border-radius: var(--r-lg);
   background: var(--surface);
   padding: var(--sp-8) var(--sp-10);
 }
 
 .warn-block h2 {
-  font-size: var(--fs-base);
+  font-size: var(--fs-lg);
   margin-bottom: var(--sp-2);
 }
 
@@ -1100,7 +1102,7 @@ input[type="search"] {
 
 .mini-disclaimer {
   border: 1px solid var(--line);
-  border-radius: 10px;
+  border-radius: var(--r-md);
   background: var(--surface-warm);
   padding: var(--sp-5) var(--sp-6);
   font-size: var(--fs-2xs);
@@ -1124,7 +1126,7 @@ input[type="search"] {
 
 .sev {
   border: 1px solid;
-  border-radius: 14px;
+  border-radius: var(--r-lg);
   padding: var(--sp-8) var(--sp-8);
   display: flex;
   flex-direction: column;
@@ -1176,7 +1178,7 @@ input[type="search"] {
 }
 
 .home-care h2 {
-  font-size: var(--fs-base);
+  font-size: var(--fs-lg);
 }
 
 .home-care ul {
@@ -1215,7 +1217,7 @@ input[type="search"] {
 details.source-fold {
   margin-top: var(--sp-10);
   border: 1px solid var(--line);
-  border-radius: 12px;
+  border-radius: var(--r-md);
   background: var(--surface);
 }
 
@@ -1258,11 +1260,11 @@ details.source-fold .fold-body {
 }
 
 .quick-section {
-  margin-top: var(--sp-16);
+  margin-top: var(--sp-20);
 }
 
 .quick-section > h2 {
-  font-size: var(--fs-base);
+  font-size: var(--fs-xl);
   display: flex;
   align-items: center;
   gap: var(--sp-4);
@@ -1279,7 +1281,7 @@ details.source-fold .fold-body {
   display: block;
   padding: var(--sp-8) var(--sp-8);
   border: 1px solid var(--line);
-  border-radius: 12px;
+  border-radius: var(--r-md);
   background: var(--surface);
   color: var(--ink);
 }
@@ -1354,7 +1356,7 @@ mark {
   margin-top: var(--sp-12);
   padding: var(--sp-10);
   border: 1px dashed var(--line);
-  border-radius: 12px;
+  border-radius: var(--r-md);
   background: var(--surface);
   font-size: var(--fs-sm);
 }
@@ -1370,7 +1372,7 @@ mark {
   padding: var(--sp-8) var(--sp-8);
   background: var(--surface);
   border: 1px solid var(--line);
-  border-radius: 12px;
+  border-radius: var(--r-md);
 }
 
 .node-picker label {
@@ -1401,7 +1403,7 @@ mark {
   margin-top: 0;
   border: 1px solid var(--dom-line);
   border-left: 5px solid var(--dom);
-  border-radius: 16px;
+  border-radius: var(--r-lg);
   background: var(--dom-bg);
   overflow: hidden;
   box-shadow: var(--shadow-sm);
@@ -1455,7 +1457,7 @@ mark {
 }
 
 .dom-head h3 {
-  font-size: var(--fs-base);
+  font-size: var(--fs-lg);
   display: flex;
   align-items: center;
   gap: var(--sp-4);
@@ -1530,13 +1532,13 @@ mark {
 .check-block {
   margin-top: var(--sp-16);
   border: 1px solid var(--danger-line);
-  border-radius: 14px;
+  border-radius: var(--r-lg);
   background: var(--surface);
   padding: var(--sp-8) var(--sp-10);
 }
 
 .check-block h2 {
-  font-size: var(--fs-base);
+  font-size: var(--fs-lg);
   margin-bottom: var(--sp-2);
 }
 
@@ -1598,7 +1600,7 @@ mark {
   margin-top: var(--sp-12);
   background: var(--danger);
   color: #fff;
-  border-radius: 12px;
+  border-radius: var(--r-md);
   padding: var(--sp-6) var(--sp-8);
   font-size: var(--fs-sm);
   line-height: 1.55;
@@ -1665,7 +1667,7 @@ mark {
   }
   .src-table tr {
     border: 1px solid var(--line);
-    border-radius: 10px;
+    border-radius: var(--r-md);
     margin-bottom: var(--sp-5);
     padding: var(--sp-2) var(--sp-2);
     background: var(--surface);
@@ -1684,13 +1686,13 @@ mark {
 .notice {
   border: 1px solid var(--line);
   background: var(--surface);
-  border-radius: 14px;
+  border-radius: var(--r-lg);
   padding: var(--sp-8) var(--sp-10);
   margin-top: var(--sp-12);
 }
 
 .notice h2 {
-  font-size: var(--fs-base);
+  font-size: var(--fs-lg);
 }
 
 .notice p:last-child {
@@ -1883,7 +1885,7 @@ mark {
   justify-content: center;
   width: 26px;
   height: 26px;
-  border-radius: 8px;
+  border-radius: var(--r-sm);
   background: var(--cat-bg, var(--surface-warm));
   color: var(--cat, var(--ink-soft));
   font-size: var(--fs-2xs);
@@ -1921,7 +1923,7 @@ mark {
 .kcard > summary .k .cat-badge {
   width: 22px;
   height: 22px;
-  border-radius: 6px;
+  border-radius: var(--r-sm);
   font-size: var(--fs-2xs);
   margin-right: var(--sp-3);
   vertical-align: -3px;
@@ -1934,7 +1936,7 @@ mark {
 .group-title .cat-badge {
   width: 24px;
   height: 24px;
-  border-radius: 7px;
+  border-radius: var(--r-sm);
   font-size: var(--fs-2xs);
 }
 
@@ -2021,7 +2023,7 @@ mark {
 
 .axis-head h2 {
   margin: 0;
-  font-size: var(--fs-base);
+  font-size: var(--fs-lg);
 }
 
 .axis-head span {
@@ -2102,7 +2104,7 @@ mark {
   font-size: var(--fs-2xs);
   font-weight: 700;
   padding: var(--sp-1) var(--sp-4);
-  border-radius: 6px;
+  border-radius: var(--r-sm);
   white-space: nowrap;
 }
 
@@ -2163,7 +2165,7 @@ mark {
 .axis-stat {
   background: var(--paper);
   border: 1px solid var(--line-soft);
-  border-radius: 10px;
+  border-radius: var(--r-md);
   padding: var(--sp-4) var(--sp-5);
 }
 
@@ -2291,7 +2293,7 @@ mark {
   min-height: 40px;
   padding: 0 var(--sp-6);
   border: 1px solid var(--line);
-  border-radius: 10px;
+  border-radius: var(--r-md);
   background: var(--surface);
   color: var(--ink-soft);
   font: inherit;
@@ -2362,7 +2364,7 @@ mark {
   max-height: 82vh;
   padding: 0;
   border: 1px solid var(--line);
-  border-radius: 18px;
+  border-radius: var(--r-lg);
   background: var(--surface);
   box-shadow: 0 24px 80px rgba(28, 43, 48, 0.28);
   overflow: hidden;
@@ -2404,7 +2406,7 @@ mark {
   min-height: 36px;
   padding: 0 var(--sp-4);
   border: 1px solid var(--line);
-  border-radius: 7px;
+  border-radius: var(--r-sm);
   background: var(--surface);
   color: var(--muted);
   font: inherit;
@@ -2423,7 +2425,7 @@ mark {
 .gs-item {
   display: block;
   padding: var(--sp-5) var(--sp-6);
-  border-radius: 10px;
+  border-radius: var(--r-md);
   color: var(--ink);
 }
 
@@ -2509,7 +2511,7 @@ mark {
   min-height: 44px;
   padding: 0 var(--sp-6);
   border: 1px solid rgba(255, 255, 255, 0.7);
-  border-radius: 8px;
+  border-radius: var(--r-sm);
   color: #fff;
   font-size: var(--fs-xs);
   font-weight: 700;
@@ -2528,7 +2530,7 @@ mark {
   min-height: 44px;
   margin-top: var(--sp-4);
   border: 1px solid currentColor;
-  border-radius: 9px;
+  border-radius: var(--r-sm);
   background: rgba(255, 255, 255, 0.55);
   color: inherit;
   font-weight: 700;
@@ -2595,7 +2597,7 @@ mark {
 
 .todo-head h2 {
   margin: 0;
-  font-size: var(--fs-base);
+  font-size: var(--fs-lg);
 }
 
 .todo-head span {
@@ -2693,8 +2695,8 @@ mark {
 /* ---------- 大运动达成窗口图 ---------- */
 
 .node-list-heading {
-  margin: var(--sp-16) 0 var(--sp-6);
-  font-size: var(--fs-lg);
+  margin: var(--sp-20) 0 var(--sp-6);
+  font-size: var(--fs-xl);
 }
 
 .mw-figure {
@@ -2716,7 +2718,7 @@ mark {
 
 .mw-head h2 {
   margin: 0 0 var(--sp-1);
-  font-size: var(--fs-base);
+  font-size: var(--fs-lg);
 }
 
 .mw-sub {
@@ -2828,7 +2830,7 @@ mark {
   position: absolute;
   top: 14px;
   height: 20px;
-  border-radius: 6px;
+  border-radius: var(--r-sm);
   background: linear-gradient(90deg, #bfdcd5, #8fc4b9);
   border: 1px solid #a9d1c8;
   box-shadow: 0 1px 2px rgba(20, 105, 92, 0.08);

@@ -262,7 +262,7 @@ const relatedHref = (r: { slug: string; age: string }) =>
       padding: var(--sp-8) var(--sp-8);
       border-left: 3px solid var(--brand);
       background: var(--brand-wash);
-      border-radius: 10px;
+      border-radius: var(--r-md);
       font-size: var(--fs-md);
       line-height: 1.7;
       color: var(--ink-soft);
@@ -278,7 +278,7 @@ const relatedHref = (r: { slug: string; age: string }) =>
       font-size: var(--fs-sm);
     }
     .fd-toc a { color: var(--ink-soft); min-height: 44px; display: inline-flex; align-items: center; }
-    .fd-section { margin-top: var(--sp-16); scroll-margin-top: 1rem; }
+    .fd-section { margin-top: var(--sp-20); scroll-margin-top: 1rem; }
     .fd-section > h2 { font-size: var(--fs-lg); margin-bottom: var(--sp-2); }
 
     .fd-timeline { list-style: none; margin: var(--sp-8) 0 0; padding: 0 0 0 var(--sp-12); border-left: 2px solid var(--line); }
@@ -292,7 +292,7 @@ const relatedHref = (r: { slug: string; age: string }) =>
     }
     .fd-stage {
       border: 1px solid var(--line);
-      border-radius: 14px;
+      border-radius: var(--r-lg);
       background: var(--surface);
       padding: var(--sp-8) var(--sp-8);
       box-shadow: var(--shadow-sm);
@@ -312,7 +312,7 @@ const relatedHref = (r: { slug: string; age: string }) =>
     .fd-table { margin-top: var(--sp-6); }
     .fd-table td:last-child, .fd-table th:last-child { white-space: normal; }
     .fd-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: var(--sp-5); margin-top: var(--sp-8); }
-    .fd-card { padding: var(--sp-8) var(--sp-8); border: 1px solid var(--line); border-top: 3px solid var(--brand); border-radius: 12px; background: var(--surface); }
+    .fd-card { padding: var(--sp-8) var(--sp-8); border: 1px solid var(--line); border-top: 3px solid var(--brand); border-radius: var(--r-md); background: var(--surface); }
     .fd-card-no { font: 700 var(--fs-2xs) var(--ff-mono); color: var(--muted); letter-spacing: 0.08em; }
     .fd-card h3 { font-size: var(--fs-base); margin: var(--sp-2) 0 var(--sp-3); }
     .fd-card p { font-size: var(--fs-sm); color: var(--ink-soft); line-height: 1.65; margin: 0; }
@@ -323,7 +323,7 @@ const relatedHref = (r: { slug: string; age: string }) =>
       color: var(--ink-soft); font-size: var(--fs-sm);
     }
     .fd-hazards { display: grid; gap: var(--sp-4); margin-top: var(--sp-6); }
-    .fd-hazard { padding: var(--sp-6) var(--sp-8); border: 1px solid var(--danger-line); border-left: 3px solid var(--danger); border-radius: 10px; background: var(--danger-wash); }
+    .fd-hazard { padding: var(--sp-6) var(--sp-8); border: 1px solid var(--danger-line); border-left: 3px solid var(--danger); border-radius: var(--r-md); background: var(--danger-wash); }
     .fd-hazard h3 { font-size: var(--fs-md); color: var(--danger); margin: 0 0 var(--sp-2); }
     .fd-hazard p { font-size: var(--fs-sm); color: var(--ink-soft); line-height: 1.65; margin: 0; }
     .fd-source { margin-bottom: var(--sp-8); }
@@ -340,7 +340,7 @@ const relatedHref = (r: { slug: string; age: string }) =>
     }
     .fd-recipes { display: grid; gap: var(--sp-5); margin-top: var(--sp-6); }
     .fd-recipe {
-      border: 1px solid var(--line); border-radius: 14px;
+      border: 1px solid var(--line); border-radius: var(--r-lg);
       background: var(--surface); box-shadow: var(--shadow-sm);
       overflow: hidden; scroll-margin-top: 1rem;
     }
@@ -380,7 +380,7 @@ const relatedHref = (r: { slug: string; age: string }) =>
     .fd-ing li::before { content: "·"; color: var(--brand); font-weight: 700; }
     .fd-tip {
       margin: 0; padding: var(--sp-5) var(--sp-6);
-      border-left: 3px solid var(--brand); border-radius: 10px;
+      border-left: 3px solid var(--brand); border-radius: var(--r-md);
       background: var(--brand-wash);
       font-size: var(--fs-sm); line-height: 1.65; color: var(--ink-soft);
     }
