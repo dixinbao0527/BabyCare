@@ -100,22 +100,22 @@ import { withBase } from '../lib/url';
   <style>
     .ab-wrap { max-width: 840px; }
 
-    .ab-head { margin: 2rem 0 1.3rem; }
-    .ab-head h1 { font-size: clamp(1.75rem, 5vw, 2.35rem); margin-bottom: 0.4rem; }
+    .ab-head { margin: var(--sp-16) 0 var(--sp-10); }
+    .ab-head h1 { font-size: clamp(1.75rem, 5vw, 2.35rem); margin-bottom: var(--sp-3); }
     .ab-lead {
-      font-size: 0.94rem; color: var(--muted); line-height: 1.8;
+      font-size: var(--fs-md); color: var(--muted); line-height: 1.8;
       max-width: 34em; margin: 0;
     }
 
-    .ab-grid { display: grid; gap: 0.9rem; }
+    .ab-grid { display: grid; gap: var(--sp-8); }
     @media (min-width: 680px) {
       .ab-grid { grid-template-columns: 1.35fr 0.65fr; align-items: stretch; }
     }
 
     .ab-card {
       position: relative;
-      margin-top: 0.9rem;
-      padding: 1.15rem 1.3rem 1.2rem;
+      margin-top: var(--sp-8);
+      padding: var(--sp-10) var(--sp-10) var(--sp-10);
       background: var(--surface);
       border: 1px solid var(--line);
       border-radius: 18px;
@@ -132,19 +132,19 @@ import { withBase } from '../lib/url';
     .ab-grid .ab-card { margin-top: 0; }
 
     .ab-card h2 {
-      display: flex; align-items: center; gap: 0.45rem;
-      font-size: 1rem; margin: 0 0 0.6rem;
+      display: flex; align-items: center; gap: var(--sp-4);
+      font-size: var(--fs-base); margin: 0 0 var(--sp-5);
       letter-spacing: 0;
     }
     .ab-card h3 {
-      font-size: 0.86rem; font-weight: 700;
+      font-size: var(--fs-sm); font-weight: 700;
       color: var(--muted); letter-spacing: 0.04em;
-      margin: 1.15rem 0 0.35rem;
+      margin: var(--sp-10) 0 var(--sp-3);
     }
-    .ab-card p { font-size: 0.9rem; line-height: 1.85; color: var(--ink-soft); margin-bottom: 0.75rem; }
+    .ab-card p { font-size: var(--fs-sm); line-height: 1.85; color: var(--ink-soft); margin-bottom: var(--sp-6); }
     .ab-card p:last-child { margin-bottom: 0; }
     .ab-card strong { color: var(--ink); }
-    .ab-ico { font-size: 1.02rem; line-height: 1; }
+    .ab-ico { font-size: var(--fs-base); line-height: 1; }
 
     .ab-contact {
       background: linear-gradient(180deg, var(--brand-wash) 0%, var(--surface) 72%);
@@ -152,7 +152,7 @@ import { withBase } from '../lib/url';
     }
     .ab-mail {
       display: inline-block;
-      margin: 0.15rem 0 0.6rem;
+      margin: var(--sp-1) 0 var(--sp-5);
       font-size: clamp(1.08rem, 3.4vw, 1.36rem);
       font-weight: 700;
       color: var(--brand-deep);
@@ -162,11 +162,11 @@ import { withBase } from '../lib/url';
     }
     .ab-mail:hover { text-decoration: underline; }
 
-    .ab-ticks { list-style: none; padding: 0; margin: 0 0 0.2rem; }
+    .ab-ticks { list-style: none; padding: 0; margin: 0 0 var(--sp-2); }
     .ab-ticks li {
       position: relative;
-      padding-left: 1.05rem;
-      font-size: 0.88rem;
+      padding-left: var(--sp-8);
+      font-size: var(--fs-sm);
       line-height: 1.75;
       color: var(--ink-soft);
     }
@@ -176,18 +176,18 @@ import { withBase } from '../lib/url';
       width: 5px; height: 5px; border-radius: 50%;
       background: var(--brand);
     }
-    .ab-fine { font-size: 0.8rem !important; color: var(--muted) !important; line-height: 1.7 !important; margin-top: 0.9rem; }
+    .ab-fine { font-size: var(--fs-xs) !important; color: var(--muted) !important; line-height: 1.7 !important; margin-top: var(--sp-8); }
 
-    .ab-legal h3:first-of-type { margin-top: 0.6rem; }
+    .ab-legal h3:first-of-type { margin-top: var(--sp-5); }
 
     .ab-actions {
-      display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem;
-      margin: 1.6rem 0 0.4rem;
+      display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-5);
+      margin: var(--sp-12) 0 var(--sp-3);
     }
     .ab-back {
       margin-left: auto;
       display: inline-flex; align-items: center; min-height: 44px;
-      font-size: 0.86rem; color: var(--muted);
+      font-size: var(--fs-sm); color: var(--muted);
     }
     .ab-back:hover { color: var(--brand-deep); text-decoration: none; }
     @media (max-width: 520px) {

@@ -13,24 +13,24 @@ import { withBase } from '../lib/url';
 <style>
   .review-notice {
     display: flex;
-    gap: 0.6rem;
+    gap: var(--sp-5);
     align-items: flex-start;
-    margin: 1rem 0 0;
-    padding: 0.7rem 0.85rem;
+    margin: var(--sp-8) 0 0;
+    padding: var(--sp-6) var(--sp-6);
     background: var(--surface-warm);
     border: 1px solid var(--line);
     border-radius: 10px;
-    font-size: 0.82rem;
+    font-size: var(--fs-xs);
     line-height: 1.65;
     color: var(--ink-soft);
   }
   .rn-tag {
     flex: none;
-    padding: 0.05rem 0.45rem;
+    padding: var(--sp-1) var(--sp-4);
     border-radius: 999px;
     background: var(--surface);
     border: 1px solid var(--line);
-    font-size: 0.72rem;
+    font-size: var(--fs-2xs);
     font-weight: 700;
     color: var(--muted);
   }
