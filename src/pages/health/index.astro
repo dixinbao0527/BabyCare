@@ -45,7 +45,7 @@ const commonConcerns = ['infant-fever', 'diarrhea-care', 'cough', 'rash']
 
     <div class="search-box">
       <span class="glass" aria-hidden="true">⌕</span>
-      <label class="sr-only" for="q" style="position:absolute;left:-9999px;">搜索症状、疾病或关键词</label>
+      <label class="sr-only" for="q">搜索症状、疾病或关键词</label>
       <input
         id="q"
         type="search"
@@ -266,11 +266,11 @@ const commonConcerns = ['infant-fever', 'diarrhea-care', 'cough', 'rash']
     function render(list: Item[], q: string) {
       if (!results) return;
       if (list.length === 0) {
-        results.innerHTML = `<div class="empty-result"><p style="margin-bottom:.5rem;"><strong>没找到「${esc(q)}」</strong></p><p class="small muted" style="margin:0;">试试更短的词，或直接看 <a href="#acute-h">急症速查</a> 与 <a href="${withBase('/health/handbook')}">高危手册</a>。</p></div>`;
+        results.innerHTML = `<div class="empty-result"><p class="empty-line"><strong>没找到「${esc(q)}」</strong></p><p class="small muted u-m-0">试试更短的词，或直接看 <a href="#acute-h">急症速查</a> 与 <a href="${withBase('/health/handbook')}">高危手册</a>。</p></div>`;
         return;
       }
       results.innerHTML =
-        `<p class="small muted" style="margin:.9rem 0 .2rem;">${list.length} 条结果</p><div class="qlist">` +
+        `<p class="small muted result-count">${list.length} 条结果</p><div class="qlist">` +
         list.map((it) => `
           <a class="qitem" href="${hrefOf(it)}">
             <span class="row">

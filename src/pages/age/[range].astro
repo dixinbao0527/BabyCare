@@ -67,12 +67,17 @@ const title = `${stage.name}宝宝的养育要点`;
       }
       <h1>{stage.name}</h1>
       <p class="tagline">{stage.tagline}</p>
-      <p class="small muted" style="margin-top:.6rem;">
+      <p class="small muted u-mt-sm">
         {entries.length} 条内容 · 按月龄筛选，急症内容不在本页展开
       </p>
     </div>
 
     <ReviewNotice />
+
+    <p class="preterm-note" id="preterm-note" hidden>
+      早产儿请按<strong>矫正月龄</strong>对照本页内容；这里的分类仍按实际月龄。
+      <a href={withBase('/milestones')}>去发育里程碑页看矫正月龄 →</a>
+    </p>
 
     {
       groups.map((g) => (
@@ -95,7 +100,7 @@ const title = `${stage.name}宝宝的养育要点`;
 
     {
       entries.length === 0 && (
-        <p class="small muted" style="margin-top:2rem;">
+        <p class="small muted u-mt-2xl">
           这一阶段的内容正在补充。可以先看 <a href={withBase('/health')}>健康查询</a> 或
           <a href={withBase('/milestones')}>发育里程碑</a>。
         </p>
@@ -119,7 +124,7 @@ const title = `${stage.name}宝宝的养育要点`;
           ))
         }
       </ul>
-      <p class="small muted" style="margin:.8rem 0 0;">
+      <p class="small muted u-mt-sm u-mb-0">
         有任何一条符合，建议尽快咨询儿科医生或儿童保健机构进行评估。本站不做判断、不给结论。
         完整清单见<a href={withBase('/milestones')}>发育里程碑</a>。
       </p>
@@ -127,7 +132,7 @@ const title = `${stage.name}宝宝的养育要点`;
 
     {
       relatedAcutes.length > 0 && (
-        <p class="small" style="margin-top:1.4rem;">
+        <p class="small u-mt-xl">
           相关急症：
           {relatedAcutes.map((a, i) => (
             <>
@@ -148,4 +153,20 @@ const title = `${stage.name}宝宝的养育要点`;
       </span>
     </nav>
   </div>
+
+  <script>
+    // 只在家长存过「胎龄 < 37 周」时提示矫正月龄，足月不打扰
+    try {
+      const raw = localStorage.getItem('ich.birth.v1');
+      if (raw) {
+        const parsed = JSON.parse(raw) as { ga?: number };
+        const ga = Number(parsed.ga);
+        if (ga >= 24 && ga < 37) {
+          document.getElementById('preterm-note')?.removeAttribute('hidden');
+        }
+      }
+    } catch {
+      /* 隐私模式下不可用，忽略 */
+    }
+  </script>
 </BaseLayout>

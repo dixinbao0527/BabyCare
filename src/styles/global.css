@@ -187,6 +187,57 @@ code {
   overflow-wrap: break-word;
 }
 
+/* ---------- 工具类（替代一次性内联 style） ---------- */
+.u-m-0 { margin: 0; }
+.u-mt-0 { margin-top: 0; }
+.u-mt-xs { margin-top: var(--sp-2); }
+.u-mt-sm { margin-top: var(--sp-4); }
+.u-mt-md { margin-top: var(--sp-6); }
+.u-mt-lg { margin-top: var(--sp-8); }
+.u-mt-xl { margin-top: var(--sp-12); }
+.u-mt-2xl { margin-top: var(--sp-16); }
+.u-mt-neg { margin-top: calc(var(--sp-2) * -1); }
+.u-mb-0 { margin-bottom: 0; }
+.u-mb-xs { margin-bottom: var(--sp-3); }
+.u-mb-sm { margin-bottom: var(--sp-4); }
+.u-mb-md { margin-bottom: var(--sp-6); }
+
+.section-subtitle { font-size: var(--fs-lg); }
+
+/* 页脚「清除本机记录」这类按钮：看起来像链接，触控高度仍 ≥44px */
+.link-button {
+  font: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  color: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+}
+
+
+.empty-line { margin-bottom: var(--sp-4); }
+.result-count { margin: var(--sp-6) 0 var(--sp-2); }
+.node-title { margin-top: var(--sp-12); font-size: var(--fs-lg); }
+.not-found-grid { margin-top: var(--sp-16); text-align: left; }
+
+/* 早产儿提示：仅在本地存过胎龄 < 37 周时由脚本显示 */
+.preterm-note {
+  margin-top: var(--sp-6);
+  padding: var(--sp-4) var(--sp-6);
+  background: var(--brand-wash);
+  border-left: 3px solid var(--brand);
+  border-radius: var(--r-md);
+  font-size: var(--fs-sm);
+  line-height: 1.7;
+  color: var(--ink-soft);
+}
+.preterm-note[hidden] { display: none; }
+.preterm-note a { font-weight: 700; }
+
 /* ---------- 布局 ---------- */
 
 .wrap {

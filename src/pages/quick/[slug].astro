@@ -59,7 +59,7 @@ const jsonLd = {
         <button type="button" class="back print-btn" id="print-page">打印这页</button>
       </div>
       <h1>{d.title}</h1>
-      <div class="tags" style="margin-bottom:.7rem;">
+      <div class="tags u-mb-sm">
         {d.scenario_tags.map((t) => <span class="tag">{t}</span>)}
       </div>
       <p class="lede">{d.summary}</p>
@@ -70,9 +70,9 @@ const jsonLd = {
       </p>
     </div>
 
-    <section aria-labelledby="sev-heading" style="margin-top:1.6rem;">
-      <h2 id="sev-heading" style="font-size:1.02rem;">现在处于哪一级</h2>
-      <p class="small muted" style="margin-top:-.2rem;">
+    <section aria-labelledby="sev-heading" class="u-mt-xl">
+      <h2 id="sev-heading" class="section-subtitle">现在处于哪一级</h2>
+      <p class="small muted u-mt-neg">
         从上到下逐条对照，命中哪一级就按哪一级处理；同时命中多级，取最严重的一级。
       </p>
       <div class="sev-grid">
@@ -104,13 +104,13 @@ const jsonLd = {
     <details class="source-fold">
       <summary>来源、整理与复核状态</summary>
       <div class="fold-body">
-        <p style="margin-bottom:.4rem;">
+        <p class="u-mb-sm">
           <strong>{d.source.name}</strong>
           {d.source.section && <><br />章节：{d.source.section}</>}
           <br />年份：{d.source.year} · 层级：{d.source.tier}
           {d.source.url && <><br /><a href={d.source.url} rel="noopener noreferrer nofollow">查看原文</a></>}
         </p>
-        <p style="margin:0;">
+        <p class="u-m-0">
           资料整理：{review.compiledBy} · {formatDate(review.compiledOn)}
           <br />
           专业复核：{review.clinicalLabel}
@@ -125,7 +125,7 @@ const jsonLd = {
       </div>
     </details>
 
-    <p class="small muted" style="margin-top:1.6rem;">
+    <p class="small muted u-mt-xl">
       其他突发状况：<a href={withBase('/health#acute-h')}>查看全部急症条目 →</a>
     </p>
   </div>

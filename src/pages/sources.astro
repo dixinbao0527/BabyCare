@@ -84,9 +84,9 @@ const tierLabel: Record<string, string> = {
       <p class="tagline">每一条知识都要能追到原文，这是本站的唯一底线。</p>
     </div>
 
-    <section aria-labelledby="list-heading" style="margin-top:1.6rem;">
-      <h2 id="list-heading" style="font-size:1.05rem;">引用指南清单</h2>
-      <p class="small muted" style="margin-top:-.2rem;">
+    <section aria-labelledby="list-heading" class="u-mt-xl">
+      <h2 id="list-heading" class="section-subtitle">引用指南清单</h2>
+      <p class="small muted u-mt-neg">
         本表由构建脚本从全部条目的 <code>source</code> 字段自动聚合，页面上写的来源与条目实际引用永远一致。
         共 {rows.length} 份文献，覆盖 {dev.length + acute.length} 条内容。
       </p>
@@ -180,7 +180,7 @@ const tierLabel: Record<string, string> = {
 
     <section class="notice" aria-labelledby="docs-heading">
       <h2 id="docs-heading">核心文献与文号</h2>
-      <p class="small muted" style="margin-top:-.2rem;">
+      <p class="small muted u-mt-neg">
         以下为站内主要依据的完整标识，便于按文号或 ISBN 查到原文。
       </p>
       <ul class="doclist">
@@ -283,14 +283,14 @@ const tierLabel: Record<string, string> = {
         你在首页填写的出生日期与胎龄，只写入浏览器的 <code>localStorage</code>（键名
         <code>ich.birth.v1</code>），不会上传到任何服务器。
       </p>
-      <p style="margin-bottom:.4rem;">
+      <p class="u-mb-sm">
         想清除这份本地记录，可以点下面的按钮，或在浏览器设置里清除本站数据。
       </p>
       <button class="btn btn-ghost" type="button" id="clear-storage-local">清除本机记录</button>
       <span class="small muted" id="clear-state" aria-live="polite"></span>
     </section>
 
-    <p class="small muted" style="margin-top:2rem;">
+    <p class="small muted u-mt-2xl">
       最后更新：{BUILD_DATE} · <a href={withBase('/')}>返回首页</a>
     </p>
   </div>

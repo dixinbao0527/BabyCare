@@ -87,8 +87,8 @@ const nodes = SCREEN_NODES.map((n) => ({
     {
       nodes.map((n, i) => (
         <section data-node={String(n.node)} hidden={i !== 0} aria-label={`${n.node} 月龄`}>
-          <h2 style="margin-top:1.8rem;font-size:1.08rem;">{n.node} 月龄的里程碑</h2>
-          <p class="small muted" style="margin-top:-.2rem;">
+          <h2 class="node-title">{n.node} 月龄的里程碑</h2>
+          <p class="small muted u-mt-neg">
             运动维度可对照上方窗口图；这一节按节点列出文字表述，不是达标线。
           </p>
 
@@ -139,7 +139,7 @@ const nodes = SCREEN_NODES.map((n) => ({
                 </li>
               ))}
             </ul>
-            <p class="small muted" style="margin:.9rem 0 0;">
+            <p class="small muted u-mt-md u-mb-0">
               该年龄段任何一条阳性，提示有发育偏异的可能。本站不判断严重程度，只提示去做评估。
             </p>
           </div>
@@ -151,7 +151,7 @@ const nodes = SCREEN_NODES.map((n) => ({
       {REFERRAL_TEXT}
     </div>
 
-    <div class="notice" style="margin-top:2rem;">
+    <div class="notice u-mt-2xl">
       <h2>怎么用这一页</h2>
       <p>
         先看上方窗口图：条目落在条内就是正常范围，落在条外也不等于异常，下一步是做评估。
@@ -165,7 +165,7 @@ const nodes = SCREEN_NODES.map((n) => ({
         早产儿一律按矫正月龄对照（首页填写胎龄后，这里会自动跳到对应节点）。
         如果某一条预警征象符合，请带上这一页的记录去儿科或儿童保健机构做评估，不要自行下结论。
       </p>
-      <p class="small muted" style="margin-bottom:0;">
+      <p class="small muted u-mb-0">
         本页不出现任何评分、百分比或达标率。完整说明见<a href={withBase('/sources')}>来源与声明</a>。
       </p>
     </div>
