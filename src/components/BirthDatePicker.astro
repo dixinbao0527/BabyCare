@@ -20,7 +20,7 @@ const minStr = `${today.getFullYear() - 6}-${pad(today.getMonth() + 1)}-${pad(to
       aria-describedby="birth-hint"
     />
   </div>
-  <p class="form-hint" id="birth-hint">用于定位月龄，只保存在你的设备上，不会上传。</p>
+  <p class="form-hint" id="birth-hint">只保存在你的设备上，不会上传。不想填，也可以直接点「成长轴」上的阶段。</p>
 
   <details class="ga-toggle">
     <summary>早产儿？填一下出生时的胎龄（可选）</summary>
@@ -37,8 +37,6 @@ const minStr = `${today.getFullYear() - 6}-${pad(today.getMonth() + 1)}-${pad(to
       <span class="small muted">不满 37 周时，按矫正月龄对照发育里程碑。</span>
     </div>
   </details>
-
-  <p class="hero-example">还没记住生日？直接点成长轴上的阶段，或看<a href={withBase('/milestones')}>发育里程碑</a>。</p>
 
   <div class="age-result" id="age-result" aria-live="polite" hidden></div>
 

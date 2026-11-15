@@ -22,6 +22,8 @@ const {
 const BUILD_DATE = new Date().toISOString().slice(0, 10);
 
 const pageTitle = title === SITE_NAME ? title : `${title}｜${SITE_NAME}`;
+/** 急症速查页自身不再显示常驻入口，避免自己链自己 */
+const onQuickPage = Astro.url.pathname.includes('/quick');
 const canonical = new URL(Astro.url.pathname, Astro.site ?? 'https://example.github.io');
 const ogImage = new URL(withBase('/og.png'), Astro.site ?? 'https://example.github.io').href;
 ---
@@ -82,6 +84,15 @@ const ogImage = new URL(withBase('/og.png'), Astro.site ?? 'https://example.gith
       <slot />
     </main>
 
+    {!bare && !onQuickPage && (
+      <a class="emergency-fab" id="emergency-fab" href={withBase('/quick')} aria-label="急症与突发状况速查">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M12 6.5v11M6.5 12h11" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" />
+        </svg>
+        <span>急症速查</span>
+      </a>
+    )}
+
     <footer class="site-footer">
       <div class="wrap-wide">
         <p class="disclaimer">
@@ -132,6 +143,47 @@ const ogImage = new URL(withBase('/og.png'), Astro.site ?? 'https://example.gith
 
       centerCurrentNav();
       window.addEventListener('resize', centerCurrentNav, { passive: true });
+
+      // 常驻急症入口：页脚进入视口时让位；页面上已有「急症」卡片时也不重复出现
+      const fab = document.getElementById('emergency-fab');
+      const siteFooter = document.querySelector('.site-footer');
+      const inlineAcute = document.querySelector('.acute-entry');
+      const stickyReferral = document.querySelector('.referral-bar');
+      if (fab && 'IntersectionObserver' in window) {
+        let footerOn = false;
+        let inlineAcuteOn = false;
+        let referralOn = false;
+        const syncFab = () =>
+          fab.classList.toggle('is-hidden', footerOn || inlineAcuteOn || referralOn);
+
+        if (siteFooter) {
+          new IntersectionObserver(
+            (entries) => {
+              footerOn = entries.some((e) => e.isIntersecting);
+              syncFab();
+            },
+            { threshold: 0.05 }
+          ).observe(siteFooter);
+        }
+        if (inlineAcute) {
+          new IntersectionObserver(
+            (entries) => {
+              inlineAcuteOn = entries.some((e) => e.isIntersecting);
+              syncFab();
+            },
+            { threshold: 0.15 }
+          ).observe(inlineAcute);
+        }
+        if (stickyReferral) {
+          new IntersectionObserver(
+            (entries) => {
+              referralOn = entries.some((e) => e.isIntersecting);
+              syncFab();
+            },
+            { threshold: 0.1 }
+          ).observe(stickyReferral);
+        }
+      }
 
       const btn = document.getElementById('clear-storage');
       btn?.addEventListener('click', () => {

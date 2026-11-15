@@ -445,15 +445,6 @@ main {
   color: var(--brand-deep);
 }
 
-.link-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem 1.25rem;
-  align-items: center;
-  margin-top: 1rem;
-  font-size: 0.92rem;
-}
-
 /* ---------- 首页 ---------- */
 
 .hero {
@@ -606,6 +597,57 @@ input[type="search"] {
   margin-top: 0.2rem;
   font-size: 0.8rem;
   color: #8a3a34;
+}
+
+/* ---------- 常驻急症入口（窄屏） ---------- */
+
+.emergency-fab {
+  position: fixed;
+  right: max(14px, env(safe-area-inset-right));
+  bottom: max(14px, env(safe-area-inset-bottom));
+  z-index: 24;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 48px;
+  padding: 0 1rem 0 0.8rem;
+  border: 1px solid var(--danger-line);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--danger);
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  box-shadow: 0 6px 18px rgba(28, 43, 48, 0.16);
+  transition: opacity 0.18s ease, transform 0.18s ease, background 0.18s ease;
+}
+
+.emergency-fab svg {
+  width: 15px;
+  height: 15px;
+}
+
+.emergency-fab:hover {
+  background: var(--danger-wash);
+  text-decoration: none;
+}
+
+.emergency-fab.is-hidden {
+  opacity: 0;
+  transform: translateY(10px);
+  pointer-events: none;
+}
+
+@media (min-width: 900px) {
+  .emergency-fab {
+    display: none;
+  }
+}
+
+@media print {
+  .emergency-fab {
+    display: none !important;
+  }
 }
 
 .section {
@@ -1721,7 +1763,6 @@ mark {
   .stage-pager,
   .skip-link,
   .btn,
-  .link-row,
   .referral-bar {
     display: none !important;
   }
@@ -1922,16 +1963,6 @@ mark {
 
 .age-result {
   min-height: 0;
-}
-
-.hero-example {
-  margin: 0.55rem 0 0;
-  font-size: 0.8rem;
-  color: var(--muted);
-}
-
-.hero-example a {
-  color: var(--brand);
 }
 
 /* ---------- 成长轴 ---------- */

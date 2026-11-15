@@ -52,23 +52,10 @@ const jsonLd = {
         <span class="eyebrow">0～3 岁 · 公益整理 · {totalCount} 条可溯源内容</span>
         <h1 id="hero-title">按月龄查，每条都能溯源</h1>
         <p class="lede">
-          填一次生日，首页会记住宝宝现在的位置；不填也能按月龄浏览。喂养、睡眠、发育、安全、日常照护，
-          急症单独成路，随时可查。
+          填一次生日，首页会记住宝宝的位置；不填也能按月龄浏览。
         </p>
 
         <BirthDatePicker />
-
-        <p class="link-row">
-          <a href={withBase('/health')}>健康查询</a>
-          <span aria-hidden="true" class="muted">·</span>
-          <a href={withBase('/milestones')}>发育里程碑</a>
-          <span aria-hidden="true" class="muted">·</span>
-          <a href={withBase('/feeding')}>婴幼儿辅食</a>
-          <span aria-hidden="true" class="muted">·</span>
-          <a href={withBase('/outdoor')}>周末去哪儿</a>
-          <span aria-hidden="true" class="muted">·</span>
-          <a href={withBase('/sources')}>内容依据</a>
-        </p>
       </div>
 
       <div class="home-side">
