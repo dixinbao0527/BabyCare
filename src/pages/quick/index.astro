@@ -191,7 +191,7 @@ const acuteTop = acute.slice(0, 3);
     function hrefOf(it: Item): string {
       if (it.path) return withBase(it.path);
       if (it.type === 'acute') return withBase(`/quick/${it.slug}`);
-      if (it.type === 'outdoor') return withBase(`/outdoor/${it.slug}`);
+      if (it.type === 'outdoor') return withBase(`/outdoor#venue-${it.slug}`);
       return withBase(`/age/${it.age_range}`) + '#' + it.slug;
     }
 

@@ -49,7 +49,7 @@ for (const slug of scene.slugs) {
   const o = outdoor.find((e) => e.id === slug);
   if (o) {
     rows.push({
-      href: withBase(`/outdoor/${o.id}`),
+      href: withBase(`/outdoor#venue-${o.id}`),
       title: o.data.title,
       summary: o.data.summary,
       kind: 'outdoor',

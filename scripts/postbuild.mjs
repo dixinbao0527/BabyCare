@@ -27,6 +27,9 @@ const HANDBOOK = JSON.parse(
 const FEEDING = JSON.parse(
   fs.readFileSync(path.join(ROOT, 'src/content/data/feeding.json'), 'utf8')
 );
+const RECIPES = JSON.parse(
+  fs.readFileSync(path.join(ROOT, 'src/content/data/recipes.json'), 'utf8')
+);
 
 const VENUE_LABEL = {
   city_park: '城市公园',
@@ -104,6 +107,8 @@ const items = [
   })),
   ...outdoor.map((x) => ({
     slug: slugOf(x.file),
+    // 站内没有场所详情页，搜索结果落到列表页对应卡片
+    path: `/outdoor#venue-${slugOf(x.file)}`,
     title: x.data.title,
     tags: [
       ...new Set([
@@ -167,6 +172,17 @@ const items = [
     summary: x.desc,
     type: 'feeding',
     category: 'safety',
+    age_range: 'all',
+  })),
+  // 辅食菜单：搜「疙瘩汤」「牛肉条」这类具体做法也要能落到锚点
+  ...RECIPES.items.map((x) => ({
+    slug: `fd-recipe-${x.id}`,
+    path: `/feeding#recipe-${x.id}`,
+    title: `辅食菜单 · ${x.name}`,
+    tags: [...new Set(['辅食', '菜单', '做法', x.monthLabel, ...x.tags])],
+    summary: `${x.monthLabel} · ${x.texture} · ${x.time}。材料：${x.ingredients.slice(0, 3).join('、')}。`,
+    type: 'feeding',
+    category: 'recipe',
     age_range: 'all',
   })),
 ];
@@ -267,11 +283,6 @@ const urls = [
   ...acute.map((x) => ({
     loc: abs(`/quick/${slugOf(x.file)}`),
     priority: '0.9',
-    freq: 'monthly',
-  })),
-  ...outdoor.map((x) => ({
-    loc: abs(`/outdoor/${slugOf(x.file)}`),
-    priority: '0.7',
     freq: 'monthly',
   })),
 ];

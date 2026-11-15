@@ -21,23 +21,37 @@ const qrLabel = (f: string) => {
 
 <BaseLayout
   title="关于"
-  description="婴幼儿健康养育手册：联系方式、做这个站的原因、内容来源、赞赏码，以及版权与免责说明。"
+  description="婴幼儿健康养育手册：联系邮箱、为什么做这个站、内容来源、赞赏码，以及版权与免责说明。"
   nav="about"
 >
   <div class="wrap ab-wrap">
-    <div class="page-head ab-head">
+    <header class="ab-head">
+      <p class="eyebrow">关于本站</p>
       <h1>关于</h1>
-      <p class="tagline">一个按月龄组织、尽量每句话都能查到出处的育儿知识站。不诊断、不卖货、不追踪。</p>
+      <p class="ab-lead">
+        一个按月龄组织、每句话尽量查得到出处的育儿知识站。不诊断、不卖货、不追踪。
+      </p>
+    </header>
+
+    <div class="ab-grid">
+      <section class="ab-card ab-contact" aria-labelledby="contact-h">
+        <h2 id="contact-h"><span class="ab-ico" aria-hidden="true">📮</span>联系邮箱</h2>
+        <a class="ab-mail" href="mailto:YuChu_Comp@qq.com">YuChu_Comp@qq.com</a>
+        <p>内容纠错、转载授权、版权问题都发这里。孩子具体的病情请直接问儿科医生，邮件不做个体化医疗咨询。</p>
+      </section>
+
+      <section class="ab-card" aria-labelledby="boundary-h">
+        <h2 id="boundary-h"><span class="ab-ico" aria-hidden="true">🚧</span>本站不做什么</h2>
+        <ul class="ab-ticks">
+          <li>不做诊断，不给药品名和剂量</li>
+          <li>不放广告，不卖货</li>
+          <li>不收集个人信息，不埋点</li>
+        </ul>
+      </section>
     </div>
 
-    <section class="ab-card ab-contact" aria-labelledby="contact-h">
-      <h2 id="contact-h">联系邮箱</h2>
-      <a class="ab-mail" href="mailto:YuChu_Comp@qq.com">YuChu_Comp@qq.com</a>
-      <p class="small muted">内容纠错、转载授权、版权问题都发到这里。不接受个体化医疗咨询——孩子的具体情况请咨询儿科医生或就近就医。</p>
-    </section>
-
     <section class="ab-card" aria-labelledby="why-h">
-      <h2 id="why-h">为什么做这个站</h2>
+      <h2 id="why-h"><span class="ab-ico" aria-hidden="true">🧭</span>为什么做这个站</h2>
       <p>
         育儿信息从来不缺，缺的是「这句话从哪来、什么时候核对过、什么情况下该停下去医院」。
         一开始只是给家里人整理的一份清单，把散落在指南、家长群和短视频里的说法按月龄拆开；
@@ -45,33 +59,31 @@ const qrLabel = (f: string) => {
       </p>
       <p>
         它只做三件事：把公开指南整理成能查的结构、标清自己的边界、在需要就医时把人推向医生。
-        没有广告、没有账号、没有埋点。
       </p>
     </section>
 
     <section class="ab-card" aria-labelledby="source-h">
-      <h2 id="source-h">内容怎么来的</h2>
+      <h2 id="source-h"><span class="ab-ico" aria-hidden="true">📚</span>内容怎么来的</h2>
       <p>
-        主体依据国家卫生健康委发布的《3 岁以下婴幼儿健康养育照护指南（试行）》与《婴幼儿喂养健康教育核心信息》，
-        发育里程碑采用 WHO 的粗大运动窗口与国家卫健委《儿童心理行为发育问题预警征象筛查表》，
-        辅食部分参考《中国居民膳食指南（2022）》与 WHO 2023 版辅食喂养指南；急症部分依据中华医学会各专业委员会共识、中国 CDC 与 NICE NG143。
+        主体依据国家卫生健康委《3 岁以下婴幼儿健康养育照护指南（试行）》与《婴幼儿喂养健康教育核心信息》；
+        发育里程碑采用 WHO 的运动窗口与国家卫健委《儿童心理行为发育问题预警征象筛查表》；
+        辅食参考《中国居民膳食指南（2022）》与 WHO 2023 版辅食喂养指南；急症部分依据中华医学会各专业委员会共识、中国 CDC 与 NICE NG143。
       </p>
-      <ul class="ab-list">
-        <li><strong>逐条标注来源与复核日期</strong>，页脚与<a href={withBase('/sources')}>来源与声明</a>可查。</li>
-        <li><strong>不改数字</strong>：月龄、频次、时长、概率照抄原始口径，不做「约等于」。</li>
-        <li><strong>区分原文与自注</strong>：场景标签、通俗解释、插画都是本站加的，不是指南原文。</li>
-        <li><strong>不写指南没说的因果</strong>，不提供诊断、药品名与剂量。</li>
+      <ul class="ab-ticks">
+        <li>逐条标注来源与复核日期，<a href={withBase('/sources')}>来源与声明</a>可查</li>
+        <li>月龄、频次、时长照抄原始口径，不做「约等于」</li>
+        <li>场景标签、通俗解释、插画是本站加的，会与原文分开</li>
+        <li>不写指南没说的因果，不提供诊断、药品名与剂量</li>
       </ul>
-      <p class="small muted" style="margin-bottom:0;">
-        户外场所与插图是另一类信息：来自公园与主管部门公开页面，逐条带核验日期，不属于医学指南，插画为本站绘制的示意图。
+      <p class="ab-fine">
+        户外场所是另一类信息：来自公园与主管部门公开页面，带整理日期，不属于医学指南。
       </p>
     </section>
 
     <section class="ab-card ab-coffee" aria-labelledby="coffee-h">
-      <h2 id="coffee-h">赞赏码</h2>
+      <h2 id="coffee-h"><span class="ab-ico" aria-hidden="true">☕</span>赞赏码</h2>
       <p>
         这个站没有广告，也不卖东西。如果它帮到过你，可以请作者喝杯咖啡，用于域名、资料核对和一点点维护时间。
-        完全自愿，金额随意，不对应任何回报或专属内容，也不会影响站内任何一条内容。
       </p>
       {
         qrFiles.length > 0 ? (
@@ -79,7 +91,7 @@ const qrLabel = (f: string) => {
             {qrFiles.map((f) => (
               <figure>
                 <img src={withBase(`/images/${f}`)} alt={`${qrLabel(f)}赞赏码`} width="240" height="240" loading="lazy" />
-                <figcaption>{qrLabel(f)}</figcaption>
+                <figcaption>{qrLabel(f)}赞赏 · 感谢支持</figcaption>
               </figure>
             ))}
           </div>
@@ -93,11 +105,13 @@ const qrLabel = (f: string) => {
           </div>
         )
       }
-      <p class="small muted" style="margin-bottom:0;">本站不处理支付、不记录谁支持过、不回传任何信息。这不是公益募捐，不提供捐赠票据。</p>
+      <p class="ab-fine">
+        完全自愿、金额随意，不对应任何回报或专属内容，也不影响站内任何一条内容。本站不处理支付，不记录谁支持过，这不是公益募捐。
+      </p>
     </section>
 
     <section class="ab-card ab-legal" aria-labelledby="legal-h">
-      <h2 id="legal-h">版权应用与免责</h2>
+      <h2 id="legal-h"><span class="ab-ico" aria-hidden="true">⚖️</span>版权应用与免责</h2>
       <h3>版权与应用</h3>
       <p>
         站内文字、结构化整理与自绘插画为本站原创；所依据的指南原文版权归原发布机构所有。
@@ -117,95 +131,143 @@ const qrLabel = (f: string) => {
         不要以本站内容作为是否就医的唯一依据。内容可能存在转述偏差或版本滞后，与指南原文不一致时一律以原文为准；
         指南更新后不另行通知，本站对使用内容所产生的后果不承担责任。
       </p>
-      <p class="small muted" style="margin-bottom:0;">
+      <p class="ab-fine">
         你在首页填的出生日期只写在浏览器本地，不上传；页脚「清除本机记录」可随时清掉。继续使用即表示已理解上述边界。
       </p>
     </section>
 
-    <p class="small muted ab-tail">
-      <a href={withBase('/')}>← 返回首页</a>
-      <span aria-hidden="true"> · </span>
-      <a href={withBase('/sources')}>来源与声明</a>
-      <span aria-hidden="true"> · </span>
-      <a href="https://github.com/dixinbao0527/BabyCare" rel="noopener noreferrer" target="_blank">源码仓库</a>
-    </p>
+    <div class="ab-actions">
+      <a class="btn" href="mailto:YuChu_Comp@qq.com">邮件联系作者</a>
+      <a class="btn btn-ghost" href={withBase('/sources')}>来源与声明</a>
+      <a class="ab-back" href={withBase('/')}>← 返回首页</a>
+    </div>
   </div>
 
   <style>
-    .ab-wrap { max-width: 720px; }
-    .ab-head { padding-bottom: 0.6rem; }
-    .ab-head .tagline { max-width: 34em; }
+    .ab-wrap { max-width: 840px; }
+
+    .ab-head { margin: 2rem 0 1.3rem; }
+    .ab-head h1 { font-size: clamp(1.75rem, 5vw, 2.35rem); margin-bottom: 0.4rem; }
+    .ab-lead {
+      font-size: 0.94rem; color: var(--muted); line-height: 1.8;
+      max-width: 34em; margin: 0;
+    }
+
+    .ab-grid { display: grid; gap: 0.9rem; }
+    @media (min-width: 680px) {
+      .ab-grid { grid-template-columns: 1.35fr 0.65fr; align-items: stretch; }
+    }
 
     .ab-card {
-      margin-top: 1rem;
-      padding: 1.2rem 1.3rem;
+      position: relative;
+      margin-top: 0.9rem;
+      padding: 1.15rem 1.3rem 1.2rem;
       background: var(--surface);
       border: 1px solid var(--line);
-      border-radius: var(--radius-lg);
+      border-radius: 18px;
       box-shadow: var(--shadow-sm);
     }
-    .ab-card h2 {
-      font-size: 1.06rem;
-      margin: 0 0 0.65rem;
-      padding-bottom: 0.55rem;
-      border-bottom: 1px solid var(--line-soft);
+    .ab-card::before {
+      content: "";
+      position: absolute;
+      inset: 0 0 auto 0;
+      height: 2px;
+      border-radius: 18px 18px 0 0;
+      background: linear-gradient(90deg, var(--brand) 0%, rgba(20, 105, 92, 0.28) 42%, transparent 88%);
     }
-    .ab-card h3 { font-size: 0.92rem; margin: 1.1rem 0 0.35rem; color: var(--brand-deep); }
-    .ab-card p { font-size: 0.92rem; color: var(--ink-soft); line-height: 1.78; margin-bottom: 0.75rem; }
+    .ab-grid .ab-card { margin-top: 0; }
+
+    .ab-card h2 {
+      display: flex; align-items: center; gap: 0.45rem;
+      font-size: 1rem; margin: 0 0 0.6rem;
+      letter-spacing: 0;
+    }
+    .ab-card h3 {
+      font-size: 0.86rem; font-weight: 700;
+      color: var(--muted); letter-spacing: 0.04em;
+      margin: 1.15rem 0 0.35rem;
+    }
+    .ab-card p { font-size: 0.9rem; line-height: 1.85; color: var(--ink-soft); margin-bottom: 0.75rem; }
     .ab-card p:last-child { margin-bottom: 0; }
     .ab-card strong { color: var(--ink); }
+    .ab-ico { font-size: 1.02rem; line-height: 1; }
 
     .ab-contact {
-      border-left: 3px solid var(--brand);
-      background: var(--brand-wash);
+      background: linear-gradient(180deg, var(--brand-wash) 0%, var(--surface) 72%);
+      border-color: #cfe0da;
     }
-    .ab-contact h2 { border-bottom-color: rgba(20, 105, 92, 0.18); }
     .ab-mail {
       display: inline-block;
-      font-size: clamp(1.05rem, 3.2vw, 1.32rem);
+      margin: 0.15rem 0 0.6rem;
+      font-size: clamp(1.08rem, 3.4vw, 1.36rem);
       font-weight: 700;
       color: var(--brand-deep);
       letter-spacing: 0.01em;
-      margin: 0.1rem 0 0.5rem;
-      min-height: 44px;
-      line-height: 44px;
+      line-height: 1.5;
+      overflow-wrap: anywhere;
     }
     .ab-mail:hover { text-decoration: underline; }
 
-    .ab-list { padding-left: 1.15rem; margin: 0.2rem 0 0.8rem; }
-    .ab-list li { font-size: 0.9rem; color: var(--ink-soft); line-height: 1.7; margin-bottom: 0.35rem; }
+    .ab-ticks { list-style: none; padding: 0; margin: 0 0 0.2rem; }
+    .ab-ticks li {
+      position: relative;
+      padding-left: 1.05rem;
+      font-size: 0.88rem;
+      line-height: 1.75;
+      color: var(--ink-soft);
+    }
+    .ab-ticks li::before {
+      content: "";
+      position: absolute; left: 0; top: 0.68em;
+      width: 5px; height: 5px; border-radius: 50%;
+      background: var(--brand);
+    }
+    .ab-fine { font-size: 0.8rem !important; color: var(--muted) !important; line-height: 1.7 !important; margin-top: 0.9rem; }
 
-    .ab-coffee { background: var(--surface-warm); }
-    .ab-qr { display: flex; flex-wrap: wrap; gap: 1.2rem; margin: 0.9rem 0; }
+    .ab-coffee { text-align: center; background: var(--surface-warm); }
+    .ab-coffee h2 { justify-content: center; }
+    .ab-coffee p { max-width: 36em; margin-inline: auto; }
+    .ab-qr { display: flex; flex-wrap: wrap; justify-content: center; gap: 1.4rem; margin: 1.1rem 0 0.4rem; }
     .ab-qr figure { margin: 0; text-align: center; }
     .ab-qr img {
-      width: 176px; height: 176px; object-fit: contain;
+      width: 190px; height: 190px; object-fit: contain;
       background: #fff; border: 1px solid var(--line);
-      border-radius: var(--radius); padding: 6px;
+      border-radius: 12px; padding: 8px;
+      box-shadow: var(--shadow-sm);
     }
-    .ab-qr figcaption { margin-top: 0.35rem; font-size: 0.8rem; color: var(--muted); }
+    .ab-qr figcaption { margin-top: 0.45rem; font-size: 0.78rem; color: var(--muted); }
     .ab-qr-empty {
       display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
+      justify-content: center;
       margin: 0.9rem 0;
       padding: 0.85rem 1rem;
       background: var(--surface);
       border: 1px dashed var(--line);
-      border-radius: var(--radius);
+      border-radius: 12px;
     }
     .ab-qr-box {
-      flex: none;
-      width: 104px; height: 104px;
+      flex: none; width: 96px; height: 96px;
       display: flex; align-items: center; justify-content: center;
-      border: 2px dashed var(--line);
-      border-radius: var(--radius);
-      color: var(--muted); font-size: 0.8rem;
-      background: var(--paper);
+      border: 2px dashed var(--line); border-radius: 10px;
+      color: var(--muted); font-size: 0.78rem; background: var(--paper);
     }
-    .ab-qr-empty p { margin: 0; max-width: 26em; }
+    .ab-qr-empty p { margin: 0; max-width: 26em; text-align: left; }
     .ab-qr-empty code { font-size: 0.78rem; }
 
-    .ab-legal h3:first-of-type { margin-top: 0; }
-    .ab-legal { border-left: 3px solid var(--line); }
-    .ab-tail { margin-top: 1.6rem; }
+    .ab-legal h3:first-of-type { margin-top: 0.6rem; }
+
+    .ab-actions {
+      display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem;
+      margin: 1.6rem 0 0.4rem;
+    }
+    .ab-back {
+      margin-left: auto;
+      display: inline-flex; align-items: center; min-height: 44px;
+      font-size: 0.86rem; color: var(--muted);
+    }
+    .ab-back:hover { color: var(--brand-deep); text-decoration: none; }
+    @media (max-width: 520px) {
+      .ab-back { margin-left: 0; }
+    }
   </style>
 </BaseLayout>

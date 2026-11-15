@@ -222,7 +222,7 @@ for (const { file, data, body } of outdoor) {
   if (days === null) fail(`[O-04] ${file}: verified_on 格式非法 → ${data.verified_on}`);
   else if (days < 0) fail(`[O-04] ${file}: verified_on 在未来 → ${data.verified_on}`);
   else if (days > 365) fail(`[O-04] ${file}: 已 ${days} 天未核验（>365），必须重新核验或下线`);
-  else if (days > 180) warn(`[O-04] ${file}: 已 ${days} 天未核验（>180），页面会显示「待复核」`);
+  else if (days > 180) warn(`[O-04] ${file}: 已 ${days} 天未核验（>180），建议重新核验`);
 
   for (const key of ['stroller', 'shade', 'nursing_room', 'toilet', 'playground']) {
     if (!FACILITY_STATES.includes(data[key])) {
@@ -254,6 +254,30 @@ if (fs.existsSync(MONTHLY_TASKS)) {
   const src = fs.readFileSync(MONTHLY_TASKS, 'utf8');
   for (const slug of outdoorSlugs) {
     if (src.includes(`'${slug}'`)) fail(`[O-12] monthlyTasks.ts: 户外条目不得进入月龄待办 → ${slug}`);
+  }
+}
+
+/* ---------- 辅食菜单（数据文件，9 组规则） ---------- */
+const RECIPES_FILE = path.join(ROOT, 'src/content/data/recipes.json');
+if (fs.existsSync(RECIPES_FILE)) {
+  let data = null;
+  try {
+    data = JSON.parse(fs.readFileSync(RECIPES_FILE, 'utf8'));
+  } catch (e) {
+    fail(`[FD] recipes.json 解析失败：${e.message}`);
+  }
+  const seen = new Set();
+  for (const x of data?.items ?? []) {
+    if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(x.id ?? '')) fail(`[FD-01] recipes.json: id 必须小写连字符 → ${x.id}`);
+    if (seen.has(x.id)) fail(`[FD-01] recipes.json: id 重复 → ${x.id}`);
+    seen.add(x.id);
+    if (!(Number(x.monthFrom) >= 6 && Number(x.monthFrom) <= 24)) {
+      fail(`[FD-02] recipes.json: ${x.id} 的 monthFrom 必须在 6～24，实际 ${x.monthFrom}`);
+    }
+    if (!x.name || !x.monthLabel || !x.texture) fail(`[FD-03] recipes.json: ${x.id} 缺少 name / monthLabel / texture`);
+    if ((x.ingredients ?? []).length < 2) fail(`[FD-04] recipes.json: ${x.id} 至少写 2 种材料`);
+    if ((x.steps ?? []).length < 2) fail(`[FD-05] recipes.json: ${x.id} 至少写 2 步做法`);
+    if (!x.tip) fail(`[FD-06] recipes.json: ${x.id} 缺少安全提示（tip）`);
   }
 }
 

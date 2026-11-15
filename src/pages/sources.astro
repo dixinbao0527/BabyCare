@@ -64,6 +64,8 @@ const rows = [...map.values()].sort((a, b) =>
   a.tier === b.tier ? a.year - b.year : a.tier.localeCompare(b.tier)
 );
 
+const BUILD_DATE = new Date().toISOString().slice(0, 10);
+
 const tierLabel: Record<string, string> = {
   NHC: '国家卫健委',
   WHO: 'WHO',
@@ -274,7 +276,7 @@ const tierLabel: Record<string, string> = {
     </section>
 
     <p class="small muted" style="margin-top:2rem;">
-      最后更新：2026-10-30 · <a href={withBase('/')}>返回首页</a>
+      最后更新：{BUILD_DATE} · <a href={withBase('/')}>返回首页</a>
     </p>
   </div>
 

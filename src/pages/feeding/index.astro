@@ -2,6 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { withBase } from '../../lib/url';
 import feeding from '../../content/data/feeding.json';
+import recipes from '../../content/data/recipes.json';
 
 const relatedHref = (r: { slug: string; age: string }) =>
   r.age === 'acute' ? withBase(`/quick/${r.slug}`) : withBase(`/age/${r.age}`) + '#' + r.slug;
@@ -29,6 +30,7 @@ const relatedHref = (r: { slug: string; age: string }) =>
       <a href="#table">频次与质地表</a>
       <a href="#principles">五条原则</a>
       <a href="#groups">7 类食物</a>
+      <a href="#recipes">辅食菜单</a>
       <a href="#hazards">安全红线</a>
       <a href="#faq">常见疑问</a>
       <a href="#sources">内容依据</a>
@@ -110,6 +112,51 @@ const relatedHref = (r: { slug: string; age: string }) =>
       </div>
     </section>
 
+    <section id="recipes" class="fd-section" aria-labelledby="recipes-h">
+      <h2 id="recipes-h">辅食菜单：{recipes.items.length} 道能当天做完的</h2>
+      <p class="small muted">{recipes.intro}</p>
+
+      <div class="fd-filters" role="group" aria-label="按适合月龄筛选菜单">
+        <button type="button" class="fd-filter is-on" data-recipe-filter="all" aria-pressed="true">全部</button>
+        <button type="button" class="fd-filter" data-recipe-filter="6" aria-pressed="false">6～8 月龄</button>
+        <button type="button" class="fd-filter" data-recipe-filter="9" aria-pressed="false">9～11 月龄</button>
+        <button type="button" class="fd-filter" data-recipe-filter="12" aria-pressed="false">12 月龄以上</button>
+      </div>
+
+      <div class="fd-recipes" id="fd-recipes">
+        {
+          recipes.items.map((r) => (
+            <details class="fd-recipe" id={`recipe-${r.id}`} data-recipe-month={String(r.monthFrom)}>
+              <summary>
+                <span class="fd-recipe-main">
+                  <span class="fd-recipe-name">{r.name}</span>
+                  <span class="fd-recipe-meta">{r.monthLabel} · {r.texture} · {r.time}</span>
+                </span>
+                <span class="fd-recipe-tags">
+                  {r.tags.map((t) => <span class="tag">{t}</span>)}
+                  <span class="fd-toggle" aria-hidden="true">+</span>
+                </span>
+              </summary>
+              <div class="fd-recipe-body">
+                <div class="fd-recipe-col">
+                  <h3>材料</h3>
+                  <ul class="fd-ing">{r.ingredients.map((i) => <li>{i}</li>)}</ul>
+                </div>
+                <div class="fd-recipe-col">
+                  <h3>做法</h3>
+                  <ol class="fd-steps">{r.steps.map((s) => <li>{s}</li>)}</ol>
+                </div>
+                <p class="fd-tip"><strong>注意</strong>{r.tip}</p>
+              </div>
+            </details>
+          ))
+        }
+      </div>
+
+      <p class="small muted fd-recipes-note" id="fd-recipes-empty" hidden>这个月龄段暂时没有菜单，先按上方「按月龄怎么加」的质地推进。</p>
+      <p class="small muted">{recipes.note}</p>
+    </section>
+
     <section id="hazards" class="fd-section" aria-labelledby="hazards-h">
       <h2 id="hazards-h">安全红线</h2>
       <div class="fd-hazards">
@@ -174,6 +221,37 @@ const relatedHref = (r: { slug: string; age: string }) =>
       </p>
     </section>
   </div>
+
+  <script>
+    const filters = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-recipe-filter]'));
+    const cards = Array.from(document.querySelectorAll<HTMLElement>('[data-recipe-month]'));
+    const emptyHint = document.getElementById('fd-recipes-empty');
+
+    function matchMonth(month: number, filter: string) {
+      if (filter === 'all') return true;
+      if (filter === '6') return month <= 8;
+      if (filter === '9') return month >= 9 && month <= 11;
+      return month >= 12;
+    }
+
+    filters.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const filter = btn.dataset.recipeFilter ?? 'all';
+        filters.forEach((b) => {
+          const on = b === btn;
+          b.classList.toggle('is-on', on);
+          b.setAttribute('aria-pressed', String(on));
+        });
+        let shown = 0;
+        cards.forEach((card) => {
+          const ok = matchMonth(Number(card.dataset.recipeMonth ?? '0'), filter);
+          card.hidden = !ok;
+          if (ok) shown += 1;
+        });
+        if (emptyHint) emptyHint.hidden = shown !== 0;
+      });
+    });
+  </script>
 
   <style>
     .fd-lead {
@@ -246,6 +324,69 @@ const relatedHref = (r: { slug: string; age: string }) =>
     .fd-hazard h3 { font-size: 0.94rem; color: var(--danger); margin: 0 0 0.25rem; }
     .fd-hazard p { font-size: 0.86rem; color: var(--ink-soft); line-height: 1.65; margin: 0; }
     .fd-source { margin-bottom: 1rem; }
+    .fd-filters { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0.9rem 0 0.2rem; }
+    .fd-filter {
+      min-height: 44px; padding: 0.3rem 0.85rem;
+      border: 1px solid var(--line); border-radius: 999px;
+      background: var(--surface); color: var(--ink-soft);
+      font: inherit; font-size: 0.84rem; cursor: pointer;
+    }
+    .fd-filter:hover { border-color: var(--brand); color: var(--brand-deep); }
+    .fd-filter.is-on {
+      background: var(--brand); border-color: var(--brand); color: #fff; font-weight: 700;
+    }
+    .fd-recipes { display: grid; gap: 0.6rem; margin-top: 0.8rem; }
+    .fd-recipe {
+      border: 1px solid var(--line); border-radius: 14px;
+      background: var(--surface); box-shadow: var(--shadow-sm);
+      overflow: hidden; scroll-margin-top: 1rem;
+    }
+    .fd-recipe[hidden] { display: none; }
+    .fd-recipe > summary {
+      display: flex; flex-wrap: wrap; gap: 0.5rem 0.8rem;
+      align-items: center; justify-content: space-between;
+      padding: 0.85rem 1rem; cursor: pointer; list-style: none;
+    }
+    .fd-recipe > summary::-webkit-details-marker { display: none; }
+    .fd-recipe > summary:hover { background: var(--surface-warm); }
+    .fd-recipe-main { display: flex; flex-direction: column; gap: 0.15rem; flex: 1; min-width: 12rem; }
+    .fd-recipe-name { font-weight: 700; font-size: 0.98rem; color: var(--ink); }
+    .fd-recipe-meta { font-size: 0.78rem; color: var(--muted); }
+    .fd-recipe-tags { display: inline-flex; flex-wrap: wrap; gap: 0.3rem; align-items: center; }
+    .fd-toggle {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 26px; height: 26px; border-radius: 50%;
+      border: 1px solid var(--line); color: var(--brand-deep);
+      font-size: 1rem; line-height: 1; transition: transform .16s ease;
+    }
+    .fd-recipe[open] .fd-toggle { transform: rotate(45deg); border-color: var(--brand); }
+    .fd-recipe[open] > summary { background: var(--surface-warm); }
+    .fd-recipe-body {
+      display: grid; gap: 0.9rem 1.3rem;
+      padding: 0.3rem 1rem 1rem;
+      border-top: 1px dashed var(--line-soft);
+    }
+    .fd-recipe-col h3 {
+      font-size: 0.76rem; font-weight: 700; letter-spacing: 0.06em;
+      color: var(--muted); margin: 0.7rem 0 0.3rem;
+    }
+    .fd-ing, .fd-steps { margin: 0; font-size: 0.86rem; color: var(--ink-soft); line-height: 1.68; }
+    .fd-ing { list-style: none; padding-left: 0; }
+    .fd-steps { padding-left: 1.15rem; }
+    .fd-ing li { display: flex; gap: 0.4rem; }
+    .fd-ing li::before { content: "·"; color: var(--brand); font-weight: 700; }
+    .fd-tip {
+      margin: 0; padding: 0.6rem 0.8rem;
+      border-left: 3px solid var(--brand); border-radius: 10px;
+      background: var(--brand-wash);
+      font-size: 0.85rem; line-height: 1.65; color: var(--ink-soft);
+    }
+    .fd-tip strong { margin-right: 0.45rem; color: var(--brand-deep); }
+    .fd-recipes-note { margin-top: 0.9rem; }
+    @media (min-width: 560px) {
+      .fd-recipe-body { grid-template-columns: 13rem 1fr; }
+      .fd-tip { grid-column: 1 / -1; }
+    }
     @media (max-width: 420px) {
       .fd-facts { grid-template-columns: 4rem 1fr; }
     }

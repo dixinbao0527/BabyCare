@@ -43,7 +43,6 @@ const ROUTES = [
   '/milestones',
   '/feeding',
   '/outdoor',
-  '/outdoor/olympic-forest-park',
   '/about',
   '/scene/going-out',
   '/sources',
