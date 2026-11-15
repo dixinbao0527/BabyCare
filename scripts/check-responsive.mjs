@@ -205,12 +205,24 @@ for (const route of ROUTES) {
         return { top: Math.round(r.top), h: Math.round(r.height) };
       })(),
       h1: document.querySelector('h1')?.textContent?.trim() ?? '',
+      nav: Array.from(document.querySelectorAll('.nav a')).map((a) => {
+        const r = a.getBoundingClientRect();
+        return { text: (a.textContent || '').trim(), left: Math.round(r.left), right: Math.round(r.right) };
+      }),
     };
   });
 
   if (report.docW > report.vw + 1) {
     failures.push(`${route}: 出现横向滚动 scrollWidth=${report.docW} > ${report.vw}`);
   }
+  // 导航项必须全部落在视口内：窄屏靠两字标签 + 横向滚动兜底，不允许被裁掉
+  const navCut = (report.nav || []).filter((n) => n.left < -1 || n.right > report.vw + 1);
+  if (navCut.length > 0) {
+    failures.push(
+      `${route}: 导航项超出视口 → ${navCut.map((n) => `${n.text}(${n.left}~${n.right})`).join(', ')}`
+    );
+  }
+
   if (report.overflowCount > 0) {
     failures.push(
       `${route}: ${report.overflowCount} 个元素超出视口 → ${report.overflow

@@ -274,6 +274,53 @@ main {
   background: var(--brand-wash);
 }
 
+.nav-short {
+  display: none;
+}
+
+/* 窄屏：导航单独成行。6 项在 375px 下换两字标签后完整可见，
+   不再被 body 的 overflow-x:hidden 裁掉；更窄时退化为可横向滚动。 */
+@media (max-width: 759px) {
+  .site-header .inner {
+    row-gap: 0.3rem;
+    padding-block: 0.5rem 0.4rem;
+  }
+  .nav {
+    order: 3;
+    flex: 1 1 100%;
+    flex-wrap: nowrap;
+    gap: 0.15rem;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    scroll-padding-inline: 0.5rem;
+    -webkit-overflow-scrolling: touch;
+  }
+  .nav::-webkit-scrollbar {
+    display: none;
+  }
+  .nav a {
+    flex: none;
+    padding: 0 0.55rem;
+    font-size: 0.95rem;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 519px) {
+  .nav-full {
+    display: none;
+  }
+  .nav-short {
+    display: inline;
+  }
+  .nav a {
+    /* 2 字标签 + 左右各 0.45rem，宽度刚好 ≥44px，触控目标不缩水 */
+    padding: 0 0.45rem;
+  }
+}
+
 /* ---------- 页脚 ---------- */
 
 .site-footer {

@@ -64,9 +64,11 @@ const ogImage = new URL(withBase('/og.png'), Astro.site ?? 'https://example.gith
             NAV.map((item) => (
               <a
                 href={withBase(item.href)}
+                aria-label={item.label}
                 aria-current={nav === item.key ? 'page' : undefined}
               >
-                {item.label}
+                <span class="nav-full" aria-hidden="true">{item.label}</span>
+                <span class="nav-short" aria-hidden="true">{item.short}</span>
               </a>
             ))
           }
@@ -111,6 +113,26 @@ const ogImage = new URL(withBase('/og.png'), Astro.site ?? 'https://example.gith
     </footer>
 
     <script>
+      // 窄屏导航可横向滚动时，把当前页滚到中间，避免「关于」这类末项一开始在视野外
+      const navBar = document.querySelector<HTMLElement>('.nav');
+      const currentLink = navBar?.querySelector<HTMLElement>('a[aria-current="page"]') ?? null;
+
+      function centerCurrentNav() {
+        if (!navBar || !currentLink) return;
+        if (navBar.scrollWidth <= navBar.clientWidth + 1) {
+          navBar.scrollLeft = 0;
+          return;
+        }
+        const bar = navBar.getBoundingClientRect();
+        const link = currentLink.getBoundingClientRect();
+        const target =
+          navBar.scrollLeft + (link.left - bar.left) - (navBar.clientWidth - link.width) / 2;
+        navBar.scrollLeft = Math.max(0, target);
+      }
+
+      centerCurrentNav();
+      window.addEventListener('resize', centerCurrentNav, { passive: true });
+
       const btn = document.getElementById('clear-storage');
       btn?.addEventListener('click', () => {
         try {

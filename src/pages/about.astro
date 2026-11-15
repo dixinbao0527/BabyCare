@@ -1,27 +1,11 @@
 ---
-import fs from 'node:fs';
-import path from 'node:path';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { withBase } from '../lib/url';
-
-/** 赞赏码由作者放进 public/images/ 即自动生效，不需要改代码 */
-const qrDir = path.join(process.cwd(), 'public/images');
-const qrFiles = fs.existsSync(qrDir)
-  ? fs.readdirSync(qrDir)
-      .filter((f) => /^(coffee|sponsor|qr|赞赏|收款)[-_a-z0-9]*\.(png|jpg|jpeg|webp)$/i.test(f))
-      .sort()
-  : [];
-
-const qrLabel = (f: string) => {
-  if (/wechat|weixin|微信/i.test(f)) return '微信';
-  if (/alipay|zhifubao|支付宝/i.test(f)) return '支付宝';
-  return '赞赏码';
-};
 ---
 
 <BaseLayout
   title="关于"
-  description="婴幼儿健康养育手册：联系邮箱、为什么做这个站、内容来源、赞赏码，以及版权与免责说明。"
+  description="婴幼儿健康养育手册：联系邮箱、为什么做这个站、内容来源，以及版权与免责说明。"
   nav="about"
 >
   <div class="wrap ab-wrap">
@@ -77,36 +61,6 @@ const qrLabel = (f: string) => {
       </ul>
       <p class="ab-fine">
         户外场所是另一类信息：来自公园与主管部门公开页面，带整理日期，不属于医学指南。
-      </p>
-    </section>
-
-    <section class="ab-card ab-coffee" aria-labelledby="coffee-h">
-      <h2 id="coffee-h"><span class="ab-ico" aria-hidden="true">☕</span>赞赏码</h2>
-      <p>
-        这个站没有广告，也不卖东西。如果它帮到过你，可以请作者喝杯咖啡，用于域名、资料核对和一点点维护时间。
-      </p>
-      {
-        qrFiles.length > 0 ? (
-          <div class="ab-qr">
-            {qrFiles.map((f) => (
-              <figure>
-                <img src={withBase(`/images/${f}`)} alt={`${qrLabel(f)}赞赏码`} width="240" height="240" loading="lazy" />
-                <figcaption>{qrLabel(f)}赞赏 · 感谢支持</figcaption>
-              </figure>
-            ))}
-          </div>
-        ) : (
-          <div class="ab-qr-empty">
-            <div class="ab-qr-box" aria-hidden="true">二维码</div>
-            <p class="small muted">
-              图片待放入：把赞赏码存为 <code>coffee-wechat.png</code>（或 <code>coffee-alipay.png</code>）
-              放进仓库的 <code>public/images/</code>，这一块会自动显示。
-            </p>
-          </div>
-        )
-      }
-      <p class="ab-fine">
-        完全自愿、金额随意，不对应任何回报或专属内容，也不影响站内任何一条内容。本站不处理支付，不记录谁支持过，这不是公益募捐。
       </p>
     </section>
 
@@ -223,36 +177,6 @@ const qrLabel = (f: string) => {
       background: var(--brand);
     }
     .ab-fine { font-size: 0.8rem !important; color: var(--muted) !important; line-height: 1.7 !important; margin-top: 0.9rem; }
-
-    .ab-coffee { text-align: center; background: var(--surface-warm); }
-    .ab-coffee h2 { justify-content: center; }
-    .ab-coffee p { max-width: 36em; margin-inline: auto; }
-    .ab-qr { display: flex; flex-wrap: wrap; justify-content: center; gap: 1.4rem; margin: 1.1rem 0 0.4rem; }
-    .ab-qr figure { margin: 0; text-align: center; }
-    .ab-qr img {
-      width: 190px; height: 190px; object-fit: contain;
-      background: #fff; border: 1px solid var(--line);
-      border-radius: 12px; padding: 8px;
-      box-shadow: var(--shadow-sm);
-    }
-    .ab-qr figcaption { margin-top: 0.45rem; font-size: 0.78rem; color: var(--muted); }
-    .ab-qr-empty {
-      display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
-      justify-content: center;
-      margin: 0.9rem 0;
-      padding: 0.85rem 1rem;
-      background: var(--surface);
-      border: 1px dashed var(--line);
-      border-radius: 12px;
-    }
-    .ab-qr-box {
-      flex: none; width: 96px; height: 96px;
-      display: flex; align-items: center; justify-content: center;
-      border: 2px dashed var(--line); border-radius: 10px;
-      color: var(--muted); font-size: 0.78rem; background: var(--paper);
-    }
-    .ab-qr-empty p { margin: 0; max-width: 26em; text-align: left; }
-    .ab-qr-empty code { font-size: 0.78rem; }
 
     .ab-legal h3:first-of-type { margin-top: 0.6rem; }
 
