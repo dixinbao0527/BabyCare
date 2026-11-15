@@ -208,7 +208,7 @@ const monthsAgo = (m) => {
 {
   const page = await browser.newPage();
   await page.setViewport({ width: 390, height: 844 });
-  await page.goto(`${origin}/quick`, { waitUntil: 'networkidle0' });
+  await page.goto(`${origin}/health`, { waitUntil: 'networkidle0' });
 
   await page.type('#q', '抽搐', { delay: 30 });
   await new Promise((r) => setTimeout(r, 600));
@@ -231,7 +231,7 @@ const monthsAgo = (m) => {
   await new Promise((r) => setTimeout(r, 600));
   const r2 = await page.evaluate(() => document.querySelector('#search-results')?.textContent ?? '');
   ok(/没找到/.test(r2), `空结果未显示兜底：${r2.slice(0, 60)}`);
-  ok(/急性喉炎/.test(r2), '空结果未给出急症快捷入口');
+  ok(/急症速查/.test(r2), '空结果未给出急症快捷入口');
 
   // 分类筛选
   await page.$eval('#q', (el) => {

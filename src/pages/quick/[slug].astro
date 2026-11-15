@@ -25,7 +25,7 @@ const jsonLd = {
   itemListElement: [
     { '@type': 'ListItem', position: 1, name: '首页', item: `${Astro.site ?? ''}${withBase('/')}` },
     { '@type': 'ListItem', position: 2, name: '健康查询', item: `${Astro.site ?? ''}${withBase('/health')}` },
-    { '@type': 'ListItem', position: 3, name: '症状速查', item: `${Astro.site ?? ''}${withBase('/quick')}` },
+    { '@type': 'ListItem', position: 3, name: '健康查询', item: `${Astro.site ?? ''}${withBase('/health')}` },
     { '@type': 'ListItem', position: 4, name: d.title },
   ],
 };
@@ -53,7 +53,7 @@ const jsonLd = {
     <div class="acute-head">
       <div class="acute-topline">
         <span class="tl-left">
-          <a class="back" href={withBase('/quick')}>← 症状速查</a>
+          <a class="back" href={withBase('/health')}>← 健康查询</a>
           <a class="back" href={withBase('/')}>婴幼儿健康养育手册</a>
         </span>
         <button type="button" class="back print-btn" id="print-page">打印这页</button>
@@ -126,7 +126,7 @@ const jsonLd = {
     </details>
 
     <p class="small muted" style="margin-top:1.6rem;">
-      其他突发状况：<a href={withBase('/quick')}>查看全部急症条目 →</a>
+      其他突发状况：<a href={withBase('/health#acute-h')}>查看全部急症条目 →</a>
     </p>
   </div>
 

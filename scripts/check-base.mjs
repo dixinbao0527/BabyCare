@@ -107,7 +107,6 @@ const pages = [
   '/',
   '/health',
   '/health/handbook',
-  '/quick',
   '/milestones',
   '/feeding',
   '/sources',
@@ -154,7 +153,7 @@ for (const href of internal) {
 if (deadLinks.length) fail(`首页死链：${deadLinks.join(', ')}`);
 
 // 搜索功能：确认能真正拿到索引并出结果
-await page.goto(`${origin}${BASE}/quick`, { waitUntil: 'networkidle0' });
+await page.goto(`${origin}${BASE}/health`, { waitUntil: 'networkidle0' });
 const searchOk = await page.evaluate(async () => {
   const input = document.querySelector('#q');
   if (!input) return { ok: false, why: 'no input' };
@@ -164,7 +163,7 @@ const searchOk = await page.evaluate(async () => {
   const items = document.querySelectorAll('.qitem');
   return { ok: items.length > 0, count: items.length };
 });
-if (!searchOk.ok) fail(`/quick 搜索无结果（${searchOk.why ?? searchOk.count}）`);
+if (!searchOk.ok) fail(`/health 搜索无结果（${searchOk.why ?? searchOk.count}）`);
 
 await browser.close();
 server.close();

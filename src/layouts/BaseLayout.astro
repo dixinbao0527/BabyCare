@@ -9,6 +9,10 @@ interface Props {
   nav?: 'home' | 'health' | 'quick' | 'milestones' | 'feeding' | 'outdoor' | 'about' | 'sources' | 'none';
   /** 急症页用：不渲染页头，让红色警示条成为页面第一个元素，严格贴顶（A-8） */
   bare?: boolean;
+  /** 合并/迁移页：不参与索引 */
+  noindex?: boolean;
+  /** 合并/迁移页：0 秒跳转到新地址（含 base 前缀） */
+  refreshTo?: string;
 }
 
 const {
@@ -16,6 +20,8 @@ const {
   description = '0～3 岁婴幼儿健康养育手册：按月龄组织的喂养、睡眠、发育、安全与日常照护知识，每条都可溯源到国家卫健委发布的指南，并参考 WHO 与 AAP 公开资料。',
   nav = 'none',
   bare = false,
+  noindex = false,
+  refreshTo,
 } = Astro.props;
 
 /** 构建日期：页脚不再写死某一天，避免内容更新后仍显示旧日期 */
@@ -24,7 +30,7 @@ const BUILD_DATE = new Date().toISOString().slice(0, 10);
 const pageTitle = title === SITE_NAME ? title : `${title}｜${SITE_NAME}`;
 /** 急症速查页自身不再显示常驻入口，避免自己链自己 */
 const onQuickPage = Astro.url.pathname.includes('/quick');
-const canonical = new URL(Astro.url.pathname, Astro.site ?? 'https://example.github.io');
+const canonical = new URL(refreshTo ?? Astro.url.pathname, Astro.site ?? 'https://example.github.io');
 const ogImage = new URL(withBase('/og.png'), Astro.site ?? 'https://example.github.io').href;
 ---
 
@@ -49,7 +55,8 @@ const ogImage = new URL(withBase('/og.png'), Astro.site ?? 'https://example.gith
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content="婴幼儿健康养育手册：0～3 岁按月龄组织的可溯源知识" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="robots" content="index,follow" />
+    <meta name="robots" content={noindex ? 'noindex,follow' : 'index,follow'} />
+    {refreshTo && <meta http-equiv="refresh" content={`0; url=${refreshTo}`} />}
   </head>
   <body>
     <a class="skip-link" href="#main">跳到主要内容</a>
@@ -85,7 +92,7 @@ const ogImage = new URL(withBase('/og.png'), Astro.site ?? 'https://example.gith
     </main>
 
     {!bare && !onQuickPage && (
-      <a class="emergency-fab" id="emergency-fab" href={withBase('/quick')} aria-label="急症与突发状况速查">
+      <a class="emergency-fab" id="emergency-fab" href={withBase('/health#acute-h')} aria-label="急症与突发状况速查">
         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
           <path d="M12 6.5v11M6.5 12h11" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" />
         </svg>

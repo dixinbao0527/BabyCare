@@ -37,7 +37,6 @@ const ROUTES = [
   '/age/25-36m',
   '/health',
   '/health/handbook',
-  '/quick',
   '/quick/acute-laryngitis',
   '/quick/choking',
   '/milestones',

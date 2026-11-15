@@ -13,8 +13,10 @@ const dev = await getCollection('developmental', ({ data }) => !data.draft);
 const groups = CATEGORY_ORDER.map((cat) => ({
   cat,
   label: CATEGORY_LABEL[cat],
-  count: dev.filter((e) => e.data.category === cat).length,
-})).filter((g) => g.count > 0);
+  items: dev
+    .filter((e) => e.data.category === cat)
+    .sort((a, b) => a.data.age_range.localeCompare(b.data.age_range) || a.data.order - b.data.order),
+})).filter((g) => g.items.length > 0);
 
 const handbookHref = (id: string) => withBase('/health/handbook') + '#' + id;
 
@@ -57,13 +59,13 @@ const commonConcerns = ['infant-fever', 'diarrhea-care', 'cough', 'rash']
 
     <div id="default-view">
       <div class="channel-grid" aria-label="两条查询路径">
-        <a class="channel channel-quick" href={withBase('/quick')}>
+        <a class="channel channel-quick" href="#acute-h">
           <span class="ch-no">路径 01</span>
-          <span class="ch-k">症状速查</span>
+          <span class="ch-k">急症速查</span>
           <span class="ch-d">
-            {acute.length} 条急症三级分诊 + {dev.length} 条按月龄知识。急症固定置顶，不按月龄筛选。
+            {acute.length} 条急症三级分诊，固定置顶、不按月龄筛选；{dev.length} 条按月龄知识可按分类展开。
           </span>
-          <span class="ch-go">进入速查 →</span>
+          <span class="ch-go">先看急症 →</span>
         </a>
         <a class="channel channel-risk" href={withBase('/health/handbook')}>
           <span class="ch-no">路径 02</span>
@@ -80,7 +82,6 @@ const commonConcerns = ['infant-fever', 'diarrhea-care', 'cough', 'rash']
           <h2 id="acute-h">急症与突发状况<span class="tag tag-acute">急症</span></h2>
           <span class="h-links">
             <a class="more" href={withBase('/quick/card')}>打印急救卡</a>
-            <a class="more" href={withBase('/quick')}>全部 {acute.length} 条 →</a>
           </span>
         </div>
         <p class="small muted">不按月龄筛选，任何年龄都可能遇到。点开看三级分诊：观察 / 立即就医 / 立即呼救。</p>
@@ -158,18 +159,49 @@ const commonConcerns = ['infant-fever', 'diarrhea-care', 'cough', 'rash']
         </div>
       </section>
 
-      <section class="h-section" aria-labelledby="cat-h">
+      <section class="h-section" id="browse" aria-labelledby="cat-h">
         <div class="h-head">
-          <h2 id="cat-h">按月龄的知识</h2>
-          <a class="more" href={withBase('/quick')}>分类浏览 →</a>
+          <h2 id="cat-h">按月龄分类浏览</h2>
+          <span class="more">共 {dev.length} 条</span>
         </div>
-        <div class="cat-chips">
+        <p class="small muted">选一个分类展开；也可以直接用上面的搜索。</p>
+
+        <div class="cat-toggle" role="group" aria-label="按分类筛选">
           {
             groups.map((g) => (
-              <a href={withBase('/quick') + '#cat-' + g.cat}>{g.label}（{g.count}）</a>
+              <button type="button" data-cat={g.cat} aria-pressed="false">
+                {g.label}（{g.items.length}）
+              </button>
             ))
           }
         </div>
+
+        <p class="small muted" id="cat-hint">选择一个分类，或直接用上面的搜索框。</p>
+
+        {
+          groups.map((g) => (
+            <div data-cat-group={g.cat} hidden>
+              <h3 class="group-title">
+                {g.label}
+                <span class="count">{g.items.length} 条</span>
+              </h3>
+              <div class="qlist">
+                {g.items.map((d) => (
+                  <a
+                    class="qitem"
+                    href={withBase(`/age/${d.data.age_range}`) + '#' + (d.id.split('/').pop() ?? '')}
+                  >
+                    <span class="row">
+                      <span class="t">{d.data.title}</span>
+                      <span class="tag">{d.data.age_range.replace('-', '～')}</span>
+                    </span>
+                    <span class="s">{d.data.summary}</span>
+                  </a>
+                ))}
+              </div>
+            </div>
+          ))
+        }
       </section>
 
       <p class="h-alert">
@@ -234,7 +266,7 @@ const commonConcerns = ['infant-fever', 'diarrhea-care', 'cough', 'rash']
     function render(list: Item[], q: string) {
       if (!results) return;
       if (list.length === 0) {
-        results.innerHTML = `<div class="empty-result"><p style="margin-bottom:.5rem;"><strong>没找到「${esc(q)}」</strong></p><p class="small muted" style="margin:0;">试试更短的词，或直接打开 <a href="${withBase('/quick')}">症状速查</a> 与 <a href="${withBase('/health/handbook')}">高危手册</a>。</p></div>`;
+        results.innerHTML = `<div class="empty-result"><p style="margin-bottom:.5rem;"><strong>没找到「${esc(q)}」</strong></p><p class="small muted" style="margin:0;">试试更短的词，或直接看 <a href="#acute-h">急症速查</a> 与 <a href="${withBase('/health/handbook')}">高危手册</a>。</p></div>`;
         return;
       }
       results.innerHTML =
@@ -318,6 +350,26 @@ const commonConcerns = ['infant-fever', 'diarrhea-care', 'cough', 'rash']
     });
     input?.addEventListener('focus', () => void ensureIndex(), { once: true });
     if (location.hash === '#q' && input) input.focus({ preventScroll: false });
+
+    // 分类浏览：一次展开一个分类
+    const catChips = document.querySelectorAll<HTMLButtonElement>('[data-cat]');
+    const catGroups = document.querySelectorAll<HTMLElement>('[data-cat-group]');
+    const catHint = document.getElementById('cat-hint');
+    catChips.forEach((chip) => {
+      chip.addEventListener('click', () => {
+        const cat = chip.dataset.cat;
+        const active = chip.getAttribute('aria-pressed') === 'true';
+        catChips.forEach((b) => b.setAttribute('aria-pressed', 'false'));
+        if (active) {
+          catGroups.forEach((g) => (g.hidden = true));
+          if (catHint) catHint.hidden = false;
+          return;
+        }
+        chip.setAttribute('aria-pressed', 'true');
+        catGroups.forEach((g) => (g.hidden = g.dataset.catGroup !== cat));
+        if (catHint) catHint.hidden = true;
+      });
+    });
   </script>
 
   <style>
@@ -393,20 +445,6 @@ const commonConcerns = ['infant-fever', 'diarrhea-care', 'cough', 'rash']
     .risk-name { font-weight: 700; font-size: var(--fs-base); line-height: 1.45; }
     .risk-red { font-size: var(--fs-xs); color: var(--danger); line-height: 1.55; }
     .risk-prob { font-size: var(--fs-2xs); color: var(--muted); margin-top: auto; padding-top: var(--sp-2); }
-
-    .cat-chips { display: flex; flex-wrap: wrap; gap: var(--sp-4); margin-top: var(--sp-6); }
-    .cat-chips a {
-      min-height: 44px;
-      display: inline-flex;
-      align-items: center;
-      padding: 0 var(--sp-6);
-      border: 1px solid var(--line);
-      border-radius: 999px;
-      background: var(--surface);
-      color: var(--ink-soft);
-      font-size: var(--fs-sm);
-    }
-    .cat-chips a:hover { border-color: var(--brand); text-decoration: none; color: var(--brand-deep); }
 
     .h-alert {
       margin-top: var(--sp-16);

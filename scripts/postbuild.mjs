@@ -256,7 +256,7 @@ const reviewStatus = [...dev, ...acute, ...outdoor].map((x) => {
 const nav = [
   { href: '/', title: '首页' },
   { href: '/health', title: '健康查询' },
-  { href: '/quick', title: '症状速查' },
+  { href: '/health#acute-h', title: '急症速查' },
   { href: '/health/handbook', title: '高危疾病识别手册' },
   { href: '/milestones', title: '发育里程碑' },
   { href: '/feeding', title: '婴幼儿辅食' },
@@ -278,7 +278,6 @@ const urls = [
   { loc: abs('/'), priority: '1.0', freq: 'weekly' },
   { loc: abs('/health'), priority: '0.9', freq: 'weekly' },
   { loc: abs('/health/handbook'), priority: '0.9', freq: 'monthly' },
-  { loc: abs('/quick'), priority: '0.8', freq: 'weekly' },
   { loc: abs('/quick/card'), priority: '0.4', freq: 'monthly' },
   { loc: abs('/milestones'), priority: '0.9', freq: 'monthly' },
   { loc: abs('/feeding'), priority: '0.9', freq: 'monthly' },
