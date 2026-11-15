@@ -78,7 +78,10 @@ const commonConcerns = ['infant-fever', 'diarrhea-care', 'cough', 'rash']
       <section class="h-section" aria-labelledby="acute-h">
         <div class="h-head">
           <h2 id="acute-h">急症与突发状况<span class="tag tag-acute">急症</span></h2>
-          <a class="more" href={withBase('/quick')}>全部 {acute.length} 条 →</a>
+          <span class="h-links">
+            <a class="more" href={withBase('/quick/card')}>打印急救卡</a>
+            <a class="more" href={withBase('/quick')}>全部 {acute.length} 条 →</a>
+          </span>
         </div>
         <p class="small muted">不按月龄筛选，任何年龄都可能遇到。点开看三级分诊：观察 / 立即就医 / 立即呼救。</p>
         <div class="qlist">
@@ -347,6 +350,8 @@ const commonConcerns = ['infant-fever', 'diarrhea-care', 'cough', 'rash']
     .channel-risk .ch-go { color: var(--danger); }
 
     .h-section { margin-top: var(--sp-20); }
+    .h-links { display: flex; align-items: baseline; gap: var(--sp-4); flex-wrap: wrap; }
+
     .h-head {
       display: flex;
       align-items: baseline;

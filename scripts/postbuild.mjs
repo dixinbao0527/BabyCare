@@ -279,6 +279,7 @@ const urls = [
   { loc: abs('/health'), priority: '0.9', freq: 'weekly' },
   { loc: abs('/health/handbook'), priority: '0.9', freq: 'monthly' },
   { loc: abs('/quick'), priority: '0.8', freq: 'weekly' },
+  { loc: abs('/quick/card'), priority: '0.4', freq: 'monthly' },
   { loc: abs('/milestones'), priority: '0.9', freq: 'monthly' },
   { loc: abs('/feeding'), priority: '0.9', freq: 'monthly' },
   { loc: abs('/outdoor'), priority: '0.9', freq: 'weekly' },

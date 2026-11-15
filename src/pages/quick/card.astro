@@ -1,0 +1,196 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { withBase } from '../../lib/url';
+import card from '../../content/data/emergency-card.json';
+
+const printedOn = new Date().toISOString().slice(0, 10).replace(/-/g, '.');
+---
+
+<BaseLayout
+  title="家庭急症速查卡"
+  description="一张 A4 的家庭急症速查卡：7 类常见急症的识别句、马上做什么、什么情况打 120。可打印后贴冰箱或放包里。"
+  nav="health"
+>
+  <div class="wrap ec-toolbar">
+    <a class="back" href={withBase('/quick')}>← 症状速查</a>
+    <div class="ec-tools">
+      <span class="ec-hint">打印时选「另存为 PDF」也可以</span>
+      <button type="button" class="ec-print" id="ec-print">打印这张卡</button>
+    </div>
+  </div>
+
+  <article class="ec-sheet" aria-labelledby="ec-title">
+    <header class="ec-head">
+      <div>
+        <p class="ec-kicker">A4 · 建议打印后贴冰箱 / 放包里</p>
+        <h1 id="ec-title">{card.title}</h1>
+        <p class="ec-sub">{card.subtitle}</p>
+      </div>
+      <div class="ec-stamp" aria-hidden="true">
+        <span>120</span>
+        <small>急救电话</small>
+      </div>
+    </header>
+
+    <div class="ec-grid">
+      {
+        card.items.map((it, i) => (
+          <section class="ec-item">
+            <h2>
+              <span class="ec-no">{String(i + 1).padStart(2, '0')}</span>
+              {it.name}
+            </h2>
+            <dl>
+              <div><dt>一眼识别</dt><dd>{it.sign}</dd></div>
+              <div><dt>马上做</dt><dd>{it.do}</dd></div>
+              <div><dt>打 120</dt><dd>{it.call}</dd></div>
+            </dl>
+          </section>
+        ))
+      }
+      <section class="ec-item ec-call">
+        <h2>{card.callTitle}</h2>
+        <ul>
+          {card.callItems.map((t) => <li>{t}</li>)}
+        </ul>
+      </section>
+    </div>
+
+    <footer class="ec-foot">
+      <p>{card.note}</p>
+      <p>依据国家卫健委《3 岁以下婴幼儿健康养育照护指南（试行）》与 WHO、AAP 公开资料整理；专业复核：待完成。打印日期 {printedOn}。</p>
+    </footer>
+  </article>
+
+  <script>
+    document.getElementById('ec-print')?.addEventListener('click', () => window.print());
+  </script>
+
+  <style>
+    .ec-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--sp-6);
+      padding-top: var(--sp-10);
+    }
+    .ec-toolbar .back { font-size: var(--fs-sm); }
+    .ec-tools { display: flex; align-items: center; gap: var(--sp-6); flex-wrap: wrap; }
+    .ec-hint { font-size: var(--fs-2xs); color: var(--muted); }
+    .ec-print {
+      min-height: 44px;
+      padding: 0 var(--sp-10);
+      border: 1px solid var(--brand);
+      border-radius: var(--r-md);
+      background: var(--brand);
+      color: #fff;
+      font: inherit;
+      font-size: var(--fs-sm);
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .ec-print:hover { background: var(--brand-deep); }
+
+    .ec-sheet {
+      max-width: 800px;
+      margin: var(--sp-6) auto var(--sp-24);
+      padding: var(--sp-12) var(--sp-12) var(--sp-10);
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: var(--r-lg);
+      box-shadow: 0 10px 30px rgba(28, 43, 48, 0.08);
+    }
+
+    .ec-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: var(--sp-8);
+      padding-bottom: var(--sp-6);
+      border-bottom: 2px solid var(--ink);
+    }
+    .ec-kicker {
+      margin: 0 0 var(--sp-1);
+      font-size: var(--fs-sm);
+      letter-spacing: 0.08em;
+      color: var(--muted);
+    }
+    .ec-head h1 { margin: 0 0 var(--sp-2); font-size: var(--fs-3xl); }
+    .ec-sub { margin: 0; max-width: 46em; font-size: var(--fs-base); line-height: 1.6; color: var(--ink-soft); }
+    .ec-stamp {
+      flex: none;
+      padding: var(--sp-2) var(--sp-4);
+      text-align: center;
+      border: 1px solid var(--danger-line);
+      border-radius: var(--r-md);
+      background: var(--danger-wash);
+      color: var(--danger);
+    }
+    .ec-stamp span { display: block; font-size: var(--fs-2xl); font-weight: 800; line-height: 1.1; }
+    .ec-stamp small { font-size: var(--fs-2xs); }
+
+    .ec-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--sp-5);
+      margin-top: var(--sp-5);
+    }
+    .ec-item {
+      padding: var(--sp-4) var(--sp-5);
+      border: 1px solid var(--line);
+      border-top: 3px solid var(--brand);
+      border-radius: var(--r-md);
+      break-inside: avoid;
+    }
+    .ec-item h2 {
+      display: flex;
+      align-items: baseline;
+      gap: var(--sp-2);
+      margin: 0 0 var(--sp-3);
+      font-size: var(--fs-lg);
+    }
+    .ec-no { font-family: var(--ff-mono); font-size: var(--fs-2xs); color: var(--brand-deep); }
+    .ec-item dl { display: grid; gap: var(--sp-1); margin: 0; }
+    .ec-item dl > div { display: grid; grid-template-columns: 58px 1fr; gap: var(--sp-2); }
+    .ec-item dt { font-size: var(--fs-sm); color: var(--muted); }
+    .ec-item dd { margin: 0; font-size: var(--fs-base); line-height: 1.55; color: var(--ink); }
+    .ec-item dl > div:last-child dt,
+    .ec-item dl > div:last-child dd { color: var(--danger); font-weight: 700; }
+
+    .ec-call { border-top-color: var(--danger); background: var(--danger-wash); }
+    .ec-call h2 { color: var(--danger); }
+    .ec-call ul { margin: 0; padding-left: 1.15em; font-size: var(--fs-base); line-height: 1.7; }
+
+    .ec-foot {
+      margin-top: var(--sp-6);
+      padding-top: var(--sp-4);
+      border-top: 1px dashed var(--line);
+    }
+    .ec-foot p { margin: 0 0 var(--sp-1); font-size: var(--fs-xs); line-height: 1.6; color: var(--muted); }
+    .ec-foot p:last-child { margin-bottom: 0; }
+
+    @media (max-width: 640px) {
+      .ec-grid { grid-template-columns: 1fr; }
+      .ec-sheet { padding: var(--sp-8) var(--sp-6); }
+      .ec-head h1 { font-size: var(--fs-xl); }
+    }
+
+    @media print {
+      @page { size: A4 portrait; margin: 9mm; }
+      body { background: #fff; }
+      .ec-toolbar { display: none !important; }
+      .ec-sheet {
+        max-width: none;
+        margin: 0;
+        padding: 0;
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+      }
+      .ec-grid { gap: 3mm; margin-top: 3mm; }
+      .ec-item { border-color: #bbb; }
+      * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    }
+  </style>
+</BaseLayout>

@@ -52,8 +52,11 @@ const jsonLd = {
   <div class="wrap">
     <div class="acute-head">
       <div class="acute-topline">
-        <a class="back" href={withBase('/quick')}>← 症状速查</a>
-        <a class="back" href={withBase('/')}>婴幼儿健康养育手册</a>
+        <span class="tl-left">
+          <a class="back" href={withBase('/quick')}>← 症状速查</a>
+          <a class="back" href={withBase('/')}>婴幼儿健康养育手册</a>
+        </span>
+        <button type="button" class="back print-btn" id="print-page">打印这页</button>
       </div>
       <h1>{d.title}</h1>
       <div class="tags" style="margin-bottom:.7rem;">
@@ -126,4 +129,8 @@ const jsonLd = {
       其他突发状况：<a href={withBase('/quick')}>查看全部急症条目 →</a>
     </p>
   </div>
+
+  <script>
+    document.getElementById('print-page')?.addEventListener('click', () => window.print());
+  </script>
 </BaseLayout>

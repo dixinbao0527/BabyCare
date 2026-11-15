@@ -35,6 +35,10 @@ const acuteTop = acute.slice(0, 3);
 
     <ReviewNotice />
 
+    <p class="quick-action">
+      <a class="btn btn-ghost" href={withBase('/quick/card')}>打印急救卡（A4）</a>
+    </p>
+
     <div class="search-box">
       <span class="glass" aria-hidden="true">⌕</span>
       <label class="sr-only" for="q" style="position:absolute;left:-9999px;">搜索症状或关键词</label>
@@ -372,4 +376,8 @@ const acuteTop = acute.slice(0, 3);
       target?.click();
     }
   </script>
+
+  <style>
+    .quick-action { margin: var(--sp-6) 0 0; }
+  </style>
 </BaseLayout>
