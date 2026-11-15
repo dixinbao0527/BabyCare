@@ -1,0 +1,29 @@
+{
+  "updated": "2026-11-15",
+  "note": "全站关键数字的单一来源之一。喂养类数字以 feeding.json 为准，运动窗口以 milestones.yaml 为准，这里只放跨主题的通用数字。",
+  "feeding": {
+    "startMonth": 6,
+    "notBeforeMonth": 4,
+    "observeDays": 3,
+    "juiceMaxMl": 120,
+    "juiceMaxAgeRange": "1-3 岁",
+    "noSaltBeforeMonth": 12,
+    "noHoneyBeforeMonth": 12
+  },
+  "screens": {
+    "noScreenBeforeMonth": 24
+  },
+  "toothpaste": {
+    "riceGrainBeforeYear": 3
+  },
+  "sleep": [
+    {
+      "range": "0-1m",
+      "total": "16～18 小时"
+    },
+    {
+      "range": "10-12m",
+      "total": "12～14 小时"
+    }
+  ]
+}

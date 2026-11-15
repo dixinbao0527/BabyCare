@@ -10,7 +10,7 @@
     "build": "node scripts/validate-content.mjs && astro build && node scripts/postbuild.mjs",
     "preview": "astro preview",
     "check": "astro check",
-    "validate": "node scripts/validate-content.mjs",
+    "validate": "node scripts/validate-content.mjs && node scripts/check-facts.mjs",
     "verify": "node scripts/check-responsive.mjs && node scripts/check-behavior.mjs",
     "verify:base": "node scripts/check-base.mjs",
     "deploy:api": "node scripts/push-via-api.mjs"

@@ -63,6 +63,8 @@ const developmental = defineCollection({
     last_reviewed: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
     reviewer: z.string().min(2),
     medical_review: medicalReview,
+    /** 关联的 WHO 运动窗口 key（见 milestones.yaml 的 windows.key），用于自动渲染窗口数字 */
+    window: z.string().min(2).optional(),
     related: z.array(z.string()).default([]),
     draft: z.boolean().default(false),
   }),
@@ -118,6 +120,8 @@ const milestones = defineCollection({
       .array(
         z
           .object({
+            /** 稳定 key，供条目通过 window 字段引用 */
+            key: z.string().min(2).optional(),
             label: z.string().min(2).max(14),
             start: z.number().min(0).max(36),
             end: z.number().min(0).max(36),

@@ -16,6 +16,14 @@ const review = reviewInfo(entry.data.last_reviewed, entry.data.reviewer, entry.d
 
 // related 存的是 acute 的 slug，标题从合集里取，避免在本文件硬编码映射
 const acutes = await getCollection('acute');
+const milestones = await getCollection('milestones');
+const windowByKey = new Map(
+  milestones
+    .flatMap((m) => m.data.windows ?? [])
+    .filter((w) => w.key)
+    .map((w) => [w.key as string, w] as const)
+);
+const win = entry.data.window ? windowByKey.get(entry.data.window) : undefined;
 const titleOf = (s: string) => acutes.find((a) => a.id === s || a.id.split('/').pop() === s)?.data.title ?? s;
 const related = entry.data.related.filter((s) => acutes.some((a) => a.id === s || a.id.split('/').pop() === s));
 ---
@@ -31,6 +39,14 @@ const related = entry.data.related.filter((s) => acutes.some((a) => a.id === s |
   </summary>
   <div class="body">
     <Content />
+    {
+      win && (
+        <p class="winline">
+          WHO 窗口：{win.label} {win.start}–{win.end} 个月（1～99 百分位）
+          <a href={withBase('/milestones')}>看窗口图 →</a>
+        </p>
+      )
+    }
     <p class="srcline">
       来源：{entry.data.source.name}
       {entry.data.source.section ? ` · ${entry.data.source.section}` : ''}

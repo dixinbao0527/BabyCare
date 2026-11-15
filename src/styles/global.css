@@ -1597,6 +1597,32 @@ mark {
   margin-top: var(--sp-1);
 }
 
+.mlist .mwin {
+  display: block;
+  margin-top: var(--sp-1);
+  font-size: var(--fs-2xs);
+  font-weight: 600;
+  color: var(--dom);
+}
+
+/* 条目里自动渲染的 WHO 窗口（数字来自 milestones.yaml，正文不再手写） */
+.winline {
+  margin: var(--sp-4) 0 0;
+  padding: var(--sp-2) var(--sp-4);
+  border-left: 3px solid var(--brand);
+  border-radius: var(--r-sm);
+  background: var(--brand-wash);
+  font-size: var(--fs-sm);
+  line-height: 1.65;
+  color: var(--brand-deep);
+}
+
+.winline a {
+  margin-left: var(--sp-2);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
 @media (max-width: 640px) {
   .dom-grid {
     grid-template-columns: minmax(0, 1fr);

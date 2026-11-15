@@ -327,6 +327,17 @@ if (fs.existsSync(TAXONOMY_FILE)) {
   }
 }
 
+/* ---------- 10. 条目引用的 WHO 窗口 key ---------- */
+if (fs.existsSync(MILESTONE_FILE)) {
+  const ms = yaml.load(fs.readFileSync(MILESTONE_FILE, 'utf8')) ?? [];
+  const keys = new Set(ms.flatMap((m) => m.windows ?? []).map((w) => w.key).filter(Boolean));
+  for (const { file, data } of dev) {
+    if (data.window && !keys.has(data.window)) {
+      fail(`[R10] ${file}: window="${data.window}" 不在 milestones.yaml 的 windows.key 中`);
+    }
+  }
+}
+
 /* ---------- 输出 ---------- */
 const rel = (p) => path.relative(ROOT, p);
 console.log(

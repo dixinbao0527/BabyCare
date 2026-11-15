@@ -113,6 +113,12 @@ const nodes = SCREEN_NODES.map((n) => ({
                       <span>
                         {m.data.description}
                         <span class="msrc">{m.data.source}</span>
+                        {m.data.windows.length > 0 && (
+                          <span class="mwin">
+                            WHO 窗口：
+                            {m.data.windows.map((w) => `${w.label} ${w.start}–${w.end} 月`).join(' · ')}
+                          </span>
+                        )}
                       </span>
                     </li>
                   ))}

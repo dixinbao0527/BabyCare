@@ -3,7 +3,7 @@ title: "爬行早晚要不要紧"
 age_range: "7-9m"
 category: "development"
 scenario_tags: ["爬行", "不会爬", "直接走", "大运动"]
-summary: "手膝爬行的窗口是 5.2～13.5 个月，也有孩子直接扶走。爬得晚本身不是问题，看的是整体运动和互动。"
+summary: "手膝爬行有明确的达成窗口，也有孩子直接扶走。爬得晚本身不是问题，看的是整体运动和互动。"
 source:
   name: "WHO Multicentre Growth Reference Study：六项粗大运动里程碑窗口"
   section: "Windows of Achievement，Acta Paediatr Suppl. 2006;450:86-95"
@@ -13,11 +13,12 @@ source:
 order: 1
 last_reviewed: "2026-10-30"
 reviewer: "内容组"
+window: "crawl"
 related: []
 draft: false
 ---
 
-手膝爬行的达成窗口是 5.2～13.5 个月，它本身就在 WHO 的六项粗大运动里程碑里。不过约 4.3% 的健康孩子会跳过爬行、直接扶着站起来走——所以「不会爬」本身不是发育异常的判据。
+手膝爬行是 WHO 六项粗大运动里程碑之一，有明确的达成窗口（见下方 WHO 窗口）。不过约 4.3% 的健康孩子会跳过爬行、直接扶着站起来走——所以「不会爬」本身不是发育异常的判据。
 
 真正需要看的是整体：能不能独坐、会不会主动抓物换手、会不会用姿势表达需求、对叫名字有没有反应。单项动作晚，但其他方面在推进，多数只需要观察。
 
