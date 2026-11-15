@@ -1,5 +1,6 @@
 ---
 title: "烫伤"
+clinical_name: "热力烧伤"
 content_type: "acute"
 age_range: "all"
 peak_age_note: "1～3 岁高发，多因碰倒热水壶、拉拽桌布、误开热水龙头；厨房和餐桌是主要发生地点"

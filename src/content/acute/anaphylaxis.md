@@ -1,5 +1,6 @@
 ---
-title: "严重过敏"
+title: "突然严重过敏"
+clinical_name: "过敏性休克"
 content_type: "acute"
 age_range: "all"
 peak_age_note: "首次添加辅食、被蜂蜇、用药后都可能发生；既往有严重过敏史的孩子再次接触同一种过敏原时风险最高"

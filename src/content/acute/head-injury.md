@@ -1,5 +1,6 @@
 ---
 title: "摔到头"
+clinical_name: "颅脑外伤"
 content_type: "acute"
 age_range: "all"
 peak_age_note: "6 月龄～3 岁高发，与会翻身、学走、攀爬有关；从 60 厘米以上高度跌落，或跌落到硬质地面时风险更高"

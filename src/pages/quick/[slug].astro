@@ -58,6 +58,7 @@ const jsonLd = {
         </span>
         <button type="button" class="back print-btn" id="print-page">打印这页</button>
       </div>
+      <p class="eyebrow">{d.clinical_name} · 急症</p>
       <h1>{d.title}</h1>
       <div class="tags u-mb-sm">
         {d.scenario_tags.map((t) => <span class="tag">{t}</span>)}

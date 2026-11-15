@@ -73,6 +73,8 @@ const acute = defineCollection({
   schema: z
     .object({
       title: z.string().min(2).max(20),
+      /** 临床名：主标题用家长会搜的说法，临床名放在副标题与标签里 */
+      clinical_name: z.string().min(2).max(20),
       content_type: z.literal('acute'),
       age_range: z.literal('all'),
       peak_age_note: z.string().min(6),

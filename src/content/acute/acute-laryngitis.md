@@ -1,5 +1,6 @@
 ---
-title: "急性喉炎"
+title: "咳嗽像小狗叫"
+clinical_name: "急性喉炎"
 content_type: "acute"
 age_range: "all"
 peak_age_note: "好发于 6 月龄～3 岁，但任何年龄都可能发生；夜间加重是典型特点"

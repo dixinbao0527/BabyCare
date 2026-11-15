@@ -1,5 +1,6 @@
 ---
-title: "噎住了怎么办"
+title: "噎住了"
+clinical_name: "气道异物梗阻"
 content_type: "acute"
 age_range: "all"
 peak_age_note: "高发年龄为 6 月龄～3 岁，与咀嚼能力不足、边吃边玩有关；坚果、果冻、整颗葡萄、硬币、电池是常见元凶"

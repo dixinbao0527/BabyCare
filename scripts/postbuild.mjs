@@ -90,7 +90,13 @@ const items = [
   ...acute.map((x) => ({
     slug: slugOf(x.file),
     title: x.data.title,
-    tags: [...new Set([...(x.data.scenario_tags ?? []), ...aliasesFor(slugOf(x.file))])],
+    tags: [
+      ...new Set([
+        ...(x.data.scenario_tags ?? []),
+        ...(x.data.clinical_name ? [x.data.clinical_name] : []),
+        ...aliasesFor(slugOf(x.file)),
+      ]),
+    ],
     summary: x.data.summary,
     type: 'acute',
     category: '',

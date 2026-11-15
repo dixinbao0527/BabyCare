@@ -1,5 +1,6 @@
 ---
-title: "热性惊厥"
+title: "发烧抽风"
+clinical_name: "热性惊厥"
 content_type: "acute"
 age_range: "all"
 peak_age_note: "多见于 6 月龄～5 岁，高峰在 12～18 月龄；与体温上升速度相关，不完全取决于烧到多少度"

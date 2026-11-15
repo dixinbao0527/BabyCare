@@ -1,5 +1,6 @@
 ---
 title: "拉肚子拉到脱水"
+clinical_name: "腹泻伴脱水"
 content_type: "acute"
 age_range: "all"
 peak_age_note: "6 月龄～2 岁高发，秋季腹泻和轮状病毒感染最常见；脱水进展比成人快得多"
