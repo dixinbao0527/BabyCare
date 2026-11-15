@@ -59,9 +59,11 @@ const jsonLd = {
         <BirthDatePicker />
 
         <p class="link-row">
-          <a href={withBase('/quick')}>症状速查</a>
+          <a href={withBase('/health')}>健康查询</a>
           <span aria-hidden="true" class="muted">·</span>
           <a href={withBase('/milestones')}>发育里程碑</a>
+          <span aria-hidden="true" class="muted">·</span>
+          <a href={withBase('/feeding')}>婴幼儿辅食</a>
           <span aria-hidden="true" class="muted">·</span>
           <a href={withBase('/outdoor')}>周末去哪儿</a>
           <span aria-hidden="true" class="muted">·</span>
@@ -122,7 +124,7 @@ const jsonLd = {
     <section class="section" aria-labelledby="quick-heading">
       <div class="section-head">
         <h2 id="quick-heading">急症与突发状况</h2>
-        <a class="more" href={withBase('/quick')}>全部 {acuteAll.length} 条 →</a>
+        <a class="more" href={withBase('/health')}>健康查询 · 全部 {acuteAll.length} 条 →</a>
       </div>
       <p class="small muted" style="margin-top:-.3rem;margin-bottom:.8rem;">
         不按月龄筛选，任何年龄都可能遇到。
@@ -145,7 +147,7 @@ const jsonLd = {
     <section class="section" aria-labelledby="scene-heading">
       <div class="section-head">
         <h2 id="scene-heading">按场景找</h2>
-        <a class="more" href={withBase('/quick')}>全部症状 →</a>
+        <a class="more" href={withBase('/health')}>健康查询 →</a>
       </div>
       <p class="small muted" style="margin-top:-.3rem;margin-bottom:.8rem;">
         不知道搜什么词，就从此刻的情况进去。
@@ -166,10 +168,22 @@ const jsonLd = {
         <h2 id="more-heading">还想看</h2>
       </div>
       <div class="entry-grid">
-        <a class="entry-card" href={withBase('/outdoor')}>
-          <span class="k">北京亲子户外</span>
+        <a class="entry-card" href={withBase('/health')}>
+          <span class="k">健康查询</span>
           <p class="sum">
-            {outdoorAll.length} 个带娃可去的公园与场所，标注推车、遮阴、水域与核验日期，出门前先看一眼。
+            症状速查 + 高危疾病识别手册合并入口：输入「抽搐」「川崎病」这类词，急症固定置顶。
+          </p>
+        </a>
+        <a class="entry-card" href={withBase('/health/handbook')}>
+          <span class="k">高危疾病识别手册</span>
+          <p class="sum">
+            12 类低概率、高后果的问题，逐条给出概率、为什么容易漏、红线信号与关键时间窗。
+          </p>
+        </a>
+        <a class="entry-card" href={withBase('/feeding')}>
+          <span class="k">婴幼儿辅食</span>
+          <p class="sum">
+            满 6 月龄起怎么加：按月龄的频次与质地、五条原则、7 类食物与安全红线。
           </p>
         </a>
         <a class="entry-card" href={withBase('/milestones')}>
@@ -178,9 +192,11 @@ const jsonLd = {
             8 个月龄节点 × 4 个维度，运动里程碑给出 WHO 窗口上下限；附国家卫健委预警征象自查清单。
           </p>
         </a>
-        <a class="entry-card" href={withBase('/quick')}>
-          <span class="k">症状快速查询</span>
-          <p class="sum">输入「抽搐」「误吞」「辅食」这类你会说的词，急症条目固定置顶。</p>
+        <a class="entry-card" href={withBase('/outdoor')}>
+          <span class="k">北京亲子户外</span>
+          <p class="sum">
+            {outdoorAll.length} 个带娃可去的公园与场所，标注推车、遮阴、水域与核验日期，点卡片直达官网。
+          </p>
         </a>
         <a class="entry-card" href={withBase('/sources')}>
           <span class="k">来源与声明</span>

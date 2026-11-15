@@ -105,8 +105,11 @@ const browser = await puppeteer.launch({
 
 const pages = [
   '/',
+  '/health',
+  '/health/handbook',
   '/quick',
   '/milestones',
+  '/feeding',
   '/sources',
   '/quick/acute-laryngitis',
   '/quick/febrile-seizure',

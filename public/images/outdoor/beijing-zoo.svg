@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" role="img" aria-label="北京动物园熊猫与竹林插画">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#dceef2"/><stop offset="1" stop-color="#faf3e6"/>
+    </linearGradient>
+    <linearGradient id="water" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#8fbcc4"/><stop offset="1" stop-color="#6fa4ae"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="360" fill="url(#sky)"/>
+  <circle cx="530" cy="68" r="32" fill="#f5d495" opacity=".85"/>
+  
+  <g fill="#ffffff" opacity=".68">
+    <ellipse cx="105" cy="72" rx="46" ry="13"/><ellipse cx="130" cy="62" rx="32" ry="16"/>
+    <ellipse cx="440" cy="52" rx="38" ry="11"/><ellipse cx="462" cy="44" rx="26" ry="13"/>
+  </g>
+  <path d="M0 252 Q120 214 250 244 T470 232 T640 250 V360 H0Z" fill="#a8c4ac"/>
+  <path d="M0 288 Q170 266 330 290 T640 278 V360 H0Z" fill="#7fa287"/>
+  <path d="M0 320 Q200 302 400 320 T640 312 V360 H0Z" fill="#6c9276" opacity=".55"/>
+  <g opacity=".92">
+    <g transform="translate(48,214)"><rect x="-4" y="42" width="8" height="42" fill="#6b5942"/><circle cx="0" cy="24" r="30" fill="#6d9b72"/><circle cx="-18" cy="34" r="20" fill="#7fae83"/><circle cx="19" cy="34" r="21" fill="#5f8e67"/></g>
+    <g transform="translate(592,222)"><rect x="-4" y="40" width="8" height="40" fill="#6b5942"/><circle cx="0" cy="22" r="28" fill="#6d9b72"/><circle cx="-16" cy="32" r="18" fill="#7fae83"/><circle cx="18" cy="32" r="19" fill="#5f8e67"/></g>
+  </g>
+  <!-- 北京动物园：熊猫 + 竹林 -->
+  <g stroke="#4f8b4a" stroke-width="9" stroke-linecap="round" fill="none" opacity=".95">
+    <path d="M78 330 Q66 220 96 120"/><path d="M132 330 Q146 226 120 132"/>
+    <path d="M520 330 Q534 216 506 116"/><path d="M572 330 Q558 230 586 140"/>
+  </g>
+  <g fill="#5c9a52" opacity=".95">
+    <ellipse cx="66" cy="176" rx="30" ry="10" transform="rotate(-28 66 176)"/>
+    <ellipse cx="118" cy="152" rx="30" ry="10" transform="rotate(24 118 152)"/>
+    <ellipse cx="88" cy="238" rx="28" ry="9" transform="rotate(18 88 238)"/>
+    <ellipse cx="536" cy="164" rx="30" ry="10" transform="rotate(26 536 164)"/>
+    <ellipse cx="580" cy="198" rx="30" ry="10" transform="rotate(-24 580 198)"/>
+    <ellipse cx="552" cy="252" rx="28" ry="9" transform="rotate(-16 552 252)"/>
+  </g>
+  <g>
+    <ellipse cx="320" cy="286" rx="106" ry="76" fill="#fdfbf5"/>
+    <ellipse cx="252" cy="264" rx="30" ry="34" fill="#2b3335" transform="rotate(-18 252 264)"/>
+    <ellipse cx="388" cy="264" rx="30" ry="34" fill="#2b3335" transform="rotate(18 388 264)"/>
+    <circle cx="320" cy="184" r="82" fill="#fdfbf5"/>
+    <circle cx="272" cy="142" r="26" fill="#2b3335"/>
+    <circle cx="368" cy="142" r="26" fill="#2b3335"/>
+    <ellipse cx="284" cy="186" rx="25" ry="31" fill="#2b3335" transform="rotate(22 284 186)"/>
+    <ellipse cx="356" cy="186" rx="25" ry="31" fill="#2b3335" transform="rotate(-22 356 186)"/>
+    <circle cx="288" cy="184" r="8" fill="#fdfbf5"/>
+    <circle cx="352" cy="184" r="8" fill="#fdfbf5"/>
+    <ellipse cx="320" cy="216" rx="13" ry="9" fill="#2b3335"/>
+    <path d="M306 232 Q320 244 334 232" fill="none" stroke="#2b3335" stroke-width="4" stroke-linecap="round"/>
+  </g>
+  <rect width="640" height="360" fill="none" stroke="#ffffff" stroke-opacity=".35" stroke-width="8"/>
+</svg>

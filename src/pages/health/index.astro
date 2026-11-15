@@ -1,0 +1,389 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+import { withBase } from '../../lib/url';
+import { CATEGORY_ORDER, CATEGORY_LABEL } from '../../lib/stages';
+import handbook from '../../content/data/handbook.json';
+
+const acute = (await getCollection('acute')).sort((a, b) =>
+  a.data.title.localeCompare(b.data.title, 'zh-CN')
+);
+const dev = await getCollection('developmental', ({ data }) => !data.draft);
+const groups = CATEGORY_ORDER.map((cat) => ({
+  cat,
+  label: CATEGORY_LABEL[cat],
+  count: dev.filter((e) => e.data.category === cat).length,
+})).filter((g) => g.count > 0);
+
+const handbookHref = (id: string) => withBase('/health/handbook') + '#' + id;
+---
+
+<BaseLayout
+  title="健康查询"
+  description="把症状速查与婴幼儿高危疾病识别手册合并到一个入口：急症分级、12 类高危问题红线、按月龄知识，一次搜得到。"
+  nav="health"
+>
+  <div class="wrap">
+    <div class="page-head">
+      <p class="eyebrow">症状速查 + 高危疾病识别</p>
+      <h1>健康查询</h1>
+      <p class="tagline">
+        两条路径，一个入口：着急时用症状速查判断紧急程度；心里不踏实时，用高危手册核对红线信号。
+        都不要替代医生——它们只帮你决定「现在该不该走、走多快、去了说什么」。
+      </p>
+    </div>
+
+    <div class="search-box">
+      <span class="glass" aria-hidden="true">⌕</span>
+      <label class="sr-only" for="q" style="position:absolute;left:-9999px;">搜索症状、疾病或关键词</label>
+      <input
+        id="q"
+        type="search"
+        enterkeyhint="search"
+        placeholder="搜症状、疾病或关键词：抽搐、川崎病、辅食…"
+        autocomplete="off"
+        aria-controls="search-results"
+      />
+    </div>
+    <div id="search-results" hidden aria-live="polite"></div>
+
+    <div id="default-view">
+      <div class="channel-grid" aria-label="两条查询路径">
+        <a class="channel channel-quick" href={withBase('/quick')}>
+          <span class="ch-no">路径 01</span>
+          <span class="ch-k">症状速查</span>
+          <span class="ch-d">
+            {acute.length} 条急症三级分诊 + {dev.length} 条按月龄知识。急症固定置顶，不按月龄筛选。
+          </span>
+          <span class="ch-go">进入速查 →</span>
+        </a>
+        <a class="channel channel-risk" href={withBase('/health/handbook')}>
+          <span class="ch-no">路径 02</span>
+          <span class="ch-k">高危疾病识别手册</span>
+          <span class="ch-d">
+            12 类低概率、高后果的问题：概率、为什么容易漏、红线信号、检查点、关键时间窗。
+          </span>
+          <span class="ch-go">阅读完整手册 →</span>
+        </a>
+      </div>
+
+      <section class="h-section" aria-labelledby="acute-h">
+        <div class="h-head">
+          <h2 id="acute-h">急症与突发状况<span class="tag tag-acute">急症</span></h2>
+          <a class="more" href={withBase('/quick')}>全部 {acute.length} 条 →</a>
+        </div>
+        <p class="small muted">不按月龄筛选，任何年龄都可能遇到。点开看三级分诊：观察 / 立即就医 / 立即呼救。</p>
+        <div class="qlist">
+          {
+            acute.map((a) => (
+              <a class="qitem" href={withBase(`/quick/${a.id}`)}>
+                <span class="row">
+                  <span class="tag tag-acute">急症</span>
+                  <span class="t">{a.data.title}</span>
+                </span>
+                <span class="s">{a.data.summary}</span>
+              </a>
+            ))
+          }
+        </div>
+      </section>
+
+      <section class="h-section" aria-labelledby="risk-h">
+        <div class="h-head">
+          <h2 id="risk-h">十二类高危问题</h2>
+          <a class="more" href={withBase('/health/handbook')}>完整手册 →</a>
+        </div>
+        <p class="small muted">
+          按「概率 / 决策窗口 / 一句话红线」先看全貌，点任意一条直达手册中的逐项详解与来源。
+        </p>
+        <div class="risk-grid">
+          {
+            handbook.items.map((it) => (
+              <a class="risk-card" href={handbookHref(it.id)}>
+                <span class="risk-top">
+                  <span class="risk-no">{it.no}</span>
+                  <span class={`risk-window risk-${it.level}`}>{it.window}</span>
+                </span>
+                <span class="risk-name">{it.name}</span>
+                <span class="risk-red">{it.redline}</span>
+                <span class="risk-prob">{it.probability}</span>
+              </a>
+            ))
+          }
+        </div>
+      </section>
+
+      <section class="h-section" aria-labelledby="tools-h">
+        <div class="h-head">
+          <h2 id="tools-h">手册里的通用工具</h2>
+        </div>
+        <p class="small muted">比记住 12 种病更重要的，是这几页可反复用的标尺与操作卡。</p>
+        <div class="entry-grid">
+          {
+            handbook.tools.map((t) => (
+              <a class="entry-card" href={handbookHref(t.id)}>
+                <span class="k">{t.name}</span>
+                <p class="sum">{t.desc}</p>
+              </a>
+            ))
+          }
+        </div>
+      </section>
+
+      <section class="h-section" aria-labelledby="cat-h">
+        <div class="h-head">
+          <h2 id="cat-h">按月龄的知识</h2>
+          <a class="more" href={withBase('/quick')}>分类浏览 →</a>
+        </div>
+        <div class="cat-chips">
+          {
+            groups.map((g) => (
+              <a href={withBase('/quick') + '#cat-' + g.cat}>{g.label}（{g.count}）</a>
+            ))
+          }
+        </div>
+      </section>
+
+      <p class="h-alert">
+        孩子出现呼吸困难、意识改变、抽搐、面色发青、压之不褪色皮疹时，请立即拨打 120 或前往急诊，
+        不要以本站内容作为是否就医的唯一依据。
+      </p>
+    </div>
+  </div>
+
+  <script>
+    import { withBase } from '../../lib/url';
+
+    const input = document.getElementById('q') as HTMLInputElement | null;
+    const results = document.getElementById('search-results');
+    const defaultView = document.getElementById('default-view');
+
+    type Item = {
+      slug: string;
+      path?: string;
+      title: string;
+      tags: string[];
+      summary: string;
+      type: 'acute' | 'developmental' | 'outdoor' | 'handbook' | 'feeding';
+      category: string;
+      age_range: string;
+    };
+
+    const TYPE_LABEL: Record<string, string> = {
+      acute: '急症',
+      developmental: '知识',
+      outdoor: '户外',
+      handbook: '高危手册',
+      feeding: '辅食',
+    };
+
+    let items: Item[] | null = null;
+    let fuse: { search: (q: string) => { item: Item }[] } | null = null;
+    let loading: Promise<void> | null = null;
+
+    const esc = (s: string) =>
+      s.replace(/[&<>"']/g, (c) =>
+        ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c] as string
+      );
+
+    function mark(text: string, q: string): string {
+      const safe = esc(text);
+      const needle = esc(q);
+      if (!needle) return safe;
+      const idx = safe.toLowerCase().indexOf(needle.toLowerCase());
+      if (idx < 0) return safe;
+      return safe.slice(0, idx) + '<mark>' + safe.slice(idx, idx + needle.length) + '</mark>' + safe.slice(idx + needle.length);
+    }
+
+    function hrefOf(it: Item): string {
+      if (it.path) return withBase(it.path);
+      if (it.type === 'acute') return withBase(`/quick/${it.slug}`);
+      if (it.type === 'outdoor') return withBase(`/outdoor/${it.slug}`);
+      return withBase(`/age/${it.age_range}`) + '#' + it.slug;
+    }
+
+    function render(list: Item[], q: string) {
+      if (!results) return;
+      if (list.length === 0) {
+        results.innerHTML = `<div class="empty-result"><p style="margin-bottom:.5rem;"><strong>没找到「${esc(q)}」</strong></p><p class="small muted" style="margin:0;">试试更短的词，或直接打开 <a href="${withBase('/quick')}">症状速查</a> 与 <a href="${withBase('/health/handbook')}">高危手册</a>。</p></div>`;
+        return;
+      }
+      results.innerHTML =
+        `<p class="small muted" style="margin:.9rem 0 .2rem;">${list.length} 条结果</p><div class="qlist">` +
+        list.map((it) => `
+          <a class="qitem" href="${hrefOf(it)}">
+            <span class="row">
+              ${it.type === 'acute' ? '<span class="tag tag-acute">急症</span>' : ''}
+              <span class="t">${mark(it.title, q)}</span>
+              <span class="tag">${TYPE_LABEL[it.type] ?? '内容'}</span>
+            </span>
+            <span class="s">${mark(it.summary, q)}</span>
+            <span class="meta">${it.tags.slice(0, 3).map((t) => `<span class="tag">${mark(t, q)}</span>`).join('')}</span>
+          </a>`).join('') + '</div>';
+    }
+
+    function fallback(q: string): Item[] {
+      const needle = q.toLowerCase();
+      const scored: { it: Item; s: number }[] = [];
+      for (const it of items ?? []) {
+        let s = 0;
+        if (it.title.toLowerCase().includes(needle)) s += 3;
+        if (it.tags.some((t) => t.toLowerCase().includes(needle))) s += 2;
+        if (it.summary.toLowerCase().includes(needle)) s += 1;
+        if (s > 0) scored.push({ it, s });
+      }
+      scored.sort((a, b) => b.s - a.s);
+      return scored.map((x) => x.it);
+    }
+
+    async function ensureIndex() {
+      if (items) return;
+      if (loading) return loading;
+      loading = (async () => {
+        try {
+          const res = await fetch(withBase('/search-index.json'), { credentials: 'omit' });
+          items = (await res.json()) as Item[];
+          items.sort((a, b) => (a.type === b.type ? 0 : a.type === 'acute' ? -1 : 1));
+        } catch { items = []; }
+        try {
+          const mod: any = await import('fuse.js');
+          const Fuse = mod.default ?? mod;
+          fuse = new Fuse(items, {
+            threshold: 0.35,
+            ignoreLocation: true,
+            keys: [
+              { name: 'title', weight: 3 },
+              { name: 'tags', weight: 2 },
+              { name: 'summary', weight: 1 },
+            ],
+          });
+        } catch { fuse = null; }
+      })();
+      return loading;
+    }
+
+    async function run(query: string) {
+      const q = query.trim();
+      if (!q) {
+        if (results) { results.hidden = true; results.innerHTML = ''; }
+        if (defaultView) defaultView.hidden = false;
+        return;
+      }
+      await ensureIndex();
+      if (defaultView) defaultView.hidden = true;
+      if (!results) return;
+      results.hidden = false;
+      let list: Item[] = fuse ? fuse.search(q).map((r) => r.item) : [];
+      for (const it of fallback(q)) if (!list.includes(it)) list.push(it);
+      list = list.slice(0, 30);
+      list.sort((a, b) => (a.type === b.type ? 0 : a.type === 'acute' ? -1 : 1));
+      render(list, q);
+    }
+
+    let timer: number | undefined;
+    input?.addEventListener('input', () => {
+      window.clearTimeout(timer);
+      timer = window.setTimeout(() => void run(input.value), 160);
+    });
+    input?.addEventListener('focus', () => void ensureIndex(), { once: true });
+    if (location.hash === '#q' && input) input.focus({ preventScroll: false });
+  </script>
+
+  <style>
+    .channel-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 0.8rem;
+      margin-top: 1.4rem;
+    }
+    .channel {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      padding: 1.2rem 1.25rem 1.1rem;
+      border-radius: 16px;
+      border: 1px solid var(--line);
+      border-top: 4px solid var(--brand);
+      background: var(--surface);
+      color: var(--ink);
+      box-shadow: var(--shadow-sm);
+    }
+    .channel:hover { text-decoration: none; border-color: var(--brand); }
+    .channel-risk { border-top-color: var(--danger); background: var(--danger-wash); }
+    .channel-risk:hover { border-color: var(--danger); }
+    .ch-no { font-size: 0.72rem; letter-spacing: 0.1em; color: var(--muted); font-weight: 700; }
+    .ch-k { font-size: 1.16rem; font-weight: 700; line-height: 1.4; }
+    .channel-risk .ch-k { color: var(--danger); }
+    .ch-d { font-size: 0.87rem; color: var(--ink-soft); line-height: 1.65; }
+    .ch-go { margin-top: 0.45rem; font-size: 0.86rem; font-weight: 700; color: var(--brand-deep); }
+    .channel-risk .ch-go { color: var(--danger); }
+
+    .h-section { margin-top: 2.2rem; }
+    .h-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 0.8rem;
+      margin-bottom: 0.25rem;
+    }
+    .h-head h2 { font-size: 1.06rem; display: flex; align-items: center; gap: 0.5rem; margin: 0; }
+    .h-head .more { font-size: 0.86rem; white-space: nowrap; }
+
+    .risk-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(215px, 1fr));
+      gap: 0.6rem;
+      margin-top: 0.8rem;
+    }
+    .risk-card {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+      padding: 0.85rem 0.95rem;
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--danger-line);
+      border-radius: 12px;
+      background: var(--surface);
+      color: var(--ink);
+    }
+    .risk-card:hover { border-color: var(--danger); border-left-color: var(--danger); text-decoration: none; }
+    .risk-top { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
+    .risk-no { font: 700 0.78rem var(--ff-mono); color: var(--muted); }
+    .risk-window {
+      font-size: 0.71rem;
+      font-weight: 700;
+      padding: 0.05rem 0.45rem;
+      border-radius: 999px;
+    }
+    .risk-fast { background: var(--danger-wash); color: var(--danger); }
+    .risk-mid { background: var(--warn-wash); color: var(--warn); }
+    .risk-name { font-weight: 700; font-size: 0.98rem; line-height: 1.45; }
+    .risk-red { font-size: 0.82rem; color: var(--danger); line-height: 1.55; }
+    .risk-prob { font-size: 0.74rem; color: var(--muted); margin-top: auto; padding-top: 0.25rem; }
+
+    .cat-chips { display: flex; flex-wrap: wrap; gap: 0.45rem; margin-top: 0.8rem; }
+    .cat-chips a {
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+      padding: 0 0.85rem;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--surface);
+      color: var(--ink-soft);
+      font-size: 0.86rem;
+    }
+    .cat-chips a:hover { border-color: var(--brand); text-decoration: none; color: var(--brand-deep); }
+
+    .h-alert {
+      margin-top: 2rem;
+      padding: 0.9rem 1rem;
+      border: 1px solid var(--danger-line);
+      border-radius: 12px;
+      background: var(--danger-wash);
+      color: #7a2c26;
+      font-size: 0.86rem;
+      line-height: 1.65;
+    }
+  </style>
+</BaseLayout>

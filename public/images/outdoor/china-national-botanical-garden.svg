@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" role="img" aria-label="国家植物园温室穹顶插画">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#dceef2"/><stop offset="1" stop-color="#faf3e6"/>
+    </linearGradient>
+    <linearGradient id="water" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#8fbcc4"/><stop offset="1" stop-color="#6fa4ae"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="360" fill="url(#sky)"/>
+  <circle cx="530" cy="68" r="32" fill="#f5d495" opacity=".85"/>
+  
+  <g fill="#ffffff" opacity=".68">
+    <ellipse cx="105" cy="72" rx="46" ry="13"/><ellipse cx="130" cy="62" rx="32" ry="16"/>
+    <ellipse cx="440" cy="52" rx="38" ry="11"/><ellipse cx="462" cy="44" rx="26" ry="13"/>
+  </g>
+  <path d="M0 252 Q120 214 250 244 T470 232 T640 250 V360 H0Z" fill="#a8c4ac"/>
+  <path d="M0 288 Q170 266 330 290 T640 278 V360 H0Z" fill="#7fa287"/>
+  <path d="M0 320 Q200 302 400 320 T640 312 V360 H0Z" fill="#6c9276" opacity=".55"/>
+  <g opacity=".92">
+    <g transform="translate(48,214)"><rect x="-4" y="42" width="8" height="42" fill="#6b5942"/><circle cx="0" cy="24" r="30" fill="#6d9b72"/><circle cx="-18" cy="34" r="20" fill="#7fae83"/><circle cx="19" cy="34" r="21" fill="#5f8e67"/></g>
+    <g transform="translate(592,222)"><rect x="-4" y="40" width="8" height="40" fill="#6b5942"/><circle cx="0" cy="22" r="28" fill="#6d9b72"/><circle cx="-16" cy="32" r="18" fill="#7fae83"/><circle cx="18" cy="32" r="19" fill="#5f8e67"/></g>
+  </g>
+  <!-- 国家植物园：温室穹顶 + 热带植物 -->
+  <g>
+    <path d="M150 280 Q150 130 320 118 Q490 130 490 280Z" fill="#dfeae6" stroke="#9fb9b0" stroke-width="5"/>
+    <g stroke="#9fb9b0" stroke-width="3" fill="none" opacity=".85">
+      <path d="M320 118 V280 M150 220 H490 M190 156 Q320 196 450 156 M172 246 Q320 272 468 246"/>
+      <path d="M226 128 Q250 200 250 280 M414 128 Q390 200 390 280"/>
+    </g>
+    <rect x="140" y="276" width="360" height="12" rx="4" fill="#c4d2cb"/>
+  </g>
+  <g fill="#4f8b4a">
+    <path d="M70 300 Q60 236 96 206 Q84 258 88 300Z"/>
+    <path d="M96 300 Q112 230 152 210 Q124 258 116 300Z"/>
+    <path d="M524 300 Q536 232 574 208 Q548 258 548 300Z"/>
+    <path d="M552 300 Q566 246 604 226 Q580 264 578 300Z"/>
+  </g>
+  <g fill="#dca743" opacity=".9"><circle cx="112" cy="212" r="9"/><circle cx="566" cy="212" r="9"/></g>
+  <rect width="640" height="360" fill="none" stroke="#ffffff" stroke-opacity=".35" stroke-width="8"/>
+</svg>

@@ -45,7 +45,7 @@ import { withBase } from '../lib/url';
 
   <div class="gs-foot">
     <span id="gs-count">共 0 条内容 · 搜索在本机完成</span>
-    <a href={withBase('/quick')}>在速查页搜索 →</a>
+    <a href={withBase('/health')}>在健康查询页搜索 →</a>
   </div>
 </dialog>
 
@@ -58,7 +58,7 @@ import { withBase } from '../lib/url';
     title: string;
     tags: string[];
     summary: string;
-    type: 'acute' | 'developmental' | 'outdoor';
+    type: 'acute' | 'developmental' | 'outdoor' | 'handbook' | 'feeding';
     category: string;
     age_range: string;
   };
@@ -90,6 +90,7 @@ import { withBase } from '../lib/url';
   let timer: number | undefined;
 
   function hrefOf(it: Item): string {
+    if (it.path) return withBase(it.path);
     if (it.type === 'acute') return withBase(`/quick/${it.slug}`);
     if (it.type === 'outdoor') return withBase(`/outdoor/${it.slug}`);
     return withBase(`/age/${it.age_range}`) + '#' + it.slug;
@@ -155,6 +156,8 @@ import { withBase } from '../lib/url';
       row.className = 'row';
       if (it.type === 'acute') row.append(tag('急症', 'tag-acute'));
       if (it.type === 'outdoor') row.append(tag('户外'));
+      if (it.type === 'handbook') row.append(tag('高危手册'));
+      if (it.type === 'feeding') row.append(tag('辅食'));
       const t = document.createElement('span');
       t.className = 't';
       t.textContent = it.title;

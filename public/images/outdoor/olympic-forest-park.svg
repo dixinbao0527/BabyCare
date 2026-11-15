@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" role="img" aria-label="奥林匹克森林公园奥林匹克塔插画">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#dceef2"/><stop offset="1" stop-color="#faf3e6"/>
+    </linearGradient>
+    <linearGradient id="water" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#8fbcc4"/><stop offset="1" stop-color="#6fa4ae"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="360" fill="url(#sky)"/>
+  <circle cx="530" cy="68" r="32" fill="#f5d495" opacity=".85"/>
+  
+  <g fill="#ffffff" opacity=".68">
+    <ellipse cx="105" cy="72" rx="46" ry="13"/><ellipse cx="130" cy="62" rx="32" ry="16"/>
+    <ellipse cx="440" cy="52" rx="38" ry="11"/><ellipse cx="462" cy="44" rx="26" ry="13"/>
+  </g>
+  <path d="M0 252 Q120 214 250 244 T470 232 T640 250 V360 H0Z" fill="#a8c4ac"/>
+  <path d="M0 288 Q170 266 330 290 T640 278 V360 H0Z" fill="#7fa287"/>
+  <path d="M0 320 Q200 302 400 320 T640 312 V360 H0Z" fill="#6c9276" opacity=".55"/>
+  <g opacity=".92">
+    <g transform="translate(48,214)"><rect x="-4" y="42" width="8" height="42" fill="#6b5942"/><circle cx="0" cy="24" r="30" fill="#6d9b72"/><circle cx="-18" cy="34" r="20" fill="#7fae83"/><circle cx="19" cy="34" r="21" fill="#5f8e67"/></g>
+    <g transform="translate(592,222)"><rect x="-4" y="40" width="8" height="40" fill="#6b5942"/><circle cx="0" cy="22" r="28" fill="#6d9b72"/><circle cx="-16" cy="32" r="18" fill="#7fae83"/><circle cx="18" cy="32" r="19" fill="#5f8e67"/></g>
+  </g>
+  <!-- 奥林匹克森林公园：奥林匹克塔 + 林带 -->
+  <g>
+    <path d="M300 288 L310 132 H330 L340 288Z" fill="#c9d3d3"/>
+    <path d="M310 132 H330 L340 288 H300Z" fill="none" stroke="#9dafb0" stroke-width="3"/>
+    <g fill="none" stroke-width="7">
+      <circle cx="292" cy="106" r="20" stroke="#3d82b0"/>
+      <circle cx="320" cy="96" r="20" stroke="#2b3335"/>
+      <circle cx="348" cy="106" r="20" stroke="#b0472f"/>
+      <circle cx="306" cy="126" r="20" stroke="#dca743"/>
+      <circle cx="334" cy="126" r="20" stroke="#4f8b4a"/>
+    </g>
+    <rect x="288" y="150" width="64" height="22" rx="6" fill="#e6ecea"/>
+    <rect x="296" y="184" width="48" height="14" rx="4" fill="#e6ecea"/>
+    <path d="M320 132 V74" stroke="#9dafb0" stroke-width="4"/>
+    <circle cx="320" cy="70" r="5" fill="#dca743"/>
+  </g>
+  <g fill="#4f8b4a" opacity=".9">
+    <path d="M60 300 L96 224 L132 300Z"/><path d="M120 300 L152 238 L184 300Z"/>
+    <path d="M456 300 L492 224 L528 300Z"/><path d="M516 300 L550 238 L584 300Z"/>
+  </g>
+  <rect width="640" height="360" fill="none" stroke="#ffffff" stroke-opacity=".35" stroke-width="8"/>
+</svg>

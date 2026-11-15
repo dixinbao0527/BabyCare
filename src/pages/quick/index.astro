@@ -21,14 +21,15 @@ const acuteTop = acute.slice(0, 3);
 ---
 
 <BaseLayout
-  title="症状快速查询"
-  description="输入症状或关键词快速定位：急症条目固定置顶，不参与月龄筛选；发展性知识可按分类浏览。"
-  nav="quick"
+  title="症状速查"
+  description="健康查询的第一条路径：输入症状或关键词快速定位，急症条目固定置顶，发展性知识可按分类浏览。"
+  nav="health"
 >
   <div class="wrap">
     <div class="page-head">
-      <h1>症状快速查询</h1>
-      <p class="tagline">用你会说的词就行：抽搐、误吞、辅食、夜醒。</p>
+      <p class="eyebrow"><a href={withBase('/health')}>健康查询</a> · 路径 01</p>
+      <h1>症状速查</h1>
+      <p class="tagline">用你会说的词就行：抽搐、误吞、辅食、夜醒。另一条路径是<a href={withBase('/health/handbook')}>高危疾病识别手册</a>。</p>
     </div>
 
     <div class="search-box">
@@ -149,7 +150,7 @@ const acuteTop = acute.slice(0, 3);
       title: string;
       tags: string[];
       summary: string;
-      type: 'acute' | 'developmental';
+      type: 'acute' | 'developmental' | 'outdoor' | 'handbook' | 'feeding';
       category: string;
       age_range: string;
     };
@@ -188,10 +189,19 @@ const acuteTop = acute.slice(0, 3);
     }
 
     function hrefOf(it: Item): string {
-      return it.type === 'acute'
-        ? withBase(`/quick/${it.slug}`)
-        : withBase(`/age/${it.age_range}`) + '#' + it.slug;
+      if (it.path) return withBase(it.path);
+      if (it.type === 'acute') return withBase(`/quick/${it.slug}`);
+      if (it.type === 'outdoor') return withBase(`/outdoor/${it.slug}`);
+      return withBase(`/age/${it.age_range}`) + '#' + it.slug;
     }
+
+    const TYPE_LABEL: Record<string, string> = {
+      acute: '急症',
+      developmental: '知识',
+      outdoor: '户外',
+      handbook: '高危手册',
+      feeding: '辅食',
+    };
 
     function renderResults(list: Item[], q: string) {
       if (!results) return;
@@ -223,7 +233,7 @@ const acuteTop = acute.slice(0, 3);
             (it) => `
         <a class="qitem" href="${hrefOf(it)}">
           <span class="row">
-            ${it.type === 'acute' ? '<span class="tag tag-acute">急症</span>' : ''}
+            ${it.type === 'acute' ? '<span class="tag tag-acute">急症</span>' : `<span class="tag">${TYPE_LABEL[it.type] ?? '内容'}</span>`}
             <span class="t">${mark(it.title, q)}</span>
             ${it.type === 'developmental' ? `<span class="tag">${esc(it.age_range.replace('-', '～'))}</span>` : ''}
           </span>
@@ -346,6 +356,14 @@ const acuteTop = acute.slice(0, 3);
     // 从首页急症入口带 #q 过来时聚焦搜索框
     if (location.hash === '#q' && input) {
       input.focus({ preventScroll: false });
+    }
+
+    // 从健康查询页带 #cat-xxx 过来时自动展开对应分类
+    if (location.hash.startsWith('#cat-')) {
+      const target = document.querySelector<HTMLButtonElement>(
+        `[data-cat="${location.hash.slice(5)}"]`
+      );
+      target?.click();
     }
   </script>
 </BaseLayout>

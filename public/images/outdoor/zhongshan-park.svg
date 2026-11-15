@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" role="img" aria-label="中山公园红墙与石牌坊插画">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#dceef2"/><stop offset="1" stop-color="#faf3e6"/>
+    </linearGradient>
+    <linearGradient id="water" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#8fbcc4"/><stop offset="1" stop-color="#6fa4ae"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="360" fill="url(#sky)"/>
+  <circle cx="530" cy="68" r="32" fill="#f5d495" opacity=".85"/>
+  
+  <g fill="#ffffff" opacity=".68">
+    <ellipse cx="105" cy="72" rx="46" ry="13"/><ellipse cx="130" cy="62" rx="32" ry="16"/>
+    <ellipse cx="440" cy="52" rx="38" ry="11"/><ellipse cx="462" cy="44" rx="26" ry="13"/>
+  </g>
+  <path d="M0 252 Q120 214 250 244 T470 232 T640 250 V360 H0Z" fill="#a8c4ac"/>
+  <path d="M0 288 Q170 266 330 290 T640 278 V360 H0Z" fill="#7fa287"/>
+  <path d="M0 320 Q200 302 400 320 T640 312 V360 H0Z" fill="#6c9276" opacity=".55"/>
+  <g opacity=".92">
+    <g transform="translate(48,214)"><rect x="-4" y="42" width="8" height="42" fill="#6b5942"/><circle cx="0" cy="24" r="30" fill="#6d9b72"/><circle cx="-18" cy="34" r="20" fill="#7fae83"/><circle cx="19" cy="34" r="21" fill="#5f8e67"/></g>
+    <g transform="translate(592,222)"><rect x="-4" y="40" width="8" height="40" fill="#6b5942"/><circle cx="0" cy="22" r="28" fill="#6d9b72"/><circle cx="-16" cy="32" r="18" fill="#7fae83"/><circle cx="18" cy="32" r="19" fill="#5f8e67"/></g>
+  </g>
+  <!-- 中山公园：红墙 + 保卫和平牌坊 + 古柏 -->
+  <g>
+    <rect x="60" y="212" width="520" height="76" fill="#b0472f"/>
+    <path d="M50 206 H590 L578 192 H62Z" fill="#dca743"/>
+    <g stroke="#8d3524" stroke-width="3" opacity=".55"><path d="M60 240H580 M60 266H580"/></g>
+  </g>
+  <g>
+    <rect x="238" y="176" width="164" height="18" rx="3" fill="#f2ede0"/>
+    <rect x="246" y="194" width="148" height="10" rx="2" fill="#e6dfcf"/>
+    <g fill="#f2ede0">
+      <rect x="246" y="204" width="18" height="84"/><rect x="300" y="204" width="16" height="84"/>
+      <rect x="324" y="204" width="16" height="84"/><rect x="376" y="204" width="18" height="84"/>
+    </g>
+    <g fill="#d9d0bc"><rect x="240" y="284" width="26" height="8"/><rect x="374" y="284" width="26" height="8"/></g>
+    <rect x="286" y="212" width="68" height="20" rx="2" fill="#c9bfa8"/>
+    <path d="M238 176 L320 156 L402 176Z" fill="#e8e0cd"/>
+  </g>
+  <g>
+    <rect x="524" y="222" width="10" height="70" fill="#6b5942"/>
+    <circle cx="529" cy="204" r="42" fill="#3f7a55"/>
+    <circle cx="500" cy="222" r="26" fill="#4f8b4a"/>
+    <circle cx="558" cy="222" r="26" fill="#356a48"/>
+  </g>
+  <rect width="640" height="360" fill="none" stroke="#ffffff" stroke-opacity=".35" stroke-width="8"/>
+</svg>

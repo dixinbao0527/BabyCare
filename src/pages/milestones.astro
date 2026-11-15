@@ -69,24 +69,30 @@ const nodes = SCREEN_NODES.map((n) => ({
             运动维度可对照上方窗口图；这一节按节点列出文字表述，不是达标线。
           </p>
 
-          {n.milestones.map((d) => (
-            <div class="dom-block">
-              <h3>
-                {d.label}
-                <span class="badge">{d.items.length} 条</span>
-              </h3>
-              <ul class="mlist">
-                {d.items.map((m) => (
-                  <li>
-                    <span>
-                      {m.data.description}
-                      <span class="msrc">{m.data.source}</span>
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+          <div class="dom-grid">
+            {n.milestones.map((d, di) => (
+              <div class={`dom-block dom-${d.key}`}>
+                <div class="dom-head">
+                  <span class="dom-idx">{String(di + 1).padStart(2, '0')}</span>
+                  <h3>
+                    {d.label}
+                    {d.note && <span class="dom-note">{d.note}</span>}
+                  </h3>
+                  <span class="badge">{d.items.length} 条</span>
+                </div>
+                <ul class="mlist">
+                  {d.items.map((m) => (
+                    <li>
+                      <span>
+                        {m.data.description}
+                        <span class="msrc">{m.data.source}</span>
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
 
           <div class="check-block">
             <h2>{n.node} 月龄预警征象</h2>

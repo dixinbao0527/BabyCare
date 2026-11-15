@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" role="img" aria-label="北海公园白塔插画">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#dceef2"/><stop offset="1" stop-color="#faf3e6"/>
+    </linearGradient>
+    <linearGradient id="water" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#8fbcc4"/><stop offset="1" stop-color="#6fa4ae"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="360" fill="url(#sky)"/>
+  <circle cx="530" cy="68" r="32" fill="#f5d495" opacity=".85"/>
+  
+  <g fill="#ffffff" opacity=".68">
+    <ellipse cx="105" cy="72" rx="46" ry="13"/><ellipse cx="130" cy="62" rx="32" ry="16"/>
+    <ellipse cx="440" cy="52" rx="38" ry="11"/><ellipse cx="462" cy="44" rx="26" ry="13"/>
+  </g>
+  <path d="M0 292 H640 V360 H0Z" fill="url(#water)"/>
+  <g stroke="#ffffff" stroke-width="2" opacity=".45" stroke-linecap="round">
+    <path d="M60 314 h54 M160 330 h72 M420 318 h66 M480 342 h84 M220 350 h48"/>
+  </g>
+  <ellipse cx="48" cy="302" rx="46" ry="11" fill="#7fa287"/>
+  <ellipse cx="592" cy="302" rx="46" ry="11" fill="#7fa287"/>
+  <g opacity=".92">
+    <g transform="translate(48,214)"><rect x="-4" y="42" width="8" height="42" fill="#6b5942"/><circle cx="0" cy="24" r="30" fill="#6d9b72"/><circle cx="-18" cy="34" r="20" fill="#7fae83"/><circle cx="19" cy="34" r="21" fill="#5f8e67"/></g>
+    <g transform="translate(592,222)"><rect x="-4" y="40" width="8" height="40" fill="#6b5942"/><circle cx="0" cy="22" r="28" fill="#6d9b72"/><circle cx="-16" cy="32" r="18" fill="#7fae83"/><circle cx="18" cy="32" r="19" fill="#5f8e67"/></g>
+  </g>
+  <!-- 北海白塔：琼华岛绿丘 + 覆钵式白塔 -->
+  <path d="M172 300 Q240 186 320 178 Q400 186 468 300Z" fill="#5f8d68"/>
+  <path d="M172 300 Q240 186 320 178 Q400 186 468 300Z" fill="none" stroke="#4d7a58" stroke-width="3" opacity=".5"/>
+  <g>
+    <rect x="278" y="228" width="84" height="46" fill="#eae4d6"/>
+    <rect x="292" y="200" width="56" height="30" fill="#fdfbf5"/>
+    <path d="M292 202 Q286 168 300 152 Q320 138 340 152 Q354 168 348 202Z" fill="#fdfbf5"/>
+    <rect x="306" y="132" width="28" height="26" fill="#fdfbf5"/>
+    <g stroke="#d9cfba" stroke-width="3"><path d="M304 142h32 M304 150h32 M302 158h36"/></g>
+    <path d="M320 118 L310 132 H330Z" fill="#dca743"/>
+    <circle cx="320" cy="114" r="6" fill="#dca743"/>
+    <rect x="300" y="244" width="40" height="30" fill="#b0472f"/>
+    <path d="M296 244h48l-6-8h-36Z" fill="#8d3524"/>
+  </g>
+  <rect width="640" height="360" fill="none" stroke="#ffffff" stroke-opacity=".35" stroke-width="8"/>
+</svg>

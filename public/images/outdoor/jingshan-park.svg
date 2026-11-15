@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" role="img" aria-label="景山公园万春亭插画">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#dceef2"/><stop offset="1" stop-color="#faf3e6"/>
+    </linearGradient>
+    <linearGradient id="water" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#8fbcc4"/><stop offset="1" stop-color="#6fa4ae"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="360" fill="url(#sky)"/>
+  <circle cx="530" cy="68" r="32" fill="#f5d495" opacity=".85"/>
+  
+  <g fill="#ffffff" opacity=".68">
+    <ellipse cx="105" cy="72" rx="46" ry="13"/><ellipse cx="130" cy="62" rx="32" ry="16"/>
+    <ellipse cx="440" cy="52" rx="38" ry="11"/><ellipse cx="462" cy="44" rx="26" ry="13"/>
+  </g>
+  <path d="M0 252 Q120 214 250 244 T470 232 T640 250 V360 H0Z" fill="#a8c4ac"/>
+  <path d="M0 288 Q170 266 330 290 T640 278 V360 H0Z" fill="#7fa287"/>
+  <path d="M0 320 Q200 302 400 320 T640 312 V360 H0Z" fill="#6c9276" opacity=".55"/>
+  <g opacity=".92">
+    <g transform="translate(48,214)"><rect x="-4" y="42" width="8" height="42" fill="#6b5942"/><circle cx="0" cy="24" r="30" fill="#6d9b72"/><circle cx="-18" cy="34" r="20" fill="#7fae83"/><circle cx="19" cy="34" r="21" fill="#5f8e67"/></g>
+    <g transform="translate(592,222)"><rect x="-4" y="40" width="8" height="40" fill="#6b5942"/><circle cx="0" cy="22" r="28" fill="#6d9b72"/><circle cx="-16" cy="32" r="18" fill="#7fae83"/><circle cx="18" cy="32" r="19" fill="#5f8e67"/></g>
+  </g>
+  <!-- 景山万春亭：山顶重檐攒尖方亭 -->
+  <path d="M120 300 Q230 206 320 200 Q410 206 520 300Z" fill="#6f9a72"/>
+  <g>
+    <rect x="252" y="226" width="136" height="56" fill="#b0472f"/>
+    <g stroke="#8d3524" stroke-width="5"><path d="M264 230v50 M292 230v50 M320 230v50 M348 230v50 M376 230v50"/></g>
+    <rect x="306" y="246" width="28" height="36" fill="#7d2c20"/>
+    <path d="M320 176 Q286 200 226 220 Q320 238 414 220 Q354 200 320 176Z" fill="#dca743"/>
+    <path d="M226 220 Q320 236 414 220" fill="none" stroke="#a97c26" stroke-width="5"/>
+    <rect x="284" y="152" width="72" height="28" fill="#c25a3c"/>
+    <path d="M320 116 Q296 136 256 152 Q320 168 384 152 Q344 136 320 116Z" fill="#e8bc5b"/>
+    <circle cx="320" cy="110" r="7" fill="#a97c26"/>
+  </g>
+  <rect width="640" height="360" fill="none" stroke="#ffffff" stroke-opacity=".35" stroke-width="8"/>
+</svg>

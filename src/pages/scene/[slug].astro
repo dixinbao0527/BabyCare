@@ -64,7 +64,7 @@ const missing = scene.slugs.filter((slug) => !known.has(slug));
 
 <BaseLayout title={scene.label} description={`${scene.question} 相关条目按急症与月龄知识分组，急症固定在前。`} nav="none">
   <div class="wrap">
-    <p class="back"><a href={withBase('/quick')}>← 症状快速查询</a></p>
+    <p class="back"><a href={withBase('/health')}>← 健康查询</a></p>
 
     <div class="page-head">
       <p class="eyebrow">按场景找</p>
@@ -92,7 +92,7 @@ const missing = scene.slugs.filter((slug) => !known.has(slug));
       rows.length === 0 && (
         <p class="notice small">
           这个场景还没有整理好的条目。可以先去
-          <a href={withBase('/quick')}>症状快速查询</a> 按分类浏览。
+          <a href={withBase('/quick')}>症状速查</a> 按分类浏览。
         </p>
       )
     }

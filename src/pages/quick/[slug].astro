@@ -22,8 +22,9 @@ const jsonLd = {
   '@type': 'BreadcrumbList',
   itemListElement: [
     { '@type': 'ListItem', position: 1, name: '首页', item: `${Astro.site ?? ''}${withBase('/')}` },
-    { '@type': 'ListItem', position: 2, name: '快速查询', item: `${Astro.site ?? ''}${withBase('/quick')}` },
-    { '@type': 'ListItem', position: 3, name: d.title },
+    { '@type': 'ListItem', position: 2, name: '健康查询', item: `${Astro.site ?? ''}${withBase('/health')}` },
+    { '@type': 'ListItem', position: 3, name: '症状速查', item: `${Astro.site ?? ''}${withBase('/quick')}` },
+    { '@type': 'ListItem', position: 4, name: d.title },
   ],
 };
 ---

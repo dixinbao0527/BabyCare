@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" role="img" aria-label="陶然亭公园湖畔亭台与垂柳插画">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#dceef2"/><stop offset="1" stop-color="#faf3e6"/>
+    </linearGradient>
+    <linearGradient id="water" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#8fbcc4"/><stop offset="1" stop-color="#6fa4ae"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="360" fill="url(#sky)"/>
+  <circle cx="530" cy="68" r="32" fill="#f5d495" opacity=".85"/>
+  
+  <g fill="#ffffff" opacity=".68">
+    <ellipse cx="105" cy="72" rx="46" ry="13"/><ellipse cx="130" cy="62" rx="32" ry="16"/>
+    <ellipse cx="440" cy="52" rx="38" ry="11"/><ellipse cx="462" cy="44" rx="26" ry="13"/>
+  </g>
+  <path d="M0 292 H640 V360 H0Z" fill="url(#water)"/>
+  <g stroke="#ffffff" stroke-width="2" opacity=".45" stroke-linecap="round">
+    <path d="M60 314 h54 M160 330 h72 M420 318 h66 M480 342 h84 M220 350 h48"/>
+  </g>
+  <ellipse cx="48" cy="302" rx="46" ry="11" fill="#7fa287"/>
+  <ellipse cx="592" cy="302" rx="46" ry="11" fill="#7fa287"/>
+  <g opacity=".92">
+    <g transform="translate(48,214)"><rect x="-4" y="42" width="8" height="42" fill="#6b5942"/><circle cx="0" cy="24" r="30" fill="#6d9b72"/><circle cx="-18" cy="34" r="20" fill="#7fae83"/><circle cx="19" cy="34" r="21" fill="#5f8e67"/></g>
+    <g transform="translate(592,222)"><rect x="-4" y="40" width="8" height="40" fill="#6b5942"/><circle cx="0" cy="22" r="28" fill="#6d9b72"/><circle cx="-16" cy="32" r="18" fill="#7fae83"/><circle cx="18" cy="32" r="19" fill="#5f8e67"/></g>
+  </g>
+  <!-- 陶然亭：湖畔灰瓦亭 + 垂柳 + 石桥 -->
+  <g>
+    <rect x="262" y="216" width="116" height="60" fill="#b0472f"/>
+    <g stroke="#8d3524" stroke-width="5"><path d="M274 220v54 M320 220v54 M366 220v54"/></g>
+    <path d="M320 166 Q282 194 232 212 Q320 230 408 212 Q358 194 320 166Z" fill="#5b6b6e"/>
+    <path d="M232 212 Q320 228 408 212" fill="none" stroke="#3f4c4f" stroke-width="5"/>
+    <circle cx="320" cy="160" r="6" fill="#dca743"/>
+  </g>
+  <g stroke="#5b8a4e" stroke-width="4" fill="none" stroke-linecap="round" opacity=".9">
+    <path d="M110 96 Q118 170 106 236 M126 92 Q140 168 132 240 M142 94 Q160 166 152 232"/>
+    <path d="M508 92 Q500 168 512 238 M524 90 Q512 166 522 240 M540 96 Q528 166 538 230"/>
+  </g>
+  <g fill="#6b9c58" opacity=".9">
+    <ellipse cx="106" cy="180" rx="8" ry="20"/><ellipse cx="132" cy="204" rx="8" ry="20"/>
+    <ellipse cx="512" cy="180" rx="8" ry="20"/><ellipse cx="522" cy="210" rx="8" ry="20"/>
+  </g>
+  <path d="M180 318 Q320 258 460 318" fill="none" stroke="#e9e2d2" stroke-width="13"/>
+  <path d="M180 318 Q320 258 460 318" fill="none" stroke="#c9c0ad" stroke-width="3"/>
+  <rect width="640" height="360" fill="none" stroke="#ffffff" stroke-opacity=".35" stroke-width="8"/>
+</svg>

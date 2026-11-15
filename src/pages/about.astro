@@ -2,300 +2,210 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { getCollection } from 'astro:content';
 import { withBase } from '../lib/url';
-import { reviewInfo } from '../lib/review';
 
-const dev = await getCollection('developmental', ({ data }) => !data.draft);
-const acute = await getCollection('acute');
-const outdoor = await getCollection('outdoor', ({ data }) => !data.draft);
+/** 赞赏码由作者放进 public/images/ 即自动生效，不需要改代码 */
+const qrDir = path.join(process.cwd(), 'public/images');
+const qrFiles = fs.existsSync(qrDir)
+  ? fs.readdirSync(qrDir)
+      .filter((f) => /^(coffee|sponsor|qr|赞赏|收款)[-_a-z0-9]*\.(png|jpg|jpeg|webp)$/i.test(f))
+      .sort()
+  : [];
 
-const allReviewed = [...dev, ...acute].map((e) => e.data.last_reviewed).filter(Boolean).sort();
-const latestReview = allReviewed.at(-1) ?? '—';
-const reviewers = [...new Set([...dev, ...acute].map((e) => e.data.reviewer))];
-const fresh = [...dev, ...acute].filter(
-  (e) => reviewInfo(e.data.last_reviewed, e.data.reviewer).state === 'fresh'
-).length;
-
-/** 二维码由作者放进 public/images/ 后自动生效，不需要改代码 */
-const coffeeDir = path.join(process.cwd(), 'public/images');
-const coffeeFiles = ['coffee-wechat.png', 'coffee-alipay.png'].filter((f) =>
-  fs.existsSync(path.join(coffeeDir, f))
-);
-
-const tour = [
-  { href: '/', title: '首页', desc: '输入出生日期，定位当前月龄该注意什么。' },
-  { href: '/quick', title: '症状快速查询', desc: '急症固定置顶，按分类或关键词找。' },
-  { href: '/milestones', title: '发育里程碑', desc: 'WHO 运动窗口 + 32 条预警征象自查。' },
-  { href: '/outdoor', title: '北京亲子户外', desc: '带娃可去的场所，标注设施、核验日期与安全提示。' },
-  { href: '/sources', title: '来源与声明', desc: '全部引用文献、文号、免责与隐私说明。' },
-  { href: '/about', title: '关于本站', desc: '你正在看的这一页。' },
-];
+const qrLabel = (f: string) => {
+  if (/wechat|weixin|微信/i.test(f)) return '微信';
+  if (/alipay|zhifubao|支付宝/i.test(f)) return '支付宝';
+  return '赞赏码';
+};
 ---
 
 <BaseLayout
-  title="关于本站"
-  description="这个站是谁做的、内容依据什么、怎么复核、怎么处理隐私、怎么纠错，以及如何支持作者。"
+  title="关于"
+  description="婴幼儿健康养育手册：联系方式、做这个站的原因、内容来源、赞赏码，以及版权与免责说明。"
   nav="about"
 >
-  <div class="wrap">
-    <div class="page-head">
-      <p class="eyebrow">公益整理 · 无广告 · 无追踪</p>
-      <h1>关于本站</h1>
-      <p class="tagline">
-        一个按月龄组织的育儿知识站。不诊断、不卖货、不追踪，尽量让每一句都能查到出处。
-      </p>
+  <div class="wrap ab-wrap">
+    <div class="page-head ab-head">
+      <h1>关于</h1>
+      <p class="tagline">一个按月龄组织、尽量每句话都能查到出处的育儿知识站。不诊断、不卖货、不追踪。</p>
     </div>
 
-    <nav class="about-toc" aria-label="本页目录">
-      <a href="#why">为什么做</a>
-      <a href="#source">内容怎么来的</a>
-      <a href="#review">复核与状态</a>
-      <a href="#tour">站点导览</a>
-      <a href="#freshness">时效</a>
-      <a href="#privacy">隐私</a>
-      <a href="#license">版权</a>
-      <a href="#changelog">更新</a>
-      <a href="#contact">纠错</a>
-      <a href="#coffee">支持作者</a>
-    </nav>
+    <section class="ab-card ab-contact" aria-labelledby="contact-h">
+      <h2 id="contact-h">联系邮箱</h2>
+      <a class="ab-mail" href="mailto:YuChu_Comp@qq.com">YuChu_Comp@qq.com</a>
+      <p class="small muted">内容纠错、转载授权、版权问题都发到这里。不接受个体化医疗咨询——孩子的具体情况请咨询儿科医生或就近就医。</p>
+    </section>
 
-    <section id="why" aria-labelledby="why-h">
+    <section class="ab-card" aria-labelledby="why-h">
       <h2 id="why-h">为什么做这个站</h2>
       <p>
-        育儿信息不缺，缺的是「这句话从哪来、什么时候复核过、什么情况下该停下去医院」。
-        这个站最早只是把散落在指南、家长群和短视频里的说法整理成一份清单，后来按月龄拆开，
-        把急症单独拎出来做成分诊卡，才变成现在这个样子。
+        育儿信息从来不缺，缺的是「这句话从哪来、什么时候核对过、什么情况下该停下去医院」。
+        一开始只是给家里人整理的一份清单，把散落在指南、家长群和短视频里的说法按月龄拆开；
+        后来把急症单独拎出来做成分诊卡，又补上发育里程碑、辅食和周末去处，才成了现在的样子。
       </p>
       <p>
-        它不试图回答所有问题。它只做三件事：把公开指南整理成能查的结构、标清边界、在需要就医时把人推向医生。
+        它只做三件事：把公开指南整理成能查的结构、标清自己的边界、在需要就医时把人推向医生。
+        没有广告、没有账号、没有埋点。
       </p>
     </section>
 
-    <section id="source" aria-labelledby="source-h">
+    <section class="ab-card" aria-labelledby="source-h">
       <h2 id="source-h">内容怎么来的</h2>
       <p>
-        主体依据国家卫生健康委发布的《3 岁以下婴幼儿健康养育照护指南（试行）》（国卫办妇幼函〔2022〕409 号），
-        运动里程碑采用 WHO 六项粗大动作窗口，部分表述参考 AAP 公开资料。
-        <strong>条目级引用以每页底部标注为准</strong>，不以这段概括为准。
+        主体依据国家卫生健康委发布的《3 岁以下婴幼儿健康养育照护指南（试行）》与《婴幼儿喂养健康教育核心信息》，
+        发育里程碑采用 WHO 的粗大运动窗口与国家卫健委《儿童心理行为发育问题预警征象筛查表》，
+        辅食部分参考《中国居民膳食指南（2022）》与 WHO 2023 版辅食喂养指南；急症部分依据中华医学会各专业委员会共识、中国 CDC 与 NICE NG143。
       </p>
-      <ul class="about-list">
-        <li><strong>逐字照录</strong>：预警征象、分级标准这类工具性文本不改写、不合并。</li>
-        <li><strong>不改数字</strong>：月龄、频次、时长照抄原文，不做「约等于」。</li>
-        <li><strong>不加推断</strong>：指南没说的因果不补，不写「因为缺钙所以……」。</li>
-        <li><strong>区分原文与自注</strong>：场景标签、通俗解释是本项目加的，不是指南原文。</li>
-        <li><strong>过期即标注</strong>：超过复核周期的条目会显示「待复核」，不装作仍然新鲜。</li>
+      <ul class="ab-list">
+        <li><strong>逐条标注来源与复核日期</strong>，页脚与<a href={withBase('/sources')}>来源与声明</a>可查。</li>
+        <li><strong>不改数字</strong>：月龄、频次、时长、概率照抄原始口径，不做「约等于」。</li>
+        <li><strong>区分原文与自注</strong>：场景标签、通俗解释、插画都是本站加的，不是指南原文。</li>
+        <li><strong>不写指南没说的因果</strong>，不提供诊断、药品名与剂量。</li>
       </ul>
-    </section>
-
-    <section id="review" aria-labelledby="review-h">
-      <h2 id="review-h">复核与当前状态</h2>
-      <p>
-        站内共 {dev.length + acute.length} 条知识（发展性 {dev.length} 条、急症 {acute.length} 条），
-        最近一次批量复核为 {latestReview.replace(/-/g, '.')}，其中 {fresh} 条仍在一年有效期内。
-        记录中的整理者为 {reviewers.join('、')}。
-      </p>
-      <p class="about-callout">
-        <strong>需要说清楚的一点：</strong>急症条目的三级分级是结构化整理，
-        <strong>尚未完成儿科背景复核人的逐条核对</strong>。在完成之前，请把它当作「帮你判断紧急程度」的参考，
-        而不是诊断依据；任何让你不安的表现，都值得直接就医。
-      </p>
-      <p class="small muted">
-        复核规则、更新响应与复核人要求，见 <a href={withBase('/sources')}>来源与声明</a>。
+      <p class="small muted" style="margin-bottom:0;">
+        户外场所与插图是另一类信息：来自公园与主管部门公开页面，逐条带核验日期，不属于医学指南，插画为本站绘制的示意图。
       </p>
     </section>
 
-    <section id="tour" aria-labelledby="tour-h">
-      <h2 id="tour-h">站点导览</h2>
-      <p class="small muted">六个模块，两类内容：医学知识可溯源，户外信息有时效。</p>
-      <div class="entry-grid">
-        {
-          tour.map((t) => (
-            <a class="entry-card" href={withBase(t.href)}>
-              <span class="k">{t.title}</span>
-              <p class="sum">{t.desc}</p>
-            </a>
-          ))
-        }
-      </div>
-    </section>
-
-    <section id="freshness" aria-labelledby="fresh-h">
-      <h2 id="fresh-h">户外信息的时效</h2>
+    <section class="ab-card ab-coffee" aria-labelledby="coffee-h">
+      <h2 id="coffee-h">赞赏码</h2>
       <p>
-        户外场所的票价、开放时间、预约规则会变，所以每条都带一个<strong>核验日期</strong>。
-        超过 180 天显示「待复核」，超过 365 天不再作为有效信息展示。
-        站内不做实时同步，也不提供天气、人流或余票。
+        这个站没有广告，也不卖东西。如果它帮到过你，可以请作者喝杯咖啡，用于域名、资料核对和一点点维护时间。
+        完全自愿，金额随意，不对应任何回报或专属内容，也不会影响站内任何一条内容。
       </p>
-      <p class="small muted">
-        当前收录 {outdoor.length} 个场所，均为北京地区。其他城市尚未覆盖。
-      </p>
-    </section>
-
-    <section id="privacy" aria-labelledby="privacy-h">
-      <h2 id="privacy-h">隐私</h2>
-      <p>
-        没有后端、没有账号、没有埋点 SDK，也不收集个人信息。你在首页填的出生日期与胎龄只写入浏览器
-        <code>localStorage</code>（键名 <code>ich.birth.v1</code>），不上传；勾选状态同理（<code>ich.tasks.v1</code>）。
-        页脚的「清除本机记录」可以随时清掉。
-      </p>
-      <p>
-        全站不加载第三方字体、统计脚本或社交插件；搜索索引在构建时生成，搜索在你的浏览器里完成。
-      </p>
-    </section>
-
-    <section id="license" aria-labelledby="license-h">
-      <h2 id="license-h">版权与引用</h2>
-      <p>
-        站内文字为原创整理，所依据的指南原文版权归原发布机构所有。本站不复制指南全文、不使用原文配图，
-        只做结构化摘要与索引，并标注来源。
-      </p>
-      <p>
-        欢迎在不改动原意、注明来源与复核日期的前提下转载与教学使用；商业用途请先联系。
-        若你是权利人并认为本站内容侵犯了你的权益，请联系删除。
-      </p>
-    </section>
-
-    <section id="changelog" aria-labelledby="changelog-h">
-      <h2 id="changelog-h">更新日志</h2>
-      <ul class="about-list">
-        <li>
-          <strong>v3.0</strong>（2026.11）：新增北京亲子户外模块与关于页；导航、搜索、站点地图同步改造；
-          页面开始显示复核状态；页脚日期改为构建时生成。
-        </li>
-        <li>
-          <strong>v2.0</strong>（2026.10）：急症独立于月龄主轴，加入三级分诊、WHO 窗口图与 32 条预警征象；
-          构建期校验与 375px 验收脚本上线。
-        </li>
-      </ul>
-      <p class="small muted">
-        下一步想做的：跨月龄主题时间线、场景化入口、离线可打开急症页。不承诺时间。
-      </p>
-    </section>
-
-    <section id="contact" aria-labelledby="contact-h">
-      <h2 id="contact-h">纠错与联系</h2>
-      <p>
-        内容纠错请走
-        <a href="https://github.com/dixinbao0527/BabyCare/issues" rel="noopener noreferrer" target="_blank">GitHub Issues</a>，
-        写清页面、句子和你的依据，会比「这里不对」更容易处理。
-      </p>
-      <p class="small muted">不接受个体化医疗咨询；孩子的具体情况，请咨询儿科医生或就近就医。</p>
-    </section>
-
-    <section id="coffee" class="about-coffee" aria-labelledby="coffee-h">
-      <h2 id="coffee-h">请作者喝杯咖啡</h2>
-      <p>
-        这个站没有广告、没有追踪，也不卖东西。如果它帮到过你，可以请作者喝杯咖啡，
-        用于域名、资料核对和一点点维护时间。
-      </p>
-      <p>
-        完全自愿，金额随意。它不对应任何回报或专属内容，也不会影响站内任何一条内容。
-        这不是公益募捐，不提供捐赠票据。
-      </p>
-
       {
-        coffeeFiles.length > 0 ? (
-          <div class="coffee-qr">
-            {coffeeFiles.map((f) => (
+        qrFiles.length > 0 ? (
+          <div class="ab-qr">
+            {qrFiles.map((f) => (
               <figure>
-                <img
-                  src={withBase(`/images/${f}`)}
-                  alt={f.includes('wechat') ? '微信收款二维码，用于请作者喝杯咖啡' : '支付宝收款二维码，用于请作者喝杯咖啡'}
-                  width="240"
-                  height="240"
-                  loading="lazy"
-                />
-                <figcaption>{f.includes('wechat') ? '微信' : '支付宝'}</figcaption>
+                <img src={withBase(`/images/${f}`)} alt={`${qrLabel(f)}赞赏码`} width="240" height="240" loading="lazy" />
+                <figcaption>{qrLabel(f)}</figcaption>
               </figure>
             ))}
           </div>
         ) : (
-          <p class="coffee-empty">
-            二维码图片待作者上传：把 <code>coffee-wechat.png</code>（或 <code>coffee-alipay.png</code>）
-            放进 <code>public/images/</code>，本区块会自动显示。
-          </p>
+          <div class="ab-qr-empty">
+            <div class="ab-qr-box" aria-hidden="true">二维码</div>
+            <p class="small muted">
+              图片待放入：把赞赏码存为 <code>coffee-wechat.png</code>（或 <code>coffee-alipay.png</code>）
+              放进仓库的 <code>public/images/</code>，这一块会自动显示。
+            </p>
+          </div>
         )
       }
-
-      <p class="small muted">本站不处理支付、不记录谁支持过、不回传任何信息。</p>
+      <p class="small muted" style="margin-bottom:0;">本站不处理支付、不记录谁支持过、不回传任何信息。这不是公益募捐，不提供捐赠票据。</p>
     </section>
 
-    <p class="small muted about-tail">
-      最后更新：{latestReview.replace(/-/g, '.')} · <a href={withBase('/')}>返回首页</a>
+    <section class="ab-card ab-legal" aria-labelledby="legal-h">
+      <h2 id="legal-h">版权应用与免责</h2>
+      <h3>版权与应用</h3>
+      <p>
+        站内文字、结构化整理与自绘插画为本站原创；所依据的指南原文版权归原发布机构所有。
+        本站不复制指南全文、不使用原文配图，只做摘要与索引并标注来源。
+      </p>
+      <p>
+        欢迎在不改动原意、注明来源与复核日期的前提下转载与教学使用；商业用途请先发邮件联系。
+        若你是权利人并认为内容侵犯了你的权益，来信即处理。
+      </p>
+      <h3>免责</h3>
+      <p>
+        本站为公益、非商业、个人维护的健康教育整理，不是医疗机构，不提供诊疗服务。
+        所有内容<strong>不替代专业医疗诊断、治疗或用药建议</strong>。
+      </p>
+      <p>
+        孩子出现呼吸困难、意识改变、抽搐、面色发青、大量出血等急症表现时，请立即拨打 120 或前往急诊，
+        不要以本站内容作为是否就医的唯一依据。内容可能存在转述偏差或版本滞后，与指南原文不一致时一律以原文为准；
+        指南更新后不另行通知，本站对使用内容所产生的后果不承担责任。
+      </p>
+      <p class="small muted" style="margin-bottom:0;">
+        你在首页填的出生日期只写在浏览器本地，不上传；页脚「清除本机记录」可随时清掉。继续使用即表示已理解上述边界。
+      </p>
+    </section>
+
+    <p class="small muted ab-tail">
+      <a href={withBase('/')}>← 返回首页</a>
+      <span aria-hidden="true"> · </span>
+      <a href={withBase('/sources')}>来源与声明</a>
+      <span aria-hidden="true"> · </span>
+      <a href="https://github.com/dixinbao0527/BabyCare" rel="noopener noreferrer" target="_blank">源码仓库</a>
     </p>
   </div>
 
   <style>
-    .about-toc {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.4rem 0.9rem;
-      margin: 1rem 0 1.6rem;
-      padding-bottom: 0.8rem;
-      border-bottom: 1px solid var(--line);
-      font-size: 0.88rem;
-    }
-    .about-toc a {
-      color: var(--ink-soft);
-      text-decoration: none;
-      min-height: 44px;
-      display: inline-flex;
-      align-items: center;
-    }
-    .about-list {
-      padding-left: 1.1rem;
-      margin: 0.6rem 0 0;
-    }
-    .about-list li {
-      margin-bottom: 0.45rem;
-    }
-    .about-callout {
-      padding: 0.9rem 1rem;
-      background: var(--warn-wash);
-      border: 1px solid #efd3b8;
-      border-radius: var(--radius);
-    }
-    .about-coffee {
-      margin-top: 1.6rem;
-      padding: 1.2rem 1.1rem;
-      background: var(--surface-warm);
+    .ab-wrap { max-width: 720px; }
+    .ab-head { padding-bottom: 0.6rem; }
+    .ab-head .tagline { max-width: 34em; }
+
+    .ab-card {
+      margin-top: 1rem;
+      padding: 1.2rem 1.3rem;
+      background: var(--surface);
       border: 1px solid var(--line);
       border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
     }
-    .coffee-qr {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1.2rem;
-      margin: 0.8rem 0;
+    .ab-card h2 {
+      font-size: 1.06rem;
+      margin: 0 0 0.65rem;
+      padding-bottom: 0.55rem;
+      border-bottom: 1px solid var(--line-soft);
     }
-    .coffee-qr figure {
-      margin: 0;
-      text-align: center;
+    .ab-card h3 { font-size: 0.92rem; margin: 1.1rem 0 0.35rem; color: var(--brand-deep); }
+    .ab-card p { font-size: 0.92rem; color: var(--ink-soft); line-height: 1.78; margin-bottom: 0.75rem; }
+    .ab-card p:last-child { margin-bottom: 0; }
+    .ab-card strong { color: var(--ink); }
+
+    .ab-contact {
+      border-left: 3px solid var(--brand);
+      background: var(--brand-wash);
     }
-    .coffee-qr img {
-      width: 160px;
-      height: 160px;
-      object-fit: contain;
-      background: #fff;
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
+    .ab-contact h2 { border-bottom-color: rgba(20, 105, 92, 0.18); }
+    .ab-mail {
+      display: inline-block;
+      font-size: clamp(1.05rem, 3.2vw, 1.32rem);
+      font-weight: 700;
+      color: var(--brand-deep);
+      letter-spacing: 0.01em;
+      margin: 0.1rem 0 0.5rem;
+      min-height: 44px;
+      line-height: 44px;
     }
-    .coffee-qr figcaption {
-      margin-top: 0.3rem;
-      font-size: 0.8rem;
-      color: var(--muted);
+    .ab-mail:hover { text-decoration: underline; }
+
+    .ab-list { padding-left: 1.15rem; margin: 0.2rem 0 0.8rem; }
+    .ab-list li { font-size: 0.9rem; color: var(--ink-soft); line-height: 1.7; margin-bottom: 0.35rem; }
+
+    .ab-coffee { background: var(--surface-warm); }
+    .ab-qr { display: flex; flex-wrap: wrap; gap: 1.2rem; margin: 0.9rem 0; }
+    .ab-qr figure { margin: 0; text-align: center; }
+    .ab-qr img {
+      width: 176px; height: 176px; object-fit: contain;
+      background: #fff; border: 1px solid var(--line);
+      border-radius: var(--radius); padding: 6px;
     }
-    .coffee-empty {
-      padding: 0.9rem 1rem;
+    .ab-qr figcaption { margin-top: 0.35rem; font-size: 0.8rem; color: var(--muted); }
+    .ab-qr-empty {
+      display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
+      margin: 0.9rem 0;
+      padding: 0.85rem 1rem;
       background: var(--surface);
       border: 1px dashed var(--line);
       border-radius: var(--radius);
-      font-size: 0.86rem;
-      color: var(--ink-soft);
     }
-    .about-tail {
-      margin-top: 2rem;
+    .ab-qr-box {
+      flex: none;
+      width: 104px; height: 104px;
+      display: flex; align-items: center; justify-content: center;
+      border: 2px dashed var(--line);
+      border-radius: var(--radius);
+      color: var(--muted); font-size: 0.8rem;
+      background: var(--paper);
     }
+    .ab-qr-empty p { margin: 0; max-width: 26em; }
+    .ab-qr-empty code { font-size: 0.78rem; }
+
+    .ab-legal h3:first-of-type { margin-top: 0; }
+    .ab-legal { border-left: 3px solid var(--line); }
+    .ab-tail { margin-top: 1.6rem; }
   </style>
 </BaseLayout>

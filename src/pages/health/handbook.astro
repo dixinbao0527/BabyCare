@@ -1,0 +1,76 @@
+---
+import fs from 'node:fs';
+import path from 'node:path';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { withBase } from '../../lib/url';
+import handbook from '../../content/data/handbook.json';
+import '../../styles/handbook.css';
+
+/** 正文保持原手册逐字原样，只在构建期读入，不改写、不缩略 */
+const body = fs.readFileSync(path.join(process.cwd(), 'src/data/handbook.html'), 'utf8');
+---
+
+<BaseLayout
+  title={handbook.title}
+  description={handbook.desc}
+  nav="health"
+>
+  <div class="wrap hb-bar">
+    <a href={withBase('/health')}>← 返回健康查询</a>
+    <span>独立成篇 · 12 类高危问题 · 整理于 {handbook.compiled}</span>
+    <button type="button" id="hb-print">打印 / 存为 PDF</button>
+  </div>
+
+  <div class="hb" set:html={body} />
+
+  <div class="wrap hb-end">
+    <a class="btn btn-ghost" href={withBase('/health')}>← 回到健康查询</a>
+    <p class="small muted">
+      本手册为家长视角的识别与就医沟通整理，不是诊断工具。孩子出现红线信号时请立即就医或拨打 120。
+    </p>
+  </div>
+
+  <script>
+    document.getElementById('hb-print')?.addEventListener('click', () => window.print());
+  </script>
+
+  <style>
+    .hb-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.6rem 1rem;
+      padding-top: 1.2rem;
+      padding-bottom: 0.6rem;
+      font-size: 0.84rem;
+      color: var(--muted);
+    }
+    .hb-bar a { font-weight: 600; }
+    .hb-bar button {
+      font: inherit;
+      font-size: 0.82rem;
+      min-height: 44px;
+      padding: 0 0.8rem;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--surface);
+      color: var(--ink-soft);
+      cursor: pointer;
+    }
+    .hb-bar button:hover { border-color: var(--brand); color: var(--brand-deep); }
+    .hb-end {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.8rem;
+      padding-top: 1.4rem;
+      border-top: 1px solid var(--line);
+      margin-top: 1rem;
+    }
+    .hb-end p { margin: 0; }
+    @media print {
+      .hb-bar, .hb-end { display: none !important; }
+    }
+  </style>
+</BaseLayout>

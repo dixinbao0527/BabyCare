@@ -1259,46 +1259,119 @@ mark {
   min-height: 44px;
 }
 
-.dom-block {
-  margin-top: 1.6rem;
+/* 四个维度做成四色独立卡片：色头 + 淡底 + 同色项目符号，
+   与下方红色「预警征象」区块明确分层，不再堆成一列白底文字。 */
+.dom-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.85rem;
+  margin-top: 1.1rem;
 }
 
-.dom-block h3 {
-  font-size: 0.95rem;
+.dom-block {
+  --dom: #14695c;
+  --dom-bg: #e9f4f0;
+  --dom-line: #a4d0c4;
+  margin-top: 0;
+  border: 1px solid var(--dom-line);
+  border-radius: 14px;
+  background: var(--dom-bg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  break-inside: avoid;
+}
+
+.dom-motor {
+  --dom: #14695c;
+  --dom-bg: #e9f4f0;
+  --dom-line: #a4d0c4;
+}
+.dom-language {
+  --dom: #a65a0a;
+  --dom-bg: #fdf1de;
+  --dom-line: #eec78d;
+}
+.dom-cognitive {
+  --dom: #4c3f96;
+  --dom-bg: #efecfa;
+  --dom-line: #c6bde9;
+}
+.dom-social {
+  --dom: #a32f5c;
+  --dom-bg: #fdebf1;
+  --dom-line: #eeb9cd;
+}
+
+.dom-head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 0.85rem;
+  background: var(--dom);
+  color: #fff;
+}
+
+.dom-head h3 {
+  font-size: 0.98rem;
   display: flex;
   align-items: center;
   gap: 0.45rem;
-  margin-bottom: 0.5rem;
+  margin: 0;
+  color: #fff;
+  flex: 1;
 }
 
-.dom-block h3 .badge {
+.dom-idx {
+  font: 700 0.76rem var(--ff-mono);
+  letter-spacing: 0.06em;
+  opacity: 0.8;
+}
+
+.dom-note {
+  font-size: 0.68rem;
+  font-weight: 600;
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  border-radius: 999px;
+  padding: 0 0.4rem;
+  white-space: nowrap;
+}
+
+.dom-head .badge {
   font-size: 0.7rem;
-  font-weight: 400;
-  color: var(--muted);
-  border: 1px solid var(--line);
+  font-weight: 600;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.65);
   border-radius: 999px;
   padding: 0 0.45rem;
+  white-space: nowrap;
 }
 
 .mlist {
   list-style: none;
   margin: 0;
-  padding: 0;
+  padding: 0.35rem 0.9rem 0.65rem;
 }
 
 .mlist li {
   display: flex;
   gap: 0.6rem;
   padding: 0.5rem 0;
-  border-bottom: 1px solid var(--line-soft);
+  border-bottom: 1px solid rgba(28, 43, 48, 0.09);
   font-size: 0.92rem;
   line-height: 1.65;
 }
 
+.mlist li:last-child {
+  border-bottom: 0;
+}
+
 .mlist li::before {
-  content: "·";
-  color: var(--brand);
-  font-weight: 700;
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--dom);
+  margin-top: 0.58rem;
   flex: none;
 }
 
@@ -1307,6 +1380,12 @@ mark {
   font-size: 0.7rem;
   color: var(--muted);
   margin-top: 0.1rem;
+}
+
+@media (max-width: 640px) {
+  .dom-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 .check-block {

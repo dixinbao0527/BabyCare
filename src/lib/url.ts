@@ -10,8 +10,9 @@ export const SITE_NAME = '婴幼儿健康养育手册';
 
 export const NAV = [
   { href: '/', label: '首页', key: 'home' },
-  { href: '/quick', label: '快速查询', key: 'quick' },
+  { href: '/health', label: '健康查询', key: 'health' },
   { href: '/milestones', label: '发育里程碑', key: 'milestones' },
+  { href: '/feeding', label: '婴幼儿辅食', key: 'feeding' },
   { href: '/outdoor', label: '户外活动', key: 'outdoor' },
   { href: '/about', label: '关于', key: 'about' },
 ] as const;

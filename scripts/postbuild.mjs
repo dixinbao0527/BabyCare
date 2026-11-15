@@ -21,6 +21,12 @@ const AGE_RANGES = ['0-1m', '1-3m', '4-6m', '7-9m', '10-12m', '13-24m', '25-36m'
 const TAXONOMY = JSON.parse(
   fs.readFileSync(path.join(ROOT, 'src/content/data/taxonomy.json'), 'utf8')
 );
+const HANDBOOK = JSON.parse(
+  fs.readFileSync(path.join(ROOT, 'src/content/data/handbook.json'), 'utf8')
+);
+const FEEDING = JSON.parse(
+  fs.readFileSync(path.join(ROOT, 'src/content/data/feeding.json'), 'utf8')
+);
 
 const VENUE_LABEL = {
   city_park: '城市公园',
@@ -111,6 +117,58 @@ const items = [
     category: x.data.district,
     age_range: 'all',
   })),
+  // 高危疾病识别手册：逐条直达手册内锚点，与症状速查共用一套搜索
+  ...HANDBOOK.items.map((x) => ({
+    slug: `hb-${x.id}`,
+    path: `/health/handbook#${x.id}`,
+    title: x.name,
+    tags: [...new Set([...x.tags, '高危', '红线', x.window])],
+    summary: `${x.tagline} 红线：${x.redline}`,
+    type: 'handbook',
+    category: 'high-risk',
+    age_range: 'all',
+  })),
+  ...HANDBOOK.tools.map((x) => ({
+    slug: `hb-tool-${x.id}`,
+    path: `/health/handbook#${x.id}`,
+    title: x.name,
+    tags: [...new Set([...x.tags, '高危手册', '工具'])],
+    summary: x.desc,
+    type: 'handbook',
+    category: 'tool',
+    age_range: 'all',
+  })),
+  // 婴幼儿辅食：按锚点索引，避免搜「辅食」只跳到零散月龄条目
+  ...FEEDING.stages.map((x) => ({
+    slug: `fd-${x.id}`,
+    path: `/feeding#${x.id}`,
+    title: `辅食 · ${x.age} ${x.label}`,
+    tags: ['辅食', x.age, x.label, x.texture, '喂养'],
+    summary: `${x.freq}；${x.texture}。${x.examples}`,
+    type: 'feeding',
+    category: 'stage',
+    age_range: 'all',
+  })),
+  ...FEEDING.principles.map((x) => ({
+    slug: `fd-${x.id}`,
+    path: `/feeding#${x.id}`,
+    title: `辅食原则 · ${x.title}`,
+    tags: ['辅食', '原则', '喂养'],
+    summary: x.desc,
+    type: 'feeding',
+    category: 'principle',
+    age_range: 'all',
+  })),
+  ...FEEDING.hazards.map((x) => ({
+    slug: `fd-${x.id}`,
+    path: `/feeding#${x.id}`,
+    title: `辅食安全 · ${x.title}`,
+    tags: [...new Set(['辅食', '安全', '呛咳', '窒息', '蜂蜜'])],
+    summary: x.desc,
+    type: 'feeding',
+    category: 'safety',
+    age_range: 'all',
+  })),
 ];
 
 const json = JSON.stringify(items);
@@ -175,8 +233,11 @@ const reviewStatus = [...dev, ...acute, ...outdoor].map((x) => {
 /* ---------- 站点导览（派生层） ---------- */
 const nav = [
   { href: '/', title: '首页' },
-  { href: '/quick', title: '症状快速查询' },
+  { href: '/health', title: '健康查询' },
+  { href: '/quick', title: '症状速查' },
+  { href: '/health/handbook', title: '高危疾病识别手册' },
   { href: '/milestones', title: '发育里程碑' },
+  { href: '/feeding', title: '婴幼儿辅食' },
   { href: '/outdoor', title: '北京亲子户外' },
   { href: '/sources', title: '来源与声明' },
   { href: '/about', title: '关于本站' },
@@ -193,8 +254,11 @@ fs.writeFileSync(path.join(derived, 'nav.json'), JSON.stringify(nav, null, 2));
 const abs = (p) => `${SITE}${BASE}${p}`;
 const urls = [
   { loc: abs('/'), priority: '1.0', freq: 'weekly' },
-  { loc: abs('/quick'), priority: '0.9', freq: 'weekly' },
+  { loc: abs('/health'), priority: '0.9', freq: 'weekly' },
+  { loc: abs('/health/handbook'), priority: '0.9', freq: 'monthly' },
+  { loc: abs('/quick'), priority: '0.8', freq: 'weekly' },
   { loc: abs('/milestones'), priority: '0.9', freq: 'monthly' },
+  { loc: abs('/feeding'), priority: '0.9', freq: 'monthly' },
   { loc: abs('/outdoor'), priority: '0.9', freq: 'weekly' },
   { loc: abs('/about'), priority: '0.5', freq: 'monthly' },
   { loc: abs('/sources'), priority: '0.5', freq: 'yearly' },
