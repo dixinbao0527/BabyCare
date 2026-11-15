@@ -22,6 +22,23 @@ export const CATEGORIES = [
 export const TIERS = ['NHC', 'AAP', 'WHO'] as const;
 export const SEVERITY_ORDER = ['observe', 'urgent', 'emergency'] as const;
 
+/**
+ * 专业复核：由具备儿科 / 儿童保健背景的人员对照指南原文逐条核对。
+ * 缺省即「未复核」，页面会如实显示「专业复核：待完成」。
+ * 注意：last_reviewed / reviewer 记录的是「资料整理」，不能当作专业复核。
+ */
+const medicalReview = z
+  .object({
+    status: z.enum(['pending', 'done']).default('pending'),
+    reviewer: z.string().default(''),
+    date: z
+      .string()
+      .regex(/^\d{4}-\d{2}-\d{2}$/)
+      .or(z.literal(''))
+      .default(''),
+  })
+  .default({ status: 'pending', reviewer: '', date: '' });
+
 /** 来源对象：section 与 url 至少一项非空（由 validate-content 兜底） */
 const source = z.object({
   name: z.string().min(4),
@@ -42,8 +59,10 @@ const developmental = defineCollection({
     summary: z.string().min(20).max(80),
     source,
     order: z.number().int().min(0).default(0),
+    /** 资料整理日期（编辑整理完成日，不是专业复核） */
     last_reviewed: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
     reviewer: z.string().min(2),
+    medical_review: medicalReview,
     related: z.array(z.string()).default([]),
     draft: z.boolean().default(false),
   }),
@@ -72,8 +91,10 @@ const acute = defineCollection({
       red_flags: z.array(z.string().min(6)).min(1),
       home_care: z.array(z.string().min(4)).min(3).max(6),
       source,
+      /** 资料整理日期（编辑整理完成日，不是专业复核） */
       last_reviewed: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
       reviewer: z.string().min(2),
+      medical_review: medicalReview,
     })
     // 业务规则：三级必须齐全且顺序固定，缺一级即构建失败（A-6）
     .refine(

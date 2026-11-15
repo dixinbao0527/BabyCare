@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import KnowledgeCard from '../../components/KnowledgeCard.astro';
+import ReviewNotice from '../../components/ReviewNotice.astro';
 import { getCollection } from 'astro:content';
 import {
   STAGES,
@@ -70,6 +71,8 @@ const title = `${stage.name}宝宝的养育要点`;
         {entries.length} 条内容 · 按月龄筛选，急症内容不在本页展开
       </p>
     </div>
+
+    <ReviewNotice />
 
     {
       groups.map((g) => (

@@ -235,14 +235,20 @@ const daysSince = (iso) => {
   return Number.isNaN(d.getTime()) ? null : Math.round((today - d) / 86400000);
 };
 const reviewStatus = [...dev, ...acute, ...outdoor].map((x) => {
-  const days = daysSince(x.data.last_reviewed ?? '');
+  const kind = x.file.includes('/acute/') ? 'acute' : x.file.includes('/outdoor/') ? 'outdoor' : 'dev';
+  const mr = x.data.medical_review;
+  const clinical = mr?.status === 'done' ? 'done' : 'pending';
   return {
     slug: slugOf(x.file),
-    kind: x.file.includes('/acute/') ? 'acute' : x.file.includes('/outdoor/') ? 'outdoor' : 'dev',
-    lastReviewed: x.data.last_reviewed ?? '',
-    reviewer: x.data.reviewer ?? '',
-    days,
-    state: days === null ? 'unknown' : days > 365 ? 'expired' : days > 180 ? 'stale' : 'fresh',
+    kind,
+    // 资料整理：编辑把公开指南拆成条目并标注来源的日期
+    compiledOn: x.data.last_reviewed ?? '',
+    compiledBy: x.data.reviewer ?? '',
+    daysSinceCompiled: daysSince(x.data.last_reviewed ?? ''),
+    // 专业复核：缺省即未复核；户外条目不属于医学内容，记 n/a
+    clinicalReview: kind === 'outdoor' ? 'n/a' : clinical,
+    clinicalReviewer: clinical === 'done' ? mr?.reviewer ?? '' : '',
+    clinicalDate: clinical === 'done' ? mr?.date ?? '' : '',
   };
 });
 
@@ -314,4 +320,4 @@ fs.writeFileSync(
 const kb = (json.length / 1024).toFixed(1);
 console.log(`✓ search-index.json ${items.length} 条 / ${kb} KB`);
 console.log(`✓ sitemap.xml ${urls.length} 个 URL`);
-console.log(`✓ derived/*.json：关系 ${relations.length} 条 · 复核记录 ${reviewStatus.length} 条`);
+console.log(`✓ derived/*.json：关系 ${relations.length} 条 · 内容状态 ${reviewStatus.length} 条`);

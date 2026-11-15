@@ -89,7 +89,7 @@ for (const file of walk(DEV_DIR)) {
   const d = daysAgo(data.last_reviewed);
   if (d === null) fail(`[R4] ${rel}: last_reviewed 格式非法 → ${data.last_reviewed}`);
   else if (d < 0) fail(`[R4] ${rel}: last_reviewed 在未来 → ${data.last_reviewed}`);
-  else if (d > 365) warn(`[R4] ${rel}: 已 ${d} 天未复核（>365）`);
+  else if (d > 365) warn(`[R4] ${rel}: 资料整理已 ${d} 天（>365），建议重新核对原文`);
 
   // 正文长度
   const paras = body.split(/\n{2,}/).filter((p) => p.trim() && !p.trim().startsWith('>'));
@@ -141,6 +141,21 @@ for (const file of walk(ACUTE_DIR)) {
 
   if ((data.home_care ?? []).length < 3) fail(`[home_care] ${rel}: 至少 3 条`);
   if (!(data.red_flags ?? []).length) fail(`[red_flags] ${rel}: 至少 1 条`);
+}
+
+/* ---------- 专业复核声明（R8） ---------- */
+// 允许「未复核」，但不允许含糊：声明 done 就必须写清谁核对、哪天核对
+for (const { file, data } of [...dev, ...acute]) {
+  const mr = data.medical_review;
+  if (!mr) continue;
+  if (!['pending', 'done'].includes(mr.status)) {
+    fail(`[R8] ${file}: medical_review.status 只能是 pending / done → ${mr.status}`);
+  }
+  if (mr.status === 'done') {
+    if (!mr.reviewer) fail(`[R8] ${file}: 声明已完成专业复核，但缺少 reviewer`);
+    if (!mr.date) fail(`[R8] ${file}: 声明已完成专业复核，但缺少 date`);
+    else if (daysAgo(mr.date) === null) fail(`[R8] ${file}: medical_review.date 格式非法 → ${mr.date}`);
+  }
 }
 
 /* ---------- related 引用必须存在 ---------- */

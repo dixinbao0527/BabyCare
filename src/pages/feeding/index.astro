@@ -3,6 +3,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import { withBase } from '../../lib/url';
 import feeding from '../../content/data/feeding.json';
 import recipes from '../../content/data/recipes.json';
+import ReviewNotice from '../../components/ReviewNotice.astro';
 
 const relatedHref = (r: { slug: string; age: string }) =>
   r.age === 'acute' ? withBase(`/quick/${r.slug}`) : withBase(`/age/${r.age}`) + '#' + r.slug;
@@ -19,6 +20,8 @@ const relatedHref = (r: { slug: string; age: string }) =>
       <h1>{feeding.title}</h1>
       <p class="tagline">{feeding.tagline}</p>
     </div>
+
+    <ReviewNotice />
 
     <div class="fd-lead">
       <strong>一句话先记住：</strong>满 6 月龄开始加，先加含铁的泥糊状食物，每次只加一种、观察 2～3 天；

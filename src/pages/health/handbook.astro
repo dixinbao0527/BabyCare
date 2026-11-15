@@ -5,6 +5,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import { withBase } from '../../lib/url';
 import handbook from '../../content/data/handbook.json';
 import '../../styles/handbook.css';
+import ReviewNotice from '../../components/ReviewNotice.astro';
 
 /** 正文保持原手册逐字原样，只在构建期读入，不改写、不缩略 */
 const body = fs.readFileSync(path.join(process.cwd(), 'src/data/handbook.html'), 'utf8');
@@ -19,6 +20,10 @@ const body = fs.readFileSync(path.join(process.cwd(), 'src/data/handbook.html'),
     <a href={withBase('/health')}>← 返回健康查询</a>
     <span>独立成篇 · 12 类高危问题 · 整理于 {handbook.compiled}</span>
     <button type="button" id="hb-print">打印 / 存为 PDF</button>
+  </div>
+
+  <div class="wrap">
+    <ReviewNotice />
   </div>
 
   <div class="hb" set:html={body} />

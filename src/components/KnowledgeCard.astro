@@ -3,6 +3,7 @@ import { render, getCollection } from 'astro:content';
 import type { CollectionEntry } from 'astro:content';
 import { withBase } from '../lib/url';
 import { CATEGORY_META } from '../lib/stages';
+import { reviewInfo, formatDate } from '../lib/review';
 
 interface Props {
   entry: CollectionEntry<'developmental'>;
@@ -11,6 +12,7 @@ const { entry } = Astro.props;
 const { Content } = await render(entry);
 const slug = entry.id.split('/').pop() ?? entry.id;
 const cat = CATEGORY_META[entry.data.category];
+const review = reviewInfo(entry.data.last_reviewed, entry.data.reviewer, entry.data.medical_review);
 
 // related 存的是 acute 的 slug，标题从合集里取，避免在本文件硬编码映射
 const acutes = await getCollection('acute');
@@ -33,6 +35,8 @@ const related = entry.data.related.filter((s) => acutes.some((a) => a.id === s |
       来源：{entry.data.source.name}
       {entry.data.source.section ? ` · ${entry.data.source.section}` : ''}
       {entry.data.source.year ? ` · ${entry.data.source.year}` : ''}
+      <br />
+      资料整理：{review.compiledBy} · {formatDate(review.compiledOn)} · 专业复核：{review.clinicalLabel}
     </p>
     {
       related.length > 0 && (

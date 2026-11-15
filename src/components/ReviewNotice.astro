@@ -1,0 +1,40 @@
+---
+import { withBase } from '../lib/url';
+---
+
+<p class="review-notice" role="note">
+  <span class="rn-tag">内容状态</span>
+  <span class="rn-text">
+    本站内容为<strong>编辑整理</strong>，<strong>尚未经儿科医生逐条复核</strong>；分级与建议只用来判断「该不该马上就医」，不替代诊断。
+    <a href={withBase('/sources')}>复核说明</a>
+  </span>
+</p>
+
+<style>
+  .review-notice {
+    display: flex;
+    gap: 0.6rem;
+    align-items: flex-start;
+    margin: 1rem 0 0;
+    padding: 0.7rem 0.85rem;
+    background: var(--surface-warm);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    font-size: 0.82rem;
+    line-height: 1.65;
+    color: var(--ink-soft);
+  }
+  .rn-tag {
+    flex: none;
+    padding: 0.05rem 0.45rem;
+    border-radius: 999px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--muted);
+  }
+  .rn-text { min-width: 0; }
+  .review-notice strong { color: var(--ink); }
+  .review-notice a { white-space: nowrap; }
+</style>

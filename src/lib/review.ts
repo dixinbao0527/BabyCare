@@ -1,38 +1,42 @@
-/** 复核状态：把「谁复核、什么时候」变成页面上可见的事实，而不是藏在 frontmatter 里 */
-export type ReviewState = 'fresh' | 'stale' | 'expired' | 'unknown';
+/**
+ * 两级状态：资料整理 ≠ 专业复核
+ * - 资料整理（compiled）：编辑把公开指南拆成条目、标注来源与日期，今天就已完成；
+ * - 专业复核（clinical）：具备儿科 / 儿童保健背景的人对照原文逐条核对，目前多数条目还没有。
+ * 页面上的文案必须把两者分开写，不能用一个「复核日期」暗示已经过医学复核。
+ */
+export type ClinicalStatus = 'pending' | 'done';
 
-export type ReviewInfo = {
-  lastReviewed: string;
-  reviewer: string;
-  days: number | null;
-  state: ReviewState;
-  label: string;
+export type MedicalReview = {
+  status?: string;
+  reviewer?: string;
+  date?: string;
 };
 
-export function reviewInfo(lastReviewed: string | undefined, reviewer: string | undefined): ReviewInfo {
-  const who = reviewer?.trim() || '内容组';
-  if (!lastReviewed) {
-    return { lastReviewed: '', reviewer: who, days: null, state: 'unknown', label: '复核记录缺失' };
-  }
-  const then = new Date(`${lastReviewed}T00:00:00`);
-  if (Number.isNaN(then.getTime())) {
-    return { lastReviewed, reviewer: who, days: null, state: 'unknown', label: '复核日期格式异常' };
-  }
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const days = Math.round((today.getTime() - then.getTime()) / 86400000);
+export type ReviewInfo = {
+  /** 资料整理日期（frontmatter: last_reviewed） */
+  compiledOn: string;
+  compiledBy: string;
+  clinical: ClinicalStatus;
+  /** 「已专业复核」/「待专业复核」 */
+  clinicalLabel: string;
+  clinicalBy: string;
+  clinicalOn: string;
+};
 
-  // 复核人自己写着「待核验」时，日期再新也不能显示「已复核」
-  if (/待|未核验|待复核/.test(who)) {
-    return { lastReviewed, reviewer: who, days, state: 'stale', label: '待复核' };
-  }
-  if (days > 365) {
-    return { lastReviewed, reviewer: who, days, state: 'expired', label: '待重新复核' };
-  }
-  if (days > 180) {
-    return { lastReviewed, reviewer: who, days, state: 'stale', label: '待复核' };
-  }
-  return { lastReviewed, reviewer: who, days, state: 'fresh', label: '已复核' };
+export function reviewInfo(
+  lastReviewed: string | undefined,
+  reviewer: string | undefined,
+  medicalReview?: MedicalReview
+): ReviewInfo {
+  const clinical: ClinicalStatus = medicalReview?.status === 'done' ? 'done' : 'pending';
+  return {
+    compiledOn: lastReviewed ?? '',
+    compiledBy: reviewer?.trim() || '内容组',
+    clinical,
+    clinicalLabel: clinical === 'done' ? '已完成' : '待完成',
+    clinicalBy: clinical === 'done' ? medicalReview?.reviewer ?? '' : '',
+    clinicalOn: clinical === 'done' ? medicalReview?.date ?? '' : '',
+  };
 }
 
 export function formatDate(iso: string): string {

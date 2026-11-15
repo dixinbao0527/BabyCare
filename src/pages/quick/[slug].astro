@@ -4,6 +4,7 @@ import SeverityCard from '../../components/SeverityCard.astro';
 import { getCollection, render } from 'astro:content';
 import { SEVERITY_META } from '../../lib/stages';
 import { withBase } from '../../lib/url';
+import { reviewInfo, formatDate } from '../../lib/review';
 
 export async function getStaticPaths() {
   const acute = await getCollection('acute');
@@ -16,6 +17,7 @@ const { Content } = await render(entry);
 
 // 顺序由 schema refine 保证：observe → urgent → emergency
 const levels = d.severity_levels;
+const review = reviewInfo(d.last_reviewed, d.reviewer, d.medical_review);
 
 const jsonLd = {
   '@context': 'https://schema.org',
@@ -97,7 +99,7 @@ const jsonLd = {
     </p>
 
     <details class="source-fold">
-      <summary>来源与复核信息</summary>
+      <summary>来源、整理与复核状态</summary>
       <div class="fold-body">
         <p style="margin-bottom:.4rem;">
           <strong>{d.source.name}</strong>
@@ -106,7 +108,14 @@ const jsonLd = {
           {d.source.url && <><br /><a href={d.source.url} rel="noopener noreferrer nofollow">查看原文</a></>}
         </p>
         <p style="margin:0;">
-          本站复核：{d.reviewer} · {d.last_reviewed}
+          资料整理：{review.compiledBy} · {formatDate(review.compiledOn)}
+          <br />
+          专业复核：{review.clinicalLabel}
+          {
+            review.clinical === 'done'
+              ? `（${review.clinicalBy} · ${formatDate(review.clinicalOn)}）`
+              : ' —— 尚未由儿科背景复核人逐条核对，分级文案只作识别与就医沟通参考。'
+          }
           <br />
           分级文案为结构化整理，具体表述以指南原文为准。如发现与原文不一致，请以原文为最终依据。
         </p>

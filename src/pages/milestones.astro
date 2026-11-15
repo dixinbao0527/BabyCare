@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import MotorWindows from '../components/MotorWindows.astro';
+import ReviewNotice from '../components/ReviewNotice.astro';
 import { getCollection } from 'astro:content';
 import { SCREEN_NODES, screenNodeFor, CATEGORY_LABEL } from '../lib/stages';
 import {
@@ -68,6 +69,8 @@ const nodes = SCREEN_NODES.map((n) => ({
         看窗口，不看单点；看整体，不看单项。落在窗口内都属正常，早不表扬，晚不警告。
       </p>
     </div>
+
+    <ReviewNotice />
 
     <MotorWindows windows={windows} />
 
