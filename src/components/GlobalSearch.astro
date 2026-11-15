@@ -51,6 +51,7 @@ import { withBase } from '../lib/url';
 
 <script>
   import { withBase } from '../lib/url';
+  import { rankByMatch, isLiteralQuery, literalFilter } from '../lib/search';
 
   type Item = {
     slug: string;
@@ -253,6 +254,8 @@ import { withBase } from '../lib/url';
     } else {
       list = fallbackSearch(query);
     }
+    if (isLiteralQuery(query)) list = literalFilter(list, query);
+    list = rankByMatch(list, query);
     list = list.slice(0, 12);
     list.sort((a, b) => (a.type === b.type ? 0 : a.type === 'acute' ? -1 : 1));
     render(list);

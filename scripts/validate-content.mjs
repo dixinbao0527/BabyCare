@@ -296,6 +296,37 @@ if (fs.existsSync(RECIPES_FILE)) {
   }
 }
 
+/* ---------- 9. taxonomy 引用完整性 ---------- */
+const TAXONOMY_FILE = path.join(ROOT, 'src/content/data/taxonomy.json');
+if (fs.existsSync(TAXONOMY_FILE)) {
+  let tax = null;
+  try {
+    tax = JSON.parse(fs.readFileSync(TAXONOMY_FILE, 'utf8'));
+  } catch (e) {
+    fail(`[R9] taxonomy.json 解析失败：${e.message}`);
+  }
+  if (tax) {
+    for (const t of tax.topics ?? []) {
+      for (const slug of t.slugs ?? []) {
+        if (!knownSlugs.has(slug)) fail(`[R9] 主题 ${t.id} 引用了不存在的条目 → ${slug}`);
+      }
+    }
+    for (const sc of tax.scenes ?? []) {
+      for (const slug of sc.slugs ?? []) {
+        if (!knownSlugs.has(slug)) fail(`[R9] 场景 ${sc.id} 引用了不存在的条目 → ${slug}`);
+      }
+    }
+    const inTax = new Set([
+      ...(tax.topics ?? []).flatMap((t) => t.slugs ?? []),
+      ...(tax.scenes ?? []).flatMap((s) => s.slugs ?? []),
+    ]);
+    const orphans = [...devSlugs].filter((s) => !inTax.has(s));
+    if (orphans.length) {
+      warn(`[R9] ${orphans.length} 条知识不在任何主题或场景中：${orphans.join('、')}`);
+    }
+  }
+}
+
 /* ---------- 输出 ---------- */
 const rel = (p) => path.relative(ROOT, p);
 console.log(

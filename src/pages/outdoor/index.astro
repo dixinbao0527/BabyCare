@@ -119,6 +119,9 @@ const latestVerified = items.map((i) => i.data.verified_on).sort().at(-1) ?? '';
                   推车 {FACILITY_LABEL[d.stroller]} · 遮阴 {FACILITY_LABEL[d.shade]} · 水域{' '}
                   {d.water_hazard ? '有' : '无'}
                 </span>
+                <span class="od-meta">
+                  母婴室 {FACILITY_LABEL[d.nursing_room]} · 儿童区 {FACILITY_LABEL[d.playground]}
+                </span>
                 <span class="od-foot">
                   <span>{TICKET_LABEL[d.free]}</span>
                   <span class="od-addr">{d.address}</span>

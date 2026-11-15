@@ -17,6 +17,11 @@ const groups = CATEGORY_ORDER.map((cat) => ({
 })).filter((g) => g.count > 0);
 
 const handbookHref = (id: string) => withBase('/health/handbook') + '#' + id;
+
+/** 高频问题不按月龄划分，单独在入口处给一条固定通道 */
+const commonConcerns = ['infant-fever', 'diarrhea-care', 'cough', 'rash']
+  .map((slug) => dev.find((e) => e.id.endsWith('/' + slug)))
+  .filter((e) => e !== undefined);
 ---
 
 <BaseLayout
@@ -91,6 +96,23 @@ const handbookHref = (id: string) => withBase('/health/handbook') + '#' + id;
         </div>
       </section>
 
+      <section class="h-section" aria-labelledby="common-h">
+        <div class="h-head">
+          <h2 id="common-h">最常遇到的四件事</h2>
+        </div>
+        <p class="small muted">发热、腹泻、咳嗽、皮疹——不按月龄分，家里先用得上。</p>
+        <div class="entry-grid is-pair">
+          {
+            commonConcerns.map((e) => (
+              <a class="entry-card" href={withBase(`/age/${e.data.age_range}`) + '#' + e.id.split('/').pop()}>
+                <span class="k">{e.data.title}</span>
+                <p class="sum">{e.data.summary}</p>
+              </a>
+            ))
+          }
+        </div>
+      </section>
+
       <section class="h-section" aria-labelledby="risk-h">
         <div class="h-head">
           <h2 id="risk-h">十二类高危问题</h2>
@@ -156,6 +178,7 @@ const handbookHref = (id: string) => withBase('/health/handbook') + '#' + id;
 
   <script>
     import { withBase } from '../../lib/url';
+    import { rankByMatch, isLiteralQuery, literalFilter } from '../../lib/search';
 
     const input = document.getElementById('q') as HTMLInputElement | null;
     const results = document.getElementById('search-results');
@@ -278,6 +301,8 @@ const handbookHref = (id: string) => withBase('/health/handbook') + '#' + id;
       results.hidden = false;
       let list: Item[] = fuse ? fuse.search(q).map((r) => r.item) : [];
       for (const it of fallback(q)) if (!list.includes(it)) list.push(it);
+      if (isLiteralQuery(q)) list = literalFilter(list, q);
+      list = rankByMatch(list, q);
       list = list.slice(0, 30);
       list.sort((a, b) => (a.type === b.type ? 0 : a.type === 'acute' ? -1 : 1));
       render(list, q);

@@ -26,7 +26,10 @@
         "texture-finger-food",
         "no-salt-sugar",
         "picky-eating",
-        "snacks"
+        "snacks",
+        "vitamin-d",
+        "iron-deficiency",
+        "weaning"
       ]
     },
     {
@@ -71,7 +74,13 @@
       "id": "development",
       "label": "发育",
       "desc": "翻身、靠坐、爬行、行走与语言爆发，一律看窗口不看单点。",
-      "slugs": ["rolling-sitting", "crawling", "language-burst", "pretend-play", "no-baby-walker"]
+      "slugs": ["rolling-sitting", "crawling", "language-burst", "pretend-play", "no-baby-walker", "toilet-training"]
+    },
+    {
+      "id": "health",
+      "label": "常见健康问题",
+      "desc": "发热、腹泻、咳嗽、皮疹：家里先做什么，什么情况去医院。",
+      "slugs": ["infant-fever", "diarrhea-care", "cough", "rash", "jaundice", "colic", "pacifier", "umbilical-cord"]
     }
   ],
   "scenes": [
@@ -127,7 +136,7 @@
       "id": "fever",
       "label": "发烧与急症",
       "question": "发热、抽搐、喘不上气，什么程度必须去医院？",
-      "slugs": ["febrile-seizure", "dehydration", "acute-laryngitis", "anaphylaxis"],
+      "slugs": ["febrile-seizure", "dehydration", "acute-laryngitis", "anaphylaxis", "infant-fever"],
       "aliases": ["发烧", "发热", "抽搐", "惊厥", "高烧", "喘", "喉炎", "过敏"]
     }
   ],
